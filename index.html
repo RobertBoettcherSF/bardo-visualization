@@ -7,175 +7,139 @@
 <style>
 @font-face {
   font-family: "Rain Devanagari";
-  src: url("assets/devanagari-subset.woff2?v=889a204") format("woff2");
+  src: url("assets/devanagari-subset.woff2?v=63b2f37") format("woff2");
   font-display: swap;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: #070807; color: #e7e2d4; }
-body {
-  min-height: 100dvh;
-  font: 18px/1.45 Georgia, "Iowan Old Style", Palatino, serif;
-}
+body { min-height: 100dvh; font: 18px/1.45 Georgia, "Iowan Old Style", Palatino, serif; }
 button, input { font-size: 16px; font-family: ui-sans-serif, system-ui, sans-serif; }
 button { min-height: 44px; min-width: 44px; }
 #rain {
   position: fixed; inset: 0; width: 100%; height: 100%;
   z-index: 0; pointer-events: none;
+  opacity: 0.22; filter: blur(2px);
 }
+#viz { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; display: block; touch-action: none; }
 .stamp {
-  position: fixed; z-index: 7;
-  top: calc(env(safe-area-inset-top) + 6px);
-  right: calc(env(safe-area-inset-right) + 6px);
-  margin: 0; max-width: calc(100vw - 12px);
+  position: fixed; z-index: 8;
+  top: calc(env(safe-area-inset-top) + 8px);
+  right: calc(env(safe-area-inset-right) + 8px);
+  margin: 0; max-width: calc(100vw - 68px);
   background: #f5e642; color: #111;
-  font: 700 12px/1.2 ui-sans-serif, system-ui, sans-serif;
-  padding: 4px 8px; pointer-events: none; white-space: nowrap;
+  font: 700 11px/1.2 ui-sans-serif, system-ui, sans-serif;
+  padding: 4px 6px; pointer-events: none; white-space: nowrap;
 }
-.app { position: relative; z-index: 1; }
-.screen { min-height: 100dvh; }
-#opening {
-  padding:
-    calc(env(safe-area-inset-top) + 4.2rem)
-    1rem
-    calc(env(safe-area-inset-bottom) + 12.5rem);
+#menu {
+  position: fixed; z-index: 8;
+  top: calc(env(safe-area-inset-top) + 6px);
+  left: max(6px, env(safe-area-inset-left));
+  width: 44px; padding: 0;
 }
-#tour {
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  padding:
-    calc(env(safe-area-inset-top) + 4.2rem)
-    0
-    calc(env(safe-area-inset-bottom) + 12.5rem);
+#menu-panel {
+  position: fixed; z-index: 8;
+  top: calc(env(safe-area-inset-top) + 56px);
+  left: max(6px, env(safe-area-inset-left));
+  width: min(280px, calc(100vw - 12px));
+  max-height: calc(100dvh - 8rem);
+  overflow: auto;
+  background: rgba(7, 8, 7, 0.96);
+  border: 1px solid #3c4038;
+  padding: 8px;
+  font-family: ui-sans-serif, system-ui, sans-serif;
 }
-#tour[hidden], #opening[hidden], #reload[hidden], #crash[hidden], #errors[hidden] { display: none; }
-h1 { font-weight: 500; font-size: 1.55rem; line-height: 1.2; margin: 0.2rem 0 0.35rem; }
-h2 { font-weight: 500; font-size: 1.1rem; margin: 0.8rem 0 0.3rem; }
-p { margin: 0.4rem 0; }
-.ui, .bar, #notes, #cards, #state { font-family: ui-sans-serif, system-ui, sans-serif; }
-.flags {
-  position: fixed; z-index: 7; display: flex; gap: 8px;
-  top: calc(env(safe-area-inset-top) + 4px);
-  left: max(8px, env(safe-area-inset-left));
-}
-button {
-  background: #1a1e1a; color: #e7e2d4;
-  border: 1px solid #3c4038; padding: 0 10px;
-}
+#menu-panel[hidden], #more[hidden], #reload[hidden], #crash[hidden], #errors[hidden] { display: none; }
+#menu-panel .row { display: flex; gap: 6px; margin: 6px 0; }
+#menu-panel .row button { flex: 1; }
+button { background: #1a1e1a; color: #e7e2d4; border: 1px solid #3c4038; padding: 0 10px; }
 button[aria-pressed="true"] { background: #e7e2d4; color: #111; }
 .debug { background: #c62828; color: #fff; border-color: #c62828; font-weight: 700; }
-#crash, #errors { margin: 0.4rem 1rem; }
+#day, #note { width: 100%; min-height: 44px; }
 #reload {
-  position: fixed; z-index: 6;
-  top: calc(env(safe-area-inset-top) + 3.4rem);
+  position: fixed; z-index: 7;
+  top: calc(env(safe-area-inset-top) + 52px);
   left: 8px; right: 8px; width: auto; margin: 0;
   text-align: left; background: #f5e642; color: #111; border: 0;
 }
-#crash, #errors { background: #2a1212; color: #ffd7d0; padding: 0.6rem 0.7rem; }
-#stage { position: relative; flex: 1; min-height: 0; }
-#viz { width: 100%; height: 100%; display: block; }
-#cards {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  display: flex; flex-wrap: wrap; gap: 6px;
-  padding: 8px; max-height: 46%; overflow: auto;
-  pointer-events: none;
+#crash, #errors {
+  position: fixed; z-index: 7; left: 8px; right: 8px;
+  top: calc(env(safe-area-inset-top) + 100px);
+  background: #2a1212; color: #ffd7d0; padding: 0.6rem 0.7rem;
 }
-#cards button { pointer-events: auto; }
-#state { padding: 0 1rem; }
-#notes { margin: 0 0.6rem; max-height: 22vh; overflow: auto; }
-#notes summary, #read-more summary { min-height: 44px; cursor: pointer; }
-#curves { width: 100%; height: 160px; background: #0c0e0c; }
+.info {
+  position: fixed; z-index: 4;
+  left: 50%; bottom: calc(env(safe-area-inset-bottom) + 4.6rem);
+  transform: translateX(-50%);
+  width: min(34rem, calc(100vw - 1.5rem));
+  margin: 0; padding: 8px 12px;
+  text-align: center;
+  background: transparent; border: 0; color: #f7f4ea;
+  font: 500 1.05rem/1.35 Georgia, "Iowan Old Style", Palatino, serif;
+  text-shadow: 0 1px 6px #000, 0 0 16px #000;
+}
+#more {
+  position: fixed; z-index: 4;
+  left: 50%; bottom: calc(env(safe-area-inset-bottom) + 8.2rem);
+  transform: translateX(-50%);
+  width: min(36rem, calc(100vw - 1.5rem));
+  max-height: 34vh; overflow: auto;
+  background: rgba(7, 8, 7, 0.88);
+  padding: 0.7rem 0.9rem; text-align: center;
+}
+#curves { width: 100%; height: 120px; background: #0c0e0c; }
 .bar {
-  position: fixed; z-index: 4; left: 0; right: 0; bottom: 0;
+  position: fixed; z-index: 5; left: 0; right: 0; bottom: 0;
+  display: flex; gap: 6px;
   padding:
     6px
     max(8px, env(safe-area-inset-right))
     calc(6px + env(safe-area-inset-bottom))
     max(8px, env(safe-area-inset-left));
-  background: rgba(7, 8, 7, 0.94);
-  border-top: 1px solid rgba(215, 208, 188, 0.2);
+  background: rgba(7, 8, 7, 0.92);
 }
-.row { display: flex; gap: 6px; }
-.row button { flex: 1; }
-#day { width: 100%; accent-color: #d9ffc3; min-height: 44px; }
-#note { width: 100%; min-height: 44px; }
-.mantra { font-family: "Rain Devanagari", serif; font-size: 1.15rem; }
-.bright { outline: 2px solid #f5e642; }
+.bar button { flex: 1; }
+#state { display: none; }
 </style>
 </head>
 <body>
 <canvas id="rain" aria-hidden="true"></canvas>
-<p id="stamp" class="stamp" data-dbg>v0.2 b20261122-2016 889a204</p>
-<div class="app">
-  <div class="flags ui">
+<canvas id="viz"></canvas>
+<p id="stamp" class="stamp" data-dbg>v0.2 b20261122-2033 63b2f37</p>
+<button type="button" id="menu" aria-expanded="false" aria-controls="menu-panel"></button>
+<div id="menu-panel" hidden>
+  <div class="row">
     <button type="button" id="lang-en" aria-pressed="true" aria-label="English">EN</button>
     <button type="button" id="lang-de" aria-pressed="false" aria-label="Deutsch">DE</button>
   </div>
-  <button type="button" id="reload" hidden></button>
-  <p id="crash" hidden></p>
-  <p id="errors" hidden></p>
-  <section id="opening" class="screen">
-    <h1 data-k="title"></h1>
-    <p data-k="lead"></p>
-    <p><button type="button" id="enter" data-k="enter"></button></p>
-    <details id="read-more">
-      <summary data-k="readMore"></summary>
-      <p data-k="opening"></p>
-      <p data-k="sources"></p>
-      <p data-k="history"></p>
-      <h2 data-k="caveatLabel"></h2>
-      <p data-k="caveat"></p>
-      <p data-k="chonyidNote"></p>
-    </details>
-  </section>
-  <section id="tour" class="screen" hidden>
-    <div id="stage">
-      <canvas id="viz"></canvas>
-      <div id="cards"></div>
-    </div>
-    <div id="state" data-day="49" data-phase="" data-clarity="" data-intensity="" data-complexity="" data-mantra="" data-scene="" data-brightest="-1" data-outcome="0">
-      <p id="phase-read"></p>
-    </div>
-    <details id="notes">
-      <summary data-k="about"></summary>
-      <h2 id="scene-title"></h2>
-      <p id="scene-body"></p>
-      <p id="outcome"></p>
-      <p id="day-line"></p>
-      <p id="clarity-read"></p>
-      <p id="intensity-read"></p>
-      <p id="complexity-read"></p>
-      <p id="dir-help"></p>
-      <p data-k="durationNote"></p>
-      <p data-k="colourNote"></p>
-      <details id="graph-fold">
-        <summary data-k="graphSummary"></summary>
-        <canvas id="curves" width="640" height="160"></canvas>
-        <p data-k="graphNote"></p>
-      </details>
-      <p class="mantra">ॐमणिपद्मेहूँ</p>
-      <p data-k="m1"></p>
-      <p data-k="noteHint"></p>
-    </details>
-  </section>
-  <div id="bar" class="bar ui">
-    <div class="row">
-      <button type="button" id="prev"></button>
-      <button type="button" id="start"></button>
-      <button type="button" id="next"></button>
-    </div>
-    <div class="row">
-      <button type="button" id="dir-jung" aria-pressed="true"></button>
-      <button type="button" id="dir-book" aria-pressed="false"></button>
-      <button type="button" id="sound" aria-pressed="false"></button>
-      <button type="button" id="rain-toggle" aria-pressed="false"></button>
-      <button type="button" id="debug" class="debug"></button>
-    </div>
-    <label for="day" id="day-read"></label>
-    <input id="day" type="range" min="0" max="49" value="49">
-    <label for="note" data-k="note"></label>
-    <input id="note" maxlength="240" autocomplete="off">
+  <div class="row">
+    <button type="button" id="dir-jung" aria-pressed="true"></button>
+    <button type="button" id="dir-book" aria-pressed="false"></button>
   </div>
+  <div class="row">
+    <button type="button" id="sound" aria-pressed="false"></button>
+    <button type="button" id="rain-toggle" aria-pressed="false"></button>
+  </div>
+  <label for="day" id="day-read"></label>
+  <input id="day" type="range" min="0" max="49" value="49">
+  <p><label for="note" data-k="note"></label></p>
+  <input id="note" maxlength="240" autocomplete="off">
+  <p data-k="noteHint"></p>
+  <p><button type="button" id="debug" class="debug"></button></p>
+</div>
+<button type="button" id="reload" hidden></button>
+<p id="crash" hidden></p>
+<p id="errors" hidden></p>
+<h1 id="enter" class="info"></h1>
+<div id="more" hidden>
+  <p id="more-body"></p>
+  <p id="outcome"></p>
+  <canvas id="curves" width="640" height="120"></canvas>
+</div>
+<div id="state" data-day="49" data-phase="" data-clarity="" data-intensity="" data-complexity="" data-mantra="" data-scene="" data-brightest="-1" data-outcome="0" data-methods="0"></div>
+<div id="bar" class="bar">
+  <button type="button" id="prev"></button>
+  <button type="button" id="start"></button>
+  <button type="button" id="next"></button>
 </div>
 <noscript><p>This page needs JavaScript. Diese Seite braucht JavaScript.</p></noscript>
 <script>
@@ -185,6 +149,13 @@ const STRINGS = {
     title: "The Bardo states",
     standfirst: "A guide through the intermediate state, read in Jung’s reverse order.",
     lead: "A guide for the newly dead, across a symbolic forty-nine days. Jung reads it backwards: Sidpa first, towards the Clear Light.",
+    menu: "Menu",
+    infoWomb: "A lotus door. Each petal is one method, in order.",
+    infoLights: "Six dull lights. The bright sector is the destination.",
+    infoJudge: "The mirror of karma, with white pebbles and black.",
+    infoWish: "The wish-body, moved by a grey wind.",
+    infoClock: "The 49-day clock. Clarity falls as the days pass.",
+    moreEnter: "Next begins the tour at the Sidpa end.",
     readMore: "Read more",
     about: "About this scene",
     prev: "Previous",
@@ -289,6 +260,13 @@ const STRINGS = {
     title: "Die Bardo-Zustände",
     standfirst: "Ein Gang durch den Zwischenzustand, in Jungs umgekehrter Lesart.",
     lead: "Eine Anleitung für die gerade Gestorbenen, über symbolische neunundvierzig Tage. Jung liest rückwärts: zuerst Sidpa, auf das klare Licht zu.",
+    menu: "Menü",
+    infoWomb: "Eine Lotustür. Jedes Blütenblatt ist eine Weise, der Reihe nach.",
+    infoLights: "Sechs matte Lichter. Der helle Ausschnitt ist das Ziel.",
+    infoJudge: "Der Spiegel des Karma, weiße Steine und schwarze.",
+    infoWish: "Der Wunschkörper, vom grauen Wind bewegt.",
+    infoClock: "Die Uhr der 49 Tage. Die Klarheit fällt.",
+    moreEnter: "Weiter beginnt die Führung am Sidpa-Ende.",
     readMore: "Weiterlesen",
     about: "Zu dieser Szene",
     prev: "Zurück",
@@ -590,7 +568,7 @@ reducedSound.addEventListener("change", function () {
   if (reducedSound.matches) setWind(false);
 });
 
-const STAMP = "v0.2 b20261122-2016 889a204";
+const STAMP = "v0.2 b20261122-2033 63b2f37";
 const RAW_VERSION = "https://raw.githubusercontent.com/RobertBoettcherSF/bardo-visualization/main/version.txt";
 const REPO_API = "https://api.github.com/repos/RobertBoettcherSF/bardo-visualization/commits/main";
 const REALM_COLOUR = ["#C9C3B5", "#4A5E48", "#A89A55", "#3A4A62", "#7A4548", "#5C5550"];
@@ -692,6 +670,15 @@ function sceneCopy(code) {
   return ["sceneClock", "bodyClock"];
 }
 
+function infoKey(scene) {
+  if (viewMode === "opening") return "title";
+  if (scene === 1) return "infoWomb";
+  if (scene === 2) return "infoLights";
+  if (scene === 3) return "infoJudge";
+  if (scene === 4) return "infoWish";
+  return "infoClock";
+}
+
 function updateChrome(out) {
   const side = sidpa();
   const day = out[2];
@@ -706,14 +693,10 @@ function updateChrome(out) {
   state.dataset.scene = String(side[0]);
   state.dataset.brightest = String(side[3]);
   state.dataset.outcome = String(side[1]);
+  state.dataset.methods = String(side[2]);
   state.dataset.paused = rain && rain.isPaused() ? "true" : "false";
   document.getElementById("day").value = String(day);
   document.getElementById("day-read").textContent = t("dayLabel") + " " + day + " " + t("of") + " 49";
-  document.getElementById("phase-read").textContent = phase;
-  document.getElementById("clarity-read").textContent = t("clarity") + " " + out[4];
-  document.getElementById("intensity-read").textContent = t("intensity") + " " + out[5];
-  document.getElementById("complexity-read").textContent = t("complexity") + " " + out[6];
-  document.getElementById("dir-help").textContent = direction === 0 ? t("helpJung") : t("helpBook");
   const jung = document.getElementById("dir-jung");
   const book = document.getElementById("dir-book");
   jung.textContent = t("jungShort");
@@ -725,60 +708,22 @@ function updateChrome(out) {
   document.getElementById("prev").textContent = t("prev");
   document.getElementById("start").textContent = t("start");
   document.getElementById("next").textContent = t("next");
+  document.getElementById("menu").textContent = t("menu");
   document.getElementById("debug").textContent = t("debug");
   const sound = document.getElementById("sound");
   sound.textContent = soundEnabled() ? t("soundOn") : t("soundOff");
   sound.setAttribute("aria-pressed", String(soundEnabled()));
-  const names = sceneCopy(side[0]);
-  document.getElementById("scene-title").textContent = t(names[0]);
-  document.getElementById("scene-body").textContent = t(names[1]);
-  document.getElementById("outcome").textContent = outcomeText(side[1]);
+  document.getElementById("enter").textContent = t(infoKey(side[0]));
+  const names = sceneCopy(viewMode === "opening" ? -1 : side[0]);
+  const moreBody = viewMode === "opening" ? t("lead") + " " + t("moreEnter") : t(names[1]);
+  document.getElementById("more-body").textContent = moreBody;
+  document.getElementById("outcome").textContent = viewMode === "opening" ? "" : outcomeText(side[1]);
   document.getElementById("prev").disabled = viewMode === "opening";
   document.getElementById("next").disabled = viewMode === "tour" && side[0] !== 0 && side[13] < 0;
   const wantWind = viewMode === "tour" && side[0] !== 0;
   if (wantWind !== windWanted) {
     windWanted = wantWind;
     setWind(wantWind);
-  }
-}
-
-function button(label, action, arg, pressed) {
-  const el = document.createElement("button");
-  el.type = "button";
-  el.textContent = label;
-  el.dataset.action = String(action);
-  el.dataset.arg = String(arg);
-  if (pressed) el.className = "bright";
-  return el;
-}
-
-function syncCards(scene) {
-  const key = [scene, lang, methodsDone, destination, sidpa()[15]].join(":");
-  if (key === cardsKey) return;
-  cardsKey = key;
-  const box = document.getElementById("cards");
-  box.replaceChildren();
-  if (scene === 1) {
-    for (let i = 1; i <= 5; i++) box.appendChild(button(t("method" + i), 1, i, false));
-    box.appendChild(button(t("transferA"), 2, 0, false));
-    box.appendChild(button(t("transferT"), 2, 1, false));
-    ["east", "south", "west", "north"].forEach(function (name, i) {
-      box.appendChild(button(t(name), 3, i, false));
-    });
-    REALM_KEY.forEach(function (name, i) {
-      box.appendChild(button(t(name), 3, 10 + i, false));
-    });
-  } else if (scene === 2) {
-    REALM_KEY.forEach(function (name, i) {
-      box.appendChild(button(t(name), 4, i, destination === i));
-    });
-  } else if (scene === 3) {
-    box.appendChild(button(t("recognise"), 5, 0, false));
-    box.appendChild(button(t("notYet"), 6, 0, false));
-  } else if (scene === 4) {
-    box.appendChild(button(t("abyssW"), 7, 0, false));
-    box.appendChild(button(t("abyssB"), 7, 1, false));
-    box.appendChild(button(t("abyssR"), 7, 2, false));
   }
 }
 
@@ -819,10 +764,11 @@ function paintAxes(ctx, width, height, marker) {
 
 function drawGraph(day) {
   const canvas = document.getElementById("curves");
+  if (!canvas || document.getElementById("more").hidden) return;
   const ctx = canvas.getContext("2d");
   const dpr = Math.min(devicePixelRatio || 1, 1.5);
-  const width = canvas.clientWidth || 320;
-  const height = canvas.clientHeight || 160;
+  const width = canvas.clientWidth || 280;
+  const height = canvas.clientHeight || 120;
   canvas.width = Math.round(width * dpr);
   canvas.height = Math.round(height * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -830,98 +776,209 @@ function drawGraph(day) {
   paintAxes(ctx, width, height, day);
 }
 
+let regions = [];
+
+function addDisc(action, arg, x, y, r) {
+  regions.push({ kind: "disc", action: action, arg: arg, x: x, y: y, r: r });
+}
+
 function drawCanvas() {
   const canvas = document.getElementById("viz");
-  const stage = document.getElementById("stage");
   const ctx = canvas.getContext("2d");
   const dpr = Math.min(devicePixelRatio || 1, 1.5);
-  const width = stage.clientWidth || 320;
-  const height = stage.clientHeight || 320;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
   canvas.width = Math.round(width * dpr);
   canvas.height = Math.round(height * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "rgba(7, 8, 7, 0.62)";
+  ctx.fillRect(0, 0, width, height);
+  regions = [];
   const side = sidpa();
-  const scene = side[0];
-  if (scene === 0) {
-    paintAxes(ctx, width, height, Number(document.getElementById("state").dataset.day || "0"));
-    return;
+  const scene = viewMode === "opening" ? -1 : side[0];
+  const cx = width / 2;
+  const cy = height * 0.40;
+  const span = Math.min(width, height);
+  if (scene === -1 || scene === 0) {
+    paintAxes(ctx, width, height * 0.72, Number(document.getElementById("state").dataset.day || "0"));
+  } else if (scene === 1) {
+    drawLotus(ctx, cx, cy, span * 0.34, side[2]);
+  } else if (scene === 2) {
+    drawWheel(ctx, cx, cy, span * 0.34, side[3]);
+  } else if (scene === 3) {
+    drawMirror(ctx, cx, cy, span);
+  } else if (scene === 4) {
+    drawWish(ctx, width, height, side);
   }
-  if (scene === 2) {
-    const cx = width / 2;
-    const cy = height * 0.38;
-    const radius = Math.min(width, height) * 0.26;
-    for (let i = 0; i < 6; i++) {
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.arc(cx, cy, radius, -Math.PI / 2 + i * Math.PI / 3, -Math.PI / 2 + (i + 1) * Math.PI / 3);
-      ctx.closePath();
-      ctx.fillStyle = REALM_COLOUR[i];
-      ctx.globalAlpha = side[3] === i ? 1 : 0.45;
-      ctx.fill();
-      if (side[3] === i) {
-        ctx.globalAlpha = 1;
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "#f5e642";
-        ctx.stroke();
-      }
-    }
-    ctx.globalAlpha = 1;
+  const rect = canvas.getBoundingClientRect();
+  window.__regions = regions.map(function (region) {
+    const x = region.kind === "disc" ? region.x : region.hitX;
+    const y = region.kind === "disc" ? region.y : region.hitY;
+    return {
+      action: region.action,
+      arg: region.arg,
+      clientX: rect.left + x,
+      clientY: rect.top + y
+    };
+  });
+}
+
+function drawLotus(ctx, cx, cy, radius, done) {
+  const next = done < 5 ? done : -1;
+  for (let i = 0; i < 5; i++) {
+    const angle = -Math.PI / 2 + i * (Math.PI * 2 / 5);
+    const px = cx + Math.cos(angle) * radius * 0.62;
+    const py = cy + Math.sin(angle) * radius * 0.62;
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(angle);
     ctx.beginPath();
-    ctx.arc(cx, cy, radius * 0.22, 0, Math.PI * 2);
-    ctx.fillStyle = "#070807";
-    ctx.fill();
-    return;
-  }
-  if (scene === 3) {
-    ctx.fillStyle = "#10141a";
-    ctx.fillRect(0, 0, width, height);
-    ctx.beginPath();
-    ctx.ellipse(width / 2, height * 0.36, Math.min(width, height) * 0.22, Math.min(width, height) * 0.3, 0, 0, Math.PI * 2);
-    ctx.fillStyle = "#F7F4EA";
-    ctx.globalAlpha = 0.85;
-    ctx.fill();
-    ctx.globalAlpha = 1;
-    for (let i = 0; i < 6; i++) {
-      ctx.beginPath();
-      ctx.arc(width * 0.28 + (i % 3) * 16, height * 0.72 + Math.floor(i / 3) * 16, 5, 0, Math.PI * 2);
-      ctx.fillStyle = "#F4F1E6";
+    ctx.ellipse(0, 0, radius * 0.34, radius * 0.16, 0, 0, Math.PI * 2);
+    if (i < done) {
+      ctx.fillStyle = "#3A6B48";
       ctx.fill();
-      ctx.beginPath();
-      ctx.arc(width * 0.62 + (i % 3) * 16, height * 0.72 + Math.floor(i / 3) * 16, 5, 0, Math.PI * 2);
-      ctx.fillStyle = "#1C1C1C";
+    } else {
+      ctx.fillStyle = i === next ? "rgba(245, 230, 66, 0.45)" : "rgba(231, 226, 212, 0.12)";
       ctx.fill();
+      ctx.lineWidth = i === next ? 5 : 2;
+      ctx.strokeStyle = i === next ? "#f5e642" : "#d9ffc3";
+      ctx.stroke();
     }
-    return;
+    ctx.restore();
+    addDisc(1, i + 1, px, py, Math.max(26, radius * 0.2));
   }
-  if (scene === 4) {
-    ctx.fillStyle = "#2a2926";
-    ctx.fillRect(0, 0, width, height);
-    const x = (side[8] / 1000) * width;
-    const y = (side[9] / 1000) * (height * 0.7);
+  ctx.beginPath();
+  ctx.arc(cx, cy, 14 + done * 7, 0, Math.PI * 2);
+  ctx.fillStyle = done >= 5 ? "#F7F4EA" : "#1a1e1a";
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#d9ffc3";
+  ctx.stroke();
+  const places = [
+    [0, 3, 0, "#8aa4c8"],
+    [Math.PI / 2, 3, 1, "#C4A24A"],
+    [Math.PI, 3, 2, "#7A4548"],
+    [-Math.PI / 2, 3, 3, "#4A5E48"],
+    [Math.PI * 0.72, 2, 0, "#8E3A3A"],
+    [Math.PI * 1.15, 2, 1, "#E0D3B0"]
+  ];
+  places.forEach(function (place) {
+    const dist = place[1] === 2 ? radius * 0.95 : radius * 1.22;
+    const x = cx + Math.cos(place[0]) * dist;
+    const y = cy + Math.sin(place[0]) * dist;
     ctx.beginPath();
     ctx.arc(x, y, 16, 0, Math.PI * 2);
-    ctx.fillStyle = "#E6E0D4";
-    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = place[3];
+    ctx.fill();
+    addDisc(place[1], place[2], x, y, 24);
+  });
+}
+
+function drawWheel(ctx, cx, cy, radius, bright) {
+  for (let i = 0; i < 6; i++) {
+    const a0 = -Math.PI / 2 + i * Math.PI / 3;
+    const a1 = a0 + Math.PI / 3;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, radius, a0, a1);
+    ctx.closePath();
+    ctx.fillStyle = REALM_COLOUR[i];
+    ctx.globalAlpha = bright === i ? 1 : 0.55;
     ctx.fill();
     ctx.globalAlpha = 1;
-    return;
+    ctx.lineWidth = bright === i ? 4 : 1;
+    ctx.strokeStyle = bright === i ? "#f5e642" : "#070807";
+    ctx.stroke();
+    const mid = (a0 + a1) / 2;
+    regions.push({
+      kind: "sector", action: 4, arg: i,
+      cx: cx, cy: cy, radius: radius, a0: a0, a1: a1,
+      hitX: cx + Math.cos(mid) * radius * 0.62,
+      hitY: cy + Math.sin(mid) * radius * 0.62
+    });
   }
-  ctx.strokeStyle = "#d9ffc3";
-  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.arc(width / 2, height * 0.36, Math.min(width, height) * 0.2, 0.3, Math.PI * 2 - 0.3);
+  ctx.arc(cx, cy, radius * 0.18, 0, Math.PI * 2);
+  ctx.fillStyle = "#070807";
+  ctx.fill();
+}
+
+function drawMirror(ctx, cx, cy, span) {
+  const rx = span * 0.22;
+  const ry = span * 0.28;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+  ctx.fillStyle = "#F7F4EA";
+  ctx.globalAlpha = 0.92;
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.strokeStyle = "#d9ffc3";
+  ctx.lineWidth = 3;
   ctx.stroke();
+  addDisc(5, 0, cx, cy, Math.min(rx, ry));
+  for (let i = 0; i < 5; i++) {
+    ctx.beginPath();
+    ctx.arc(cx - rx - 28, cy - 20 + i * 14, 6, 0, Math.PI * 2);
+    ctx.fillStyle = "#F4F1E6";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx + rx + 28, cy - 20 + i * 14, 6, 0, Math.PI * 2);
+    ctx.fillStyle = "#1C1C1C";
+    ctx.fill();
+  }
+  const passY = cy + ry + 36;
+  ctx.beginPath();
+  ctx.arc(cx, passY, 14, 0, Math.PI * 2);
+  ctx.strokeStyle = "#5C5550";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  addDisc(6, 0, cx, passY, 22);
+}
+
+function drawWish(ctx, width, height, side) {
+  const x = (side[8] / 1000) * width;
+  const y = (side[9] / 1000) * (height * 0.55) + height * 0.08;
+  ctx.beginPath();
+  ctx.arc(x, y, 22, 0, Math.PI * 2);
+  ctx.fillStyle = "#E6E0D4";
+  ctx.fill();
+  const colours = ["#E6E0D4", "#1C1C1C", "#8E3A3A"];
+  const yA = height * 0.62;
+  colours.forEach(function (colour, i) {
+    const ax = width * (0.22 + i * 0.28);
+    ctx.beginPath();
+    ctx.arc(ax, yA, 20, 0, Math.PI * 2);
+    ctx.fillStyle = colour;
+    ctx.fill();
+    ctx.strokeStyle = "#d9ffc3";
+    ctx.stroke();
+    addDisc(7, i, ax, yA, 26);
+  });
+}
+
+function hitContains(region, x, y) {
+  if (region.kind === "disc") {
+    const dx = x - region.x;
+    const dy = y - region.y;
+    return dx * dx + dy * dy <= region.r * region.r;
+  }
+  const dx = x - region.cx;
+  const dy = y - region.cy;
+  const dist = Math.hypot(dx, dy);
+  if (dist > region.radius || dist < region.radius * 0.18) return false;
+  let ang = Math.atan2(dy, dx);
+  const start = region.a0;
+  while (ang < start) ang += Math.PI * 2;
+  while (ang >= start + Math.PI * 2) ang -= Math.PI * 2;
+  return ang >= start && ang <= region.a1;
 }
 
 function render() {
   const out = compute();
   updateChrome(out);
-  if (viewMode === "tour") {
-    syncCards(sidpa()[0]);
-    drawCanvas();
-    maybeAnimate();
-  }
+  drawCanvas();
+  if (viewMode === "tour") maybeAnimate();
   drawGraph(out[2]);
 }
 
@@ -943,15 +1000,13 @@ function sampleCurves() {
 function showOpening() {
   viewMode = "opening";
   animating = false;
-  document.getElementById("opening").hidden = false;
-  document.getElementById("tour").hidden = true;
-  updateChrome(compute());
+  document.getElementById("more").hidden = true;
+  render();
 }
 
 function showTour() {
   viewMode = "tour";
-  document.getElementById("opening").hidden = true;
-  document.getElementById("tour").hidden = false;
+  document.getElementById("more").hidden = true;
 }
 
 function enterTour() {
@@ -1190,7 +1245,21 @@ document.getElementById("day").addEventListener("input", function (event) {
   cardsKey = "";
   render();
 });
-document.getElementById("enter").addEventListener("click", function () { playClick(); enterTour(); });
+document.getElementById("enter").addEventListener("click", function () {
+  const more = document.getElementById("more");
+  if (more.hidden) {
+    more.hidden = false;
+    drawGraph(Number(document.getElementById("state").dataset.day || "0"));
+    return;
+  }
+  more.hidden = true;
+  if (viewMode === "opening") enterTour();
+});
+document.getElementById("menu").addEventListener("click", function () {
+  const panel = document.getElementById("menu-panel");
+  panel.hidden = !panel.hidden;
+  document.getElementById("menu").setAttribute("aria-expanded", String(!panel.hidden));
+});
 document.getElementById("next").addEventListener("click", goNext);
 document.getElementById("prev").addEventListener("click", goPrev);
 document.getElementById("start").addEventListener("click", function () {
@@ -1207,11 +1276,6 @@ document.getElementById("sound").addEventListener("click", function () {
   if (soundEnabled()) playClick();
   render();
 });
-document.getElementById("cards").addEventListener("click", function (event) {
-  const el = event.target.closest("button");
-  if (!el) return;
-  act(Number(el.dataset.action), Number(el.dataset.arg));
-});
 document.getElementById("debug").addEventListener("click", downloadReport);
 document.addEventListener("keydown", function (event) {
   if (event.key === "F9" && event.target.id !== "note") {
@@ -1227,33 +1291,38 @@ document.addEventListener("keydown", function (event) {
     document.getElementById("start").click();
   }
 });
-const stage = document.getElementById("stage");
-let touchX = null;
-stage.addEventListener("touchstart", function (event) {
-  touchX = event.changedTouches[0].clientX;
-}, { passive: true });
-stage.addEventListener("touchend", function (event) {
-  if (touchX === null) return;
-  const dx = event.changedTouches[0].clientX - touchX;
-  touchX = null;
-  if (dx <= -48) goNext();
-  else if (dx >= 48) goPrev();
-}, { passive: true });
-
-const wide = matchMedia("(min-width: 900px)");
-function foldGraph() {
-  document.getElementById("graph-fold").open = wide.matches;
-  document.getElementById("notes").open = wide.matches;
-}
-wide.addEventListener("change", foldGraph);
-foldGraph();
-document.getElementById("graph-fold").addEventListener("toggle", function () {
-  if (ada) drawGraph(Number(document.getElementById("state").dataset.day || "0"));
+const viz = document.getElementById("viz");
+let pointer = null;
+viz.addEventListener("pointerdown", function (event) {
+  pointer = { x: event.clientX, y: event.clientY };
+});
+viz.addEventListener("pointerup", function (event) {
+  if (!pointer) return;
+  const dx = event.clientX - pointer.x;
+  const dy = event.clientY - pointer.y;
+  pointer = null;
+  if (Math.hypot(dx, dy) > 36) {
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 48) {
+      if (dx < 0) goNext();
+      else goPrev();
+    }
+    return;
+  }
+  if (viewMode !== "tour") return;
+  const rect = viz.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  for (let i = regions.length - 1; i >= 0; i--) {
+    if (hitContains(regions[i], x, y)) {
+      act(regions[i].action, regions[i].arg);
+      return;
+    }
+  }
 });
 addEventListener("resize", function () {
   if (!ada) return;
+  drawCanvas();
   drawGraph(Number(document.getElementById("state").dataset.day || "0"));
-  if (viewMode === "tour") drawCanvas();
 });
 
 boot().catch(function (err) {
