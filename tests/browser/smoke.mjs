@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { mkdir, rm } from "node:fs/promises";
+import { mkdir, rm, copyFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -108,29 +108,58 @@ try {
     assert(state.clarity === "0", name + " clarity " + state.clarity);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     assert(overflow <= 1, name + " overflow " + overflow);
-    const enterBox = await page.$eval("#enter", (el) => {
-      const r = el.getBoundingClientRect();
-      return { top: r.top, bottom: r.bottom };
-    });
     const vh = await page.evaluate(() => innerHeight);
-    assert(enterBox.top >= 0 && enterBox.bottom <= vh + 1, name + " enter below the fold " + enterBox.bottom + "/" + vh);
-    const soundOff = await page.$eval("#sound", (el) => el.getAttribute("aria-pressed"));
-    assert(soundOff === "false", name + " sound was on");
-    await page.screenshot({ path: join(outDir, name + "-open.png"), fullPage: false });
-    await page.click("#enter");
-    const scene = await page.$eval("#state", (el) => el.dataset.scene);
-    assert(scene === "1", name + " expected womb, got " + scene);
-    const stageH = await page.$eval("#stage", (el) => el.getBoundingClientRect().height);
-    assert(stageH > vh * 0.35, name + " stage short " + stageH);
-    const barTop = await page.$eval("#bar", (el) => el.getBoundingClientRect().top);
-    assert(barTop < vh, name + " bar off screen");
+    async function onScreen(sel) {
+      return page.$eval(sel, (el) => {
+        const r = el.getBoundingClientRect();
+        return r.width > 2 && r.height > 2 && r.top < innerHeight && r.bottom > 0;
+      });
+    }
+    assert(await onScreen("#enter"), name + " info line missing");
+    assert(await onScreen("#menu"), name + " menu missing");
+    assert(await onScreen("#prev") && await onScreen("#start") && await onScreen("#next"), name + " nav missing");
+    assert(await onScreen("#viz"), name + " drawing missing");
+    assert(!(await onScreen("#sound")), name + " sound leaked onto the scene");
+    assert(!(await onScreen("#day")), name + " scrubber leaked onto the scene");
+    assert(!(await onScreen("#debug")), name + " debug leaked onto the scene");
+    assert(!(await onScreen("#dir-jung")), name + " direction leaked onto the scene");
+    const rainDim = await page.$eval("#rain", (el) => getComputedStyle(el).opacity);
+    assert(Number(rainDim) <= 0.35, name + " rain not dimmed " + rainDim);
+    await page.click("#menu");
+    await page.click("#lang-de");
+    const de = await page.$eval("#enter", (el) => el.textContent);
+    assert(de.includes("Bardo"), name + " german title " + de);
+    const lang = await page.$eval("html", (el) => el.lang);
+    assert(lang === "de", name + " lang " + lang);
+    await page.click("#lang-en");
+    await page.click("#menu");
     await page.click("#next");
-    const lights = await page.$eval("#state", (el) => el.dataset.scene);
-    assert(lights === "2", name + " expected lights, got " + lights);
-    await page.click("#cards button");
+    let scene = await page.$eval("#state", (el) => el.dataset.scene);
+    assert(scene === "1", name + " expected womb, got " + scene);
+    const regions = await page.evaluate(() => window.__regions.map((r) => r.action));
+    assert(regions.includes(1) && !regions.includes(4), name + " lights leaked into the womb " + regions.join(","));
+    if (width === 390) await page.screenshot({ path: join(outDir, "sidpa-womb-390.png"), fullPage: false });
+    const petal = await page.evaluate(() => window.__regions.find((r) => r.action === 1 && r.arg === 1));
+    await page.mouse.click(petal.clientX, petal.clientY);
+    const methods = await page.$eval("#state", (el) => el.dataset.methods);
+    assert(methods === "1", name + " petal did not close " + methods);
+    await page.click("#next");
+    scene = await page.$eval("#state", (el) => el.dataset.scene);
+    assert(scene === "2", name + " expected lights, got " + scene);
+    const light = await page.evaluate(() => window.__regions.find((r) => r.action === 4 && r.arg === 0));
+    await page.mouse.click(light.clientX, light.clientY);
     const bright = await page.$eval("#state", (el) => el.dataset.brightest);
     assert(bright === "0", name + " brightest " + bright);
-    await page.screenshot({ path: join(outDir, name + ".png"), fullPage: false });
+    if (width === 390) await page.screenshot({ path: join(outDir, "sidpa-lights-390.png"), fullPage: false });
+    await page.click("#next");
+    scene = await page.$eval("#state", (el) => el.dataset.scene);
+    assert(scene === "3", name + " expected judgement, got " + scene);
+    if (width === 390) await page.screenshot({ path: join(outDir, "sidpa-judgement-390.png"), fullPage: false });
+    await page.click("#next");
+    scene = await page.$eval("#state", (el) => el.dataset.scene);
+    assert(scene === "4", name + " expected wish-body, got " + scene);
+    if (width === 390) await page.screenshot({ path: join(outDir, "sidpa-wish-390.png"), fullPage: false });
+    await page.click("#menu");
     await page.$eval("#day", (el) => {
       el.value = "0";
       el.dispatchEvent(new Event("input", { bubbles: true }));
@@ -153,22 +182,19 @@ try {
     assert(paused === "true", name + " pause");
     const debugBg = await page.$eval("#debug", (el) => getComputedStyle(el).backgroundColor);
     assert(debugBg === "rgb(198, 40, 40)", name + " debug colour " + debugBg);
-    await page.click("#lang-de");
-    const de = await page.$eval("h1", (el) => el.textContent);
-    assert(de.includes("Bardo"), name + " german title " + de);
-    const lang = await page.$eval("html", (el) => el.lang);
-    assert(lang === "de", name + " lang " + lang);
     assert(logs.length === 0, name + " console " + logs.join(" | "));
     await page.close();
   }
 
   const reduced = await open(browser, 390, 844, true);
+  await reduced.page.click("#menu");
   const pressed = await reduced.page.$eval("#rain-toggle", (el) => el.getAttribute("aria-pressed"));
   assert(pressed === "true", "reduced motion did not start paused");
   assert(reduced.logs.length === 0, "reduced console " + reduced.logs.join(" | "));
   await reduced.page.close();
 
   const reportPage = await open(browser, 1280, 800, false);
+  await reportPage.page.click("#menu");
   await reportPage.page.type("#note", "expected the Sidpa end");
   await reportPage.page.click("#debug");
   const report = await readReport("bardo-report.json");
@@ -183,6 +209,10 @@ try {
   assert(f9.stamp === stamp, "F9 stamp");
   assert(reportPage.logs.length === 0, "report console");
   await reportPage.page.close();
+  await mkdir("/opt/cursor/artifacts", { recursive: true });
+  for (const name of ["sidpa-womb-390.png", "sidpa-lights-390.png", "sidpa-judgement-390.png", "sidpa-wish-390.png"]) {
+    await copyFile(join(outDir, name), join("/opt/cursor/artifacts", name));
+  }
   console.log("browser smoke ok", stamp);
 } finally {
   await browser.close();

@@ -12,170 +12,134 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: #070807; color: #e7e2d4; }
-body {
-  min-height: 100dvh;
-  font: 18px/1.45 Georgia, "Iowan Old Style", Palatino, serif;
-}
+body { min-height: 100dvh; font: 18px/1.45 Georgia, "Iowan Old Style", Palatino, serif; }
 button, input { font-size: 16px; font-family: ui-sans-serif, system-ui, sans-serif; }
 button { min-height: 44px; min-width: 44px; }
 #rain {
   position: fixed; inset: 0; width: 100%; height: 100%;
   z-index: 0; pointer-events: none;
+  opacity: 0.22; filter: blur(2px);
 }
+#viz { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; display: block; touch-action: none; }
 .stamp {
-  position: fixed; z-index: 7;
-  top: calc(env(safe-area-inset-top) + 6px);
-  right: calc(env(safe-area-inset-right) + 6px);
-  margin: 0; max-width: calc(100vw - 12px);
+  position: fixed; z-index: 8;
+  top: calc(env(safe-area-inset-top) + 8px);
+  right: calc(env(safe-area-inset-right) + 8px);
+  margin: 0; max-width: calc(100vw - 68px);
   background: #f5e642; color: #111;
-  font: 700 12px/1.2 ui-sans-serif, system-ui, sans-serif;
-  padding: 4px 8px; pointer-events: none; white-space: nowrap;
+  font: 700 11px/1.2 ui-sans-serif, system-ui, sans-serif;
+  padding: 4px 6px; pointer-events: none; white-space: nowrap;
 }
-.app { position: relative; z-index: 1; }
-.screen { min-height: 100dvh; }
-#opening {
-  padding:
-    calc(env(safe-area-inset-top) + 4.2rem)
-    1rem
-    calc(env(safe-area-inset-bottom) + 12.5rem);
+#menu {
+  position: fixed; z-index: 8;
+  top: calc(env(safe-area-inset-top) + 6px);
+  left: max(6px, env(safe-area-inset-left));
+  width: 44px; padding: 0;
 }
-#tour {
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  padding:
-    calc(env(safe-area-inset-top) + 4.2rem)
-    0
-    calc(env(safe-area-inset-bottom) + 12.5rem);
+#menu-panel {
+  position: fixed; z-index: 8;
+  top: calc(env(safe-area-inset-top) + 56px);
+  left: max(6px, env(safe-area-inset-left));
+  width: min(280px, calc(100vw - 12px));
+  max-height: calc(100dvh - 8rem);
+  overflow: auto;
+  background: rgba(7, 8, 7, 0.96);
+  border: 1px solid #3c4038;
+  padding: 8px;
+  font-family: ui-sans-serif, system-ui, sans-serif;
 }
-#tour[hidden], #opening[hidden], #reload[hidden], #crash[hidden], #errors[hidden] { display: none; }
-h1 { font-weight: 500; font-size: 1.55rem; line-height: 1.2; margin: 0.2rem 0 0.35rem; }
-h2 { font-weight: 500; font-size: 1.1rem; margin: 0.8rem 0 0.3rem; }
-p { margin: 0.4rem 0; }
-.ui, .bar, #notes, #cards, #state { font-family: ui-sans-serif, system-ui, sans-serif; }
-.flags {
-  position: fixed; z-index: 7; display: flex; gap: 8px;
-  top: calc(env(safe-area-inset-top) + 4px);
-  left: max(8px, env(safe-area-inset-left));
-}
-button {
-  background: #1a1e1a; color: #e7e2d4;
-  border: 1px solid #3c4038; padding: 0 10px;
-}
+#menu-panel[hidden], #more[hidden], #reload[hidden], #crash[hidden], #errors[hidden] { display: none; }
+#menu-panel .row { display: flex; gap: 6px; margin: 6px 0; }
+#menu-panel .row button { flex: 1; }
+button { background: #1a1e1a; color: #e7e2d4; border: 1px solid #3c4038; padding: 0 10px; }
 button[aria-pressed="true"] { background: #e7e2d4; color: #111; }
 .debug { background: #c62828; color: #fff; border-color: #c62828; font-weight: 700; }
-#crash, #errors { margin: 0.4rem 1rem; }
+#day, #note { width: 100%; min-height: 44px; }
 #reload {
-  position: fixed; z-index: 6;
-  top: calc(env(safe-area-inset-top) + 3.4rem);
+  position: fixed; z-index: 7;
+  top: calc(env(safe-area-inset-top) + 52px);
   left: 8px; right: 8px; width: auto; margin: 0;
   text-align: left; background: #f5e642; color: #111; border: 0;
 }
-#crash, #errors { background: #2a1212; color: #ffd7d0; padding: 0.6rem 0.7rem; }
-#stage { position: relative; flex: 1; min-height: 0; }
-#viz { width: 100%; height: 100%; display: block; }
-#cards {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  display: flex; flex-wrap: wrap; gap: 6px;
-  padding: 8px; max-height: 46%; overflow: auto;
-  pointer-events: none;
+#crash, #errors {
+  position: fixed; z-index: 7; left: 8px; right: 8px;
+  top: calc(env(safe-area-inset-top) + 100px);
+  background: #2a1212; color: #ffd7d0; padding: 0.6rem 0.7rem;
 }
-#cards button { pointer-events: auto; }
-#state { padding: 0 1rem; }
-#notes { margin: 0 0.6rem; max-height: 22vh; overflow: auto; }
-#notes summary, #read-more summary { min-height: 44px; cursor: pointer; }
-#curves { width: 100%; height: 160px; background: #0c0e0c; }
+.info {
+  position: fixed; z-index: 4;
+  left: 50%; bottom: calc(env(safe-area-inset-bottom) + 4.6rem);
+  transform: translateX(-50%);
+  width: min(34rem, calc(100vw - 1.5rem));
+  margin: 0; padding: 8px 12px;
+  text-align: center;
+  background: transparent; border: 0; color: #f7f4ea;
+  font: 500 1.05rem/1.35 Georgia, "Iowan Old Style", Palatino, serif;
+  text-shadow: 0 1px 6px #000, 0 0 16px #000;
+}
+#more {
+  position: fixed; z-index: 4;
+  left: 50%; bottom: calc(env(safe-area-inset-bottom) + 8.2rem);
+  transform: translateX(-50%);
+  width: min(36rem, calc(100vw - 1.5rem));
+  max-height: 34vh; overflow: auto;
+  background: rgba(7, 8, 7, 0.88);
+  padding: 0.7rem 0.9rem; text-align: center;
+}
+#curves { width: 100%; height: 120px; background: #0c0e0c; }
 .bar {
-  position: fixed; z-index: 4; left: 0; right: 0; bottom: 0;
+  position: fixed; z-index: 5; left: 0; right: 0; bottom: 0;
+  display: flex; gap: 6px;
   padding:
     6px
     max(8px, env(safe-area-inset-right))
     calc(6px + env(safe-area-inset-bottom))
     max(8px, env(safe-area-inset-left));
-  background: rgba(7, 8, 7, 0.94);
-  border-top: 1px solid rgba(215, 208, 188, 0.2);
+  background: rgba(7, 8, 7, 0.92);
 }
-.row { display: flex; gap: 6px; }
-.row button { flex: 1; }
-#day { width: 100%; accent-color: #d9ffc3; min-height: 44px; }
-#note { width: 100%; min-height: 44px; }
-.mantra { font-family: "Rain Devanagari", serif; font-size: 1.15rem; }
-.bright { outline: 2px solid #f5e642; }
+.bar button { flex: 1; }
+#state { display: none; }
 </style>
 </head>
 <body>
 <canvas id="rain" aria-hidden="true"></canvas>
+<canvas id="viz"></canvas>
 <p id="stamp" class="stamp" data-dbg>__STAMP__</p>
-<div class="app">
-  <div class="flags ui">
+<button type="button" id="menu" aria-expanded="false" aria-controls="menu-panel"></button>
+<div id="menu-panel" hidden>
+  <div class="row">
     <button type="button" id="lang-en" aria-pressed="true" aria-label="English">EN</button>
     <button type="button" id="lang-de" aria-pressed="false" aria-label="Deutsch">DE</button>
   </div>
-  <button type="button" id="reload" hidden></button>
-  <p id="crash" hidden></p>
-  <p id="errors" hidden></p>
-  <section id="opening" class="screen">
-    <h1 data-k="title"></h1>
-    <p data-k="lead"></p>
-    <p><button type="button" id="enter" data-k="enter"></button></p>
-    <details id="read-more">
-      <summary data-k="readMore"></summary>
-      <p data-k="opening"></p>
-      <p data-k="sources"></p>
-      <p data-k="history"></p>
-      <h2 data-k="caveatLabel"></h2>
-      <p data-k="caveat"></p>
-      <p data-k="chonyidNote"></p>
-    </details>
-  </section>
-  <section id="tour" class="screen" hidden>
-    <div id="stage">
-      <canvas id="viz"></canvas>
-      <div id="cards"></div>
-    </div>
-    <div id="state" data-day="49" data-phase="" data-clarity="" data-intensity="" data-complexity="" data-mantra="" data-scene="" data-brightest="-1" data-outcome="0">
-      <p id="phase-read"></p>
-    </div>
-    <details id="notes">
-      <summary data-k="about"></summary>
-      <h2 id="scene-title"></h2>
-      <p id="scene-body"></p>
-      <p id="outcome"></p>
-      <p id="day-line"></p>
-      <p id="clarity-read"></p>
-      <p id="intensity-read"></p>
-      <p id="complexity-read"></p>
-      <p id="dir-help"></p>
-      <p data-k="durationNote"></p>
-      <p data-k="colourNote"></p>
-      <details id="graph-fold">
-        <summary data-k="graphSummary"></summary>
-        <canvas id="curves" width="640" height="160"></canvas>
-        <p data-k="graphNote"></p>
-      </details>
-      <p class="mantra">ॐमणिपद्मेहूँ</p>
-      <p data-k="m1"></p>
-      <p data-k="noteHint"></p>
-    </details>
-  </section>
-  <div id="bar" class="bar ui">
-    <div class="row">
-      <button type="button" id="prev"></button>
-      <button type="button" id="start"></button>
-      <button type="button" id="next"></button>
-    </div>
-    <div class="row">
-      <button type="button" id="dir-jung" aria-pressed="true"></button>
-      <button type="button" id="dir-book" aria-pressed="false"></button>
-      <button type="button" id="sound" aria-pressed="false"></button>
-      <button type="button" id="rain-toggle" aria-pressed="false"></button>
-      <button type="button" id="debug" class="debug"></button>
-    </div>
-    <label for="day" id="day-read"></label>
-    <input id="day" type="range" min="0" max="49" value="49">
-    <label for="note" data-k="note"></label>
-    <input id="note" maxlength="240" autocomplete="off">
+  <div class="row">
+    <button type="button" id="dir-jung" aria-pressed="true"></button>
+    <button type="button" id="dir-book" aria-pressed="false"></button>
   </div>
+  <div class="row">
+    <button type="button" id="sound" aria-pressed="false"></button>
+    <button type="button" id="rain-toggle" aria-pressed="false"></button>
+  </div>
+  <label for="day" id="day-read"></label>
+  <input id="day" type="range" min="0" max="49" value="49">
+  <p><label for="note" data-k="note"></label></p>
+  <input id="note" maxlength="240" autocomplete="off">
+  <p data-k="noteHint"></p>
+  <p><button type="button" id="debug" class="debug"></button></p>
+</div>
+<button type="button" id="reload" hidden></button>
+<p id="crash" hidden></p>
+<p id="errors" hidden></p>
+<h1 id="enter" class="info"></h1>
+<div id="more" hidden>
+  <p id="more-body"></p>
+  <p id="outcome"></p>
+  <canvas id="curves" width="640" height="120"></canvas>
+</div>
+<div id="state" data-day="49" data-phase="" data-clarity="" data-intensity="" data-complexity="" data-mantra="" data-scene="" data-brightest="-1" data-outcome="0" data-methods="0"></div>
+<div id="bar" class="bar">
+  <button type="button" id="prev"></button>
+  <button type="button" id="start"></button>
+  <button type="button" id="next"></button>
 </div>
 <noscript><p>This page needs JavaScript. Diese Seite braucht JavaScript.</p></noscript>
 <script>

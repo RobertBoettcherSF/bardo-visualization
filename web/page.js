@@ -100,6 +100,15 @@ function sceneCopy(code) {
   return ["sceneClock", "bodyClock"];
 }
 
+function infoKey(scene) {
+  if (viewMode === "opening") return "title";
+  if (scene === 1) return "infoWomb";
+  if (scene === 2) return "infoLights";
+  if (scene === 3) return "infoJudge";
+  if (scene === 4) return "infoWish";
+  return "infoClock";
+}
+
 function updateChrome(out) {
   const side = sidpa();
   const day = out[2];
@@ -114,14 +123,10 @@ function updateChrome(out) {
   state.dataset.scene = String(side[0]);
   state.dataset.brightest = String(side[3]);
   state.dataset.outcome = String(side[1]);
+  state.dataset.methods = String(side[2]);
   state.dataset.paused = rain && rain.isPaused() ? "true" : "false";
   document.getElementById("day").value = String(day);
   document.getElementById("day-read").textContent = t("dayLabel") + " " + day + " " + t("of") + " 49";
-  document.getElementById("phase-read").textContent = phase;
-  document.getElementById("clarity-read").textContent = t("clarity") + " " + out[4];
-  document.getElementById("intensity-read").textContent = t("intensity") + " " + out[5];
-  document.getElementById("complexity-read").textContent = t("complexity") + " " + out[6];
-  document.getElementById("dir-help").textContent = direction === 0 ? t("helpJung") : t("helpBook");
   const jung = document.getElementById("dir-jung");
   const book = document.getElementById("dir-book");
   jung.textContent = t("jungShort");
@@ -133,60 +138,22 @@ function updateChrome(out) {
   document.getElementById("prev").textContent = t("prev");
   document.getElementById("start").textContent = t("start");
   document.getElementById("next").textContent = t("next");
+  document.getElementById("menu").textContent = t("menu");
   document.getElementById("debug").textContent = t("debug");
   const sound = document.getElementById("sound");
   sound.textContent = soundEnabled() ? t("soundOn") : t("soundOff");
   sound.setAttribute("aria-pressed", String(soundEnabled()));
-  const names = sceneCopy(side[0]);
-  document.getElementById("scene-title").textContent = t(names[0]);
-  document.getElementById("scene-body").textContent = t(names[1]);
-  document.getElementById("outcome").textContent = outcomeText(side[1]);
+  document.getElementById("enter").textContent = t(infoKey(side[0]));
+  const names = sceneCopy(viewMode === "opening" ? -1 : side[0]);
+  const moreBody = viewMode === "opening" ? t("lead") + " " + t("moreEnter") : t(names[1]);
+  document.getElementById("more-body").textContent = moreBody;
+  document.getElementById("outcome").textContent = viewMode === "opening" ? "" : outcomeText(side[1]);
   document.getElementById("prev").disabled = viewMode === "opening";
   document.getElementById("next").disabled = viewMode === "tour" && side[0] !== 0 && side[13] < 0;
   const wantWind = viewMode === "tour" && side[0] !== 0;
   if (wantWind !== windWanted) {
     windWanted = wantWind;
     setWind(wantWind);
-  }
-}
-
-function button(label, action, arg, pressed) {
-  const el = document.createElement("button");
-  el.type = "button";
-  el.textContent = label;
-  el.dataset.action = String(action);
-  el.dataset.arg = String(arg);
-  if (pressed) el.className = "bright";
-  return el;
-}
-
-function syncCards(scene) {
-  const key = [scene, lang, methodsDone, destination, sidpa()[15]].join(":");
-  if (key === cardsKey) return;
-  cardsKey = key;
-  const box = document.getElementById("cards");
-  box.replaceChildren();
-  if (scene === 1) {
-    for (let i = 1; i <= 5; i++) box.appendChild(button(t("method" + i), 1, i, false));
-    box.appendChild(button(t("transferA"), 2, 0, false));
-    box.appendChild(button(t("transferT"), 2, 1, false));
-    ["east", "south", "west", "north"].forEach(function (name, i) {
-      box.appendChild(button(t(name), 3, i, false));
-    });
-    REALM_KEY.forEach(function (name, i) {
-      box.appendChild(button(t(name), 3, 10 + i, false));
-    });
-  } else if (scene === 2) {
-    REALM_KEY.forEach(function (name, i) {
-      box.appendChild(button(t(name), 4, i, destination === i));
-    });
-  } else if (scene === 3) {
-    box.appendChild(button(t("recognise"), 5, 0, false));
-    box.appendChild(button(t("notYet"), 6, 0, false));
-  } else if (scene === 4) {
-    box.appendChild(button(t("abyssW"), 7, 0, false));
-    box.appendChild(button(t("abyssB"), 7, 1, false));
-    box.appendChild(button(t("abyssR"), 7, 2, false));
   }
 }
 
@@ -227,10 +194,11 @@ function paintAxes(ctx, width, height, marker) {
 
 function drawGraph(day) {
   const canvas = document.getElementById("curves");
+  if (!canvas || document.getElementById("more").hidden) return;
   const ctx = canvas.getContext("2d");
   const dpr = Math.min(devicePixelRatio || 1, 1.5);
-  const width = canvas.clientWidth || 320;
-  const height = canvas.clientHeight || 160;
+  const width = canvas.clientWidth || 280;
+  const height = canvas.clientHeight || 120;
   canvas.width = Math.round(width * dpr);
   canvas.height = Math.round(height * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -238,98 +206,209 @@ function drawGraph(day) {
   paintAxes(ctx, width, height, day);
 }
 
+let regions = [];
+
+function addDisc(action, arg, x, y, r) {
+  regions.push({ kind: "disc", action: action, arg: arg, x: x, y: y, r: r });
+}
+
 function drawCanvas() {
   const canvas = document.getElementById("viz");
-  const stage = document.getElementById("stage");
   const ctx = canvas.getContext("2d");
   const dpr = Math.min(devicePixelRatio || 1, 1.5);
-  const width = stage.clientWidth || 320;
-  const height = stage.clientHeight || 320;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
   canvas.width = Math.round(width * dpr);
   canvas.height = Math.round(height * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "rgba(7, 8, 7, 0.62)";
+  ctx.fillRect(0, 0, width, height);
+  regions = [];
   const side = sidpa();
-  const scene = side[0];
-  if (scene === 0) {
-    paintAxes(ctx, width, height, Number(document.getElementById("state").dataset.day || "0"));
-    return;
+  const scene = viewMode === "opening" ? -1 : side[0];
+  const cx = width / 2;
+  const cy = height * 0.40;
+  const span = Math.min(width, height);
+  if (scene === -1 || scene === 0) {
+    paintAxes(ctx, width, height * 0.72, Number(document.getElementById("state").dataset.day || "0"));
+  } else if (scene === 1) {
+    drawLotus(ctx, cx, cy, span * 0.34, side[2]);
+  } else if (scene === 2) {
+    drawWheel(ctx, cx, cy, span * 0.34, side[3]);
+  } else if (scene === 3) {
+    drawMirror(ctx, cx, cy, span);
+  } else if (scene === 4) {
+    drawWish(ctx, width, height, side);
   }
-  if (scene === 2) {
-    const cx = width / 2;
-    const cy = height * 0.38;
-    const radius = Math.min(width, height) * 0.26;
-    for (let i = 0; i < 6; i++) {
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.arc(cx, cy, radius, -Math.PI / 2 + i * Math.PI / 3, -Math.PI / 2 + (i + 1) * Math.PI / 3);
-      ctx.closePath();
-      ctx.fillStyle = REALM_COLOUR[i];
-      ctx.globalAlpha = side[3] === i ? 1 : 0.45;
-      ctx.fill();
-      if (side[3] === i) {
-        ctx.globalAlpha = 1;
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "#f5e642";
-        ctx.stroke();
-      }
-    }
-    ctx.globalAlpha = 1;
+  const rect = canvas.getBoundingClientRect();
+  window.__regions = regions.map(function (region) {
+    const x = region.kind === "disc" ? region.x : region.hitX;
+    const y = region.kind === "disc" ? region.y : region.hitY;
+    return {
+      action: region.action,
+      arg: region.arg,
+      clientX: rect.left + x,
+      clientY: rect.top + y
+    };
+  });
+}
+
+function drawLotus(ctx, cx, cy, radius, done) {
+  const next = done < 5 ? done : -1;
+  for (let i = 0; i < 5; i++) {
+    const angle = -Math.PI / 2 + i * (Math.PI * 2 / 5);
+    const px = cx + Math.cos(angle) * radius * 0.62;
+    const py = cy + Math.sin(angle) * radius * 0.62;
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(angle);
     ctx.beginPath();
-    ctx.arc(cx, cy, radius * 0.22, 0, Math.PI * 2);
-    ctx.fillStyle = "#070807";
-    ctx.fill();
-    return;
-  }
-  if (scene === 3) {
-    ctx.fillStyle = "#10141a";
-    ctx.fillRect(0, 0, width, height);
-    ctx.beginPath();
-    ctx.ellipse(width / 2, height * 0.36, Math.min(width, height) * 0.22, Math.min(width, height) * 0.3, 0, 0, Math.PI * 2);
-    ctx.fillStyle = "#F7F4EA";
-    ctx.globalAlpha = 0.85;
-    ctx.fill();
-    ctx.globalAlpha = 1;
-    for (let i = 0; i < 6; i++) {
-      ctx.beginPath();
-      ctx.arc(width * 0.28 + (i % 3) * 16, height * 0.72 + Math.floor(i / 3) * 16, 5, 0, Math.PI * 2);
-      ctx.fillStyle = "#F4F1E6";
+    ctx.ellipse(0, 0, radius * 0.34, radius * 0.16, 0, 0, Math.PI * 2);
+    if (i < done) {
+      ctx.fillStyle = "#3A6B48";
       ctx.fill();
-      ctx.beginPath();
-      ctx.arc(width * 0.62 + (i % 3) * 16, height * 0.72 + Math.floor(i / 3) * 16, 5, 0, Math.PI * 2);
-      ctx.fillStyle = "#1C1C1C";
+    } else {
+      ctx.fillStyle = i === next ? "rgba(245, 230, 66, 0.45)" : "rgba(231, 226, 212, 0.12)";
       ctx.fill();
+      ctx.lineWidth = i === next ? 5 : 2;
+      ctx.strokeStyle = i === next ? "#f5e642" : "#d9ffc3";
+      ctx.stroke();
     }
-    return;
+    ctx.restore();
+    addDisc(1, i + 1, px, py, Math.max(26, radius * 0.2));
   }
-  if (scene === 4) {
-    ctx.fillStyle = "#2a2926";
-    ctx.fillRect(0, 0, width, height);
-    const x = (side[8] / 1000) * width;
-    const y = (side[9] / 1000) * (height * 0.7);
+  ctx.beginPath();
+  ctx.arc(cx, cy, 14 + done * 7, 0, Math.PI * 2);
+  ctx.fillStyle = done >= 5 ? "#F7F4EA" : "#1a1e1a";
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#d9ffc3";
+  ctx.stroke();
+  const places = [
+    [0, 3, 0, "#8aa4c8"],
+    [Math.PI / 2, 3, 1, "#C4A24A"],
+    [Math.PI, 3, 2, "#7A4548"],
+    [-Math.PI / 2, 3, 3, "#4A5E48"],
+    [Math.PI * 0.72, 2, 0, "#8E3A3A"],
+    [Math.PI * 1.15, 2, 1, "#E0D3B0"]
+  ];
+  places.forEach(function (place) {
+    const dist = place[1] === 2 ? radius * 0.95 : radius * 1.22;
+    const x = cx + Math.cos(place[0]) * dist;
+    const y = cy + Math.sin(place[0]) * dist;
     ctx.beginPath();
     ctx.arc(x, y, 16, 0, Math.PI * 2);
-    ctx.fillStyle = "#E6E0D4";
-    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = place[3];
+    ctx.fill();
+    addDisc(place[1], place[2], x, y, 24);
+  });
+}
+
+function drawWheel(ctx, cx, cy, radius, bright) {
+  for (let i = 0; i < 6; i++) {
+    const a0 = -Math.PI / 2 + i * Math.PI / 3;
+    const a1 = a0 + Math.PI / 3;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, radius, a0, a1);
+    ctx.closePath();
+    ctx.fillStyle = REALM_COLOUR[i];
+    ctx.globalAlpha = bright === i ? 1 : 0.55;
     ctx.fill();
     ctx.globalAlpha = 1;
-    return;
+    ctx.lineWidth = bright === i ? 4 : 1;
+    ctx.strokeStyle = bright === i ? "#f5e642" : "#070807";
+    ctx.stroke();
+    const mid = (a0 + a1) / 2;
+    regions.push({
+      kind: "sector", action: 4, arg: i,
+      cx: cx, cy: cy, radius: radius, a0: a0, a1: a1,
+      hitX: cx + Math.cos(mid) * radius * 0.62,
+      hitY: cy + Math.sin(mid) * radius * 0.62
+    });
   }
-  ctx.strokeStyle = "#d9ffc3";
-  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.arc(width / 2, height * 0.36, Math.min(width, height) * 0.2, 0.3, Math.PI * 2 - 0.3);
+  ctx.arc(cx, cy, radius * 0.18, 0, Math.PI * 2);
+  ctx.fillStyle = "#070807";
+  ctx.fill();
+}
+
+function drawMirror(ctx, cx, cy, span) {
+  const rx = span * 0.22;
+  const ry = span * 0.28;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+  ctx.fillStyle = "#F7F4EA";
+  ctx.globalAlpha = 0.92;
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.strokeStyle = "#d9ffc3";
+  ctx.lineWidth = 3;
   ctx.stroke();
+  addDisc(5, 0, cx, cy, Math.min(rx, ry));
+  for (let i = 0; i < 5; i++) {
+    ctx.beginPath();
+    ctx.arc(cx - rx - 28, cy - 20 + i * 14, 6, 0, Math.PI * 2);
+    ctx.fillStyle = "#F4F1E6";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx + rx + 28, cy - 20 + i * 14, 6, 0, Math.PI * 2);
+    ctx.fillStyle = "#1C1C1C";
+    ctx.fill();
+  }
+  const passY = cy + ry + 36;
+  ctx.beginPath();
+  ctx.arc(cx, passY, 14, 0, Math.PI * 2);
+  ctx.strokeStyle = "#5C5550";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  addDisc(6, 0, cx, passY, 22);
+}
+
+function drawWish(ctx, width, height, side) {
+  const x = (side[8] / 1000) * width;
+  const y = (side[9] / 1000) * (height * 0.55) + height * 0.08;
+  ctx.beginPath();
+  ctx.arc(x, y, 22, 0, Math.PI * 2);
+  ctx.fillStyle = "#E6E0D4";
+  ctx.fill();
+  const colours = ["#E6E0D4", "#1C1C1C", "#8E3A3A"];
+  const yA = height * 0.62;
+  colours.forEach(function (colour, i) {
+    const ax = width * (0.22 + i * 0.28);
+    ctx.beginPath();
+    ctx.arc(ax, yA, 20, 0, Math.PI * 2);
+    ctx.fillStyle = colour;
+    ctx.fill();
+    ctx.strokeStyle = "#d9ffc3";
+    ctx.stroke();
+    addDisc(7, i, ax, yA, 26);
+  });
+}
+
+function hitContains(region, x, y) {
+  if (region.kind === "disc") {
+    const dx = x - region.x;
+    const dy = y - region.y;
+    return dx * dx + dy * dy <= region.r * region.r;
+  }
+  const dx = x - region.cx;
+  const dy = y - region.cy;
+  const dist = Math.hypot(dx, dy);
+  if (dist > region.radius || dist < region.radius * 0.18) return false;
+  let ang = Math.atan2(dy, dx);
+  const start = region.a0;
+  while (ang < start) ang += Math.PI * 2;
+  while (ang >= start + Math.PI * 2) ang -= Math.PI * 2;
+  return ang >= start && ang <= region.a1;
 }
 
 function render() {
   const out = compute();
   updateChrome(out);
-  if (viewMode === "tour") {
-    syncCards(sidpa()[0]);
-    drawCanvas();
-    maybeAnimate();
-  }
+  drawCanvas();
+  if (viewMode === "tour") maybeAnimate();
   drawGraph(out[2]);
 }
 
@@ -351,15 +430,13 @@ function sampleCurves() {
 function showOpening() {
   viewMode = "opening";
   animating = false;
-  document.getElementById("opening").hidden = false;
-  document.getElementById("tour").hidden = true;
-  updateChrome(compute());
+  document.getElementById("more").hidden = true;
+  render();
 }
 
 function showTour() {
   viewMode = "tour";
-  document.getElementById("opening").hidden = true;
-  document.getElementById("tour").hidden = false;
+  document.getElementById("more").hidden = true;
 }
 
 function enterTour() {
@@ -598,7 +675,21 @@ document.getElementById("day").addEventListener("input", function (event) {
   cardsKey = "";
   render();
 });
-document.getElementById("enter").addEventListener("click", function () { playClick(); enterTour(); });
+document.getElementById("enter").addEventListener("click", function () {
+  const more = document.getElementById("more");
+  if (more.hidden) {
+    more.hidden = false;
+    drawGraph(Number(document.getElementById("state").dataset.day || "0"));
+    return;
+  }
+  more.hidden = true;
+  if (viewMode === "opening") enterTour();
+});
+document.getElementById("menu").addEventListener("click", function () {
+  const panel = document.getElementById("menu-panel");
+  panel.hidden = !panel.hidden;
+  document.getElementById("menu").setAttribute("aria-expanded", String(!panel.hidden));
+});
 document.getElementById("next").addEventListener("click", goNext);
 document.getElementById("prev").addEventListener("click", goPrev);
 document.getElementById("start").addEventListener("click", function () {
@@ -615,11 +706,6 @@ document.getElementById("sound").addEventListener("click", function () {
   if (soundEnabled()) playClick();
   render();
 });
-document.getElementById("cards").addEventListener("click", function (event) {
-  const el = event.target.closest("button");
-  if (!el) return;
-  act(Number(el.dataset.action), Number(el.dataset.arg));
-});
 document.getElementById("debug").addEventListener("click", downloadReport);
 document.addEventListener("keydown", function (event) {
   if (event.key === "F9" && event.target.id !== "note") {
@@ -635,33 +721,38 @@ document.addEventListener("keydown", function (event) {
     document.getElementById("start").click();
   }
 });
-const stage = document.getElementById("stage");
-let touchX = null;
-stage.addEventListener("touchstart", function (event) {
-  touchX = event.changedTouches[0].clientX;
-}, { passive: true });
-stage.addEventListener("touchend", function (event) {
-  if (touchX === null) return;
-  const dx = event.changedTouches[0].clientX - touchX;
-  touchX = null;
-  if (dx <= -48) goNext();
-  else if (dx >= 48) goPrev();
-}, { passive: true });
-
-const wide = matchMedia("(min-width: 900px)");
-function foldGraph() {
-  document.getElementById("graph-fold").open = wide.matches;
-  document.getElementById("notes").open = wide.matches;
-}
-wide.addEventListener("change", foldGraph);
-foldGraph();
-document.getElementById("graph-fold").addEventListener("toggle", function () {
-  if (ada) drawGraph(Number(document.getElementById("state").dataset.day || "0"));
+const viz = document.getElementById("viz");
+let pointer = null;
+viz.addEventListener("pointerdown", function (event) {
+  pointer = { x: event.clientX, y: event.clientY };
+});
+viz.addEventListener("pointerup", function (event) {
+  if (!pointer) return;
+  const dx = event.clientX - pointer.x;
+  const dy = event.clientY - pointer.y;
+  pointer = null;
+  if (Math.hypot(dx, dy) > 36) {
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 48) {
+      if (dx < 0) goNext();
+      else goPrev();
+    }
+    return;
+  }
+  if (viewMode !== "tour") return;
+  const rect = viz.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  for (let i = regions.length - 1; i >= 0; i--) {
+    if (hitContains(regions[i], x, y)) {
+      act(regions[i].action, regions[i].arg);
+      return;
+    }
+  }
 });
 addEventListener("resize", function () {
   if (!ada) return;
+  drawCanvas();
   drawGraph(Number(document.getElementById("state").dataset.day || "0"));
-  if (viewMode === "tour") drawCanvas();
 });
 
 boot().catch(function (err) {
