@@ -1,0 +1,15 @@
+project Smoke is
+   type Mode_Kind is ("n12", "n14");
+   Mode : Mode_Kind := external ("MODE", "n12");
+   for Source_Dirs use (".", "../src");
+   for Object_Dir use "../obj/" & Mode;
+   for Exec_Dir use "../obj/" & Mode;
+   for Main use ("smoke.adb");
+   package Compiler is
+      for Default_Switches ("Ada") use
+        ("-gnat2022", "-gnata", "-gnatwa", "-gnatwe", "-O2");
+   end Compiler;
+   package Binder is
+      for Default_Switches ("Ada") use ("-static");
+   end Binder;
+end Smoke;

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Bardo states</title>
+<style>
+@font-face {
+  font-family: "Rain Devanagari";
+  src: url("assets/devanagari-subset.woff2?v=__ASSET__") format("woff2");
+  font-display: swap;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  min-height: 100dvh;
+  background: #070807;
+  color: #e7e2d4;
+  font: 18px/1.5 Georgia, "Iowan Old Style", Palatino, serif;
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+button, input { font-size: 16px; font-family: ui-sans-serif, system-ui, sans-serif; }
+button { min-height: 44px; min-width: 44px; }
+#rain {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+.stamp {
+  position: fixed;
+  z-index: 5;
+  top: calc(env(safe-area-inset-top) + 6px);
+  right: calc(env(safe-area-inset-right) + 6px);
+  margin: 0;
+  max-width: calc(100vw - 12px);
+  background: #f5e642;
+  color: #111;
+  font: 700 12px/1.2 ui-sans-serif, system-ui, sans-serif;
+  padding: 4px 8px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2.8rem 1rem 2.5rem;
+}
+.layout { display: grid; gap: 1rem; }
+@media (min-width: 900px) {
+  .layout { grid-template-columns: 1.2fr 0.8fr; align-items: start; }
+}
+.panel {
+  background: rgba(7, 8, 7, 0.86);
+  border: 1px solid rgba(215, 208, 188, 0.18);
+  padding: 1rem 1.05rem 1.2rem;
+}
+h1 { font-weight: 500; font-size: 1.7rem; line-height: 1.25; margin: 0 0 0.4rem; }
+h2 { font-weight: 500; font-size: 1.15rem; margin: 1.1rem 0 0.3rem; }
+p { margin: 0.55rem 0; }
+.ui { font-family: ui-sans-serif, system-ui, sans-serif; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.flags button[aria-pressed="true"], .dirs button[aria-pressed="true"] {
+  background: #e7e2d4;
+  color: #111;
+}
+button {
+  background: #1a1e1a;
+  color: #e7e2d4;
+  border: 1px solid #3c4038;
+  padding: 0 12px;
+}
+.debug { background: #c62828; color: #fff; border-color: #c62828; font-weight: 700; }
+#reload {
+  display: block;
+  width: 100%;
+  margin: 0 0 0.8rem;
+  text-align: left;
+  background: #f5e642;
+  color: #111;
+  border: 0;
+  padding: 10px 12px;
+}
+#reload[hidden], #crash[hidden], #errors[hidden] { display: none; }
+#crash, #errors {
+  background: #2a1212;
+  color: #ffd7d0;
+  padding: 0.7rem 0.8rem;
+  margin: 0 0 0.8rem;
+}
+#day { width: 100%; accent-color: #d9ffc3; }
+#note { width: 100%; min-height: 44px; }
+.mantra { font-family: "Rain Devanagari", serif; font-size: 1.25rem; margin: 0; }
+.caption { margin: 0.15rem 0 0.7rem; color: #b7b1a2; }
+.active + .caption, .mantra.active { color: #d9ffc3; }
+#curves { width: 100%; height: 200px; display: block; background: #0c0e0c; }
+.legend { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.85rem; color: #b7b1a2; }
+.legend i { font-style: normal; }
+.c { color: #d9ffc3; } .i { color: #e0b080; } .x { color: #8aa4c8; }
+summary { min-height: 44px; cursor: pointer; }
+#state { font-family: ui-sans-serif, system-ui, sans-serif; }
+</style>
+</head>
+<body>
+<canvas id="rain" aria-hidden="true"></canvas>
+<p id="stamp" class="stamp" data-dbg>__STAMP__</p>
+<div class="wrap">
+  <div class="row flags ui">
+    <button type="button" id="lang-en" aria-pressed="true" aria-label="English">EN</button>
+    <button type="button" id="lang-de" aria-pressed="false" aria-label="Deutsch">DE</button>
+  </div>
+  <button type="button" id="reload" hidden></button>
+  <p id="crash" hidden></p>
+  <p id="errors" hidden></p>
+  <div class="layout">
+    <article class="panel">
+      <h1 data-k="title"></h1>
+      <p data-k="standfirst"></p>
+      <p data-k="opening"></p>
+      <p data-k="sources"></p>
+      <p data-k="history"></p>
+      <h2 data-k="caveatLabel"></h2>
+      <p data-k="caveat"></p>
+      <p data-k="chonyidNote"></p>
+      <p><button type="button" id="enter" data-k="enter"></button></p>
+    </article>
+    <section class="panel ui" id="tour">
+      <div class="row dirs">
+        <button type="button" id="dir-jung" data-k="directionJung" aria-pressed="true"></button>
+        <button type="button" id="dir-book" data-k="directionBook" aria-pressed="false"></button>
+      </div>
+      <p id="dir-help"></p>
+      <label for="day" id="day-read">Day</label>
+      <input id="day" type="range" min="0" max="49" value="49">
+      <p><button type="button" id="walk"></button></p>
+      <div id="state" data-day="49" data-phase="" data-clarity="" data-intensity="" data-complexity="" data-mantra="">
+        <p id="phase-read"></p>
+        <p id="clarity-read"></p>
+        <p id="intensity-read"></p>
+        <p id="complexity-read"></p>
+      </div>
+      <details id="graph-fold">
+        <summary data-k="graphSummary"></summary>
+        <canvas id="curves" width="640" height="200"></canvas>
+        <p class="legend"><i class="c">●</i> <span data-k="clarity"></span> · <i class="i">●</i> <span data-k="intensity"></span> · <i class="x">●</i> <span data-k="complexity"></span> · <span data-k="thousandths"></span></p>
+        <p data-k="graphNote"></p>
+      </details>
+      <p><button type="button" id="rain-toggle" aria-pressed="false"></button></p>
+      <h2 data-k="mantraTitle"></h2>
+      <p data-k="mantraBody"></p>
+      <p class="mantra" id="m1">ॐमणिपद्मेहूँ</p>
+      <p class="caption" data-k="m1"></p>
+      <p class="mantra" id="m2">ॐअमिताभह्रीः</p>
+      <p class="caption" data-k="m2"></p>
+      <p class="mantra" id="m3">ॐआःहूँवज्रगुरुपद्मसिद्धिहूँ</p>
+      <p class="caption" data-k="m3"></p>
+      <details>
+        <summary data-k="model"></summary>
+        <p data-k="modelBody"></p>
+      </details>
+      <p><label for="note" data-k="note"></label></p>
+      <input id="note" maxlength="240" autocomplete="off">
+      <p class="hint" data-k="noteHint"></p>
+      <p class="row">
+        <button type="button" id="debug" class="debug" data-k="debug"></button>
+        <span data-k="f9"></span>
+      </p>
+    </section>
+  </div>
+</div>
+<noscript><p>This page needs JavaScript. Diese Seite braucht JavaScript.</p></noscript>
+<script>
+__JS__
+</script>
+</body>
+</html>
