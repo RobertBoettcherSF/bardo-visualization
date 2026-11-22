@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Bardo states</title>
+<style>
+@font-face {
+  font-family: "Rain Devanagari";
+  src: url("assets/devanagari-subset.woff2?v=d0ee170") format("woff2");
+  font-display: swap;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  min-height: 100dvh;
+  background: #070807;
+  color: #e7e2d4;
+  font: 18px/1.5 Georgia, "Iowan Old Style", Palatino, serif;
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+button, input { font-size: 16px; font-family: ui-sans-serif, system-ui, sans-serif; }
+button { min-height: 44px; min-width: 44px; }
+#rain {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+.stamp {
+  position: fixed;
+  z-index: 5;
+  top: calc(env(safe-area-inset-top) + 6px);
+  right: calc(env(safe-area-inset-right) + 6px);
+  margin: 0;
+  max-width: calc(100vw - 12px);
+  background: #f5e642;
+  color: #111;
+  font: 700 12px/1.2 ui-sans-serif, system-ui, sans-serif;
+  padding: 4px 8px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2.8rem 1rem 2.5rem;
+}
+.layout { display: grid; gap: 1rem; }
+@media (min-width: 900px) {
+  .layout { grid-template-columns: 1.2fr 0.8fr; align-items: start; }
+}
+.panel {
+  background: rgba(7, 8, 7, 0.86);
+  border: 1px solid rgba(215, 208, 188, 0.18);
+  padding: 1rem 1.05rem 1.2rem;
+}
+h1 { font-weight: 500; font-size: 1.7rem; line-height: 1.25; margin: 0 0 0.4rem; }
+h2 { font-weight: 500; font-size: 1.15rem; margin: 1.1rem 0 0.3rem; }
+p { margin: 0.55rem 0; }
+.ui { font-family: ui-sans-serif, system-ui, sans-serif; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.flags button[aria-pressed="true"], .dirs button[aria-pressed="true"] {
+  background: #e7e2d4;
+  color: #111;
+}
+button {
+  background: #1a1e1a;
+  color: #e7e2d4;
+  border: 1px solid #3c4038;
+  padding: 0 12px;
+}
+.debug { background: #c62828; color: #fff; border-color: #c62828; font-weight: 700; }
+#reload {
+  display: block;
+  width: 100%;
+  margin: 0 0 0.8rem;
+  text-align: left;
+  background: #f5e642;
+  color: #111;
+  border: 0;
+  padding: 10px 12px;
+}
+#reload[hidden], #crash[hidden], #errors[hidden] { display: none; }
+#crash, #errors {
+  background: #2a1212;
+  color: #ffd7d0;
+  padding: 0.7rem 0.8rem;
+  margin: 0 0 0.8rem;
+}
+#day { width: 100%; accent-color: #d9ffc3; }
+#note { width: 100%; min-height: 44px; }
+.mantra { font-family: "Rain Devanagari", serif; font-size: 1.25rem; margin: 0; }
+.caption { margin: 0.15rem 0 0.7rem; color: #b7b1a2; }
+.active + .caption, .mantra.active { color: #d9ffc3; }
+#curves { width: 100%; height: 200px; display: block; background: #0c0e0c; }
+.legend { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.85rem; color: #b7b1a2; }
+.legend i { font-style: normal; }
+.c { color: #d9ffc3; } .i { color: #e0b080; } .x { color: #8aa4c8; }
+summary { min-height: 44px; cursor: pointer; }
+#state { font-family: ui-sans-serif, system-ui, sans-serif; }
+</style>
+</head>
+<body>
+<canvas id="rain" aria-hidden="true"></canvas>
+<p id="stamp" class="stamp" data-dbg>v0.1 b20261122-1954 d0ee170</p>
+<div class="wrap">
+  <div class="row flags ui">
+    <button type="button" id="lang-en" aria-pressed="true" aria-label="English">EN</button>
+    <button type="button" id="lang-de" aria-pressed="false" aria-label="Deutsch">DE</button>
+  </div>
+  <button type="button" id="reload" hidden></button>
+  <p id="crash" hidden></p>
+  <p id="errors" hidden></p>
+  <div class="layout">
+    <article class="panel">
+      <h1 data-k="title"></h1>
+      <p data-k="standfirst"></p>
+      <p data-k="opening"></p>
+      <p data-k="sources"></p>
+      <p data-k="history"></p>
+      <h2 data-k="caveatLabel"></h2>
+      <p data-k="caveat"></p>
+      <p data-k="chonyidNote"></p>
+      <p><button type="button" id="enter" data-k="enter"></button></p>
+    </article>
+    <section class="panel ui" id="tour">
+      <div class="row dirs">
+        <button type="button" id="dir-jung" data-k="directionJung" aria-pressed="true"></button>
+        <button type="button" id="dir-book" data-k="directionBook" aria-pressed="false"></button>
+      </div>
+      <p id="dir-help"></p>
+      <label for="day" id="day-read">Day</label>
+      <input id="day" type="range" min="0" max="49" value="49">
+      <p><button type="button" id="walk"></button></p>
+      <div id="state" data-day="49" data-phase="" data-clarity="" data-intensity="" data-complexity="" data-mantra="">
+        <p id="phase-read"></p>
+        <p id="clarity-read"></p>
+        <p id="intensity-read"></p>
+        <p id="complexity-read"></p>
+      </div>
+      <details id="graph-fold">
+        <summary data-k="graphSummary"></summary>
+        <canvas id="curves" width="640" height="200"></canvas>
+        <p class="legend"><i class="c">●</i> <span data-k="clarity"></span> · <i class="i">●</i> <span data-k="intensity"></span> · <i class="x">●</i> <span data-k="complexity"></span> · <span data-k="thousandths"></span></p>
+        <p data-k="graphNote"></p>
+      </details>
+      <p><button type="button" id="rain-toggle" aria-pressed="false"></button></p>
+      <h2 data-k="mantraTitle"></h2>
+      <p data-k="mantraBody"></p>
+      <p class="mantra" id="m1">ॐमणिपद्मेहूँ</p>
+      <p class="caption" data-k="m1"></p>
+      <p class="mantra" id="m2">ॐअमिताभह्रीः</p>
+      <p class="caption" data-k="m2"></p>
+      <p class="mantra" id="m3">ॐआःहूँवज्रगुरुपद्मसिद्धिहूँ</p>
+      <p class="caption" data-k="m3"></p>
+      <details>
+        <summary data-k="model"></summary>
+        <p data-k="modelBody"></p>
+      </details>
+      <p><label for="note" data-k="note"></label></p>
+      <input id="note" maxlength="240" autocomplete="off">
+      <p class="hint" data-k="noteHint"></p>
+      <p class="row">
+        <button type="button" id="debug" class="debug" data-k="debug"></button>
+        <span data-k="f9"></span>
+      </p>
+    </section>
+  </div>
+</div>
+<noscript><p>This page needs JavaScript. Diese Seite braucht JavaScript.</p></noscript>
+<script>
+const WASM_BASE64 = "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";
+const STRINGS = {
+  en: {
+    title: "The Bardo states",
+    standfirst: "A guide through the intermediate state, read in Jung’s reverse order.",
+    opening: "The Bardo Thödol is a guide for someone who has just died. Its name is often rendered “liberation through hearing in the intermediate state”. A reader speaks it beside the body, across a symbolic forty-nine days between one life and the next, and asks the dead to recognise each appearance as the mind’s own light rather than as a power arriving from outside.",
+    sources: "Sources: W. Y. Evans-Wentz, The Tibetan Book of the Dead, from the translation of Lama Kazi Dawa Samdup; psychological commentary by C. G. Jung; historical note by L. Goepfert-March.",
+    history: "L. Goepfert-March’s note follows the traditional attribution of the book to Padmasambhava and a long passage by word of mouth before the later written editions. The English text most readers meet was prepared by Evans-Wentz from Lama Kazi Dawa Samdup’s translation. This tour’s clock was checked against a later German edition of that book. The sentences here are ours.",
+    caveatLabel: "Jung’s caveat",
+    caveat: "C. G. Jung suggests reading the book backwards. Understanding Sidpa, the drive towards a new birth, opens Chonyid, the bardo in which appearances arise, and that in turn opens Chikhai, the clear light at the moment of death. He offers the reversal as an inverted initiation: a map of inner process for a Western reader. He is plain that this is not the original intent of the Bardo Thödol. The book itself addresses the deceased in the forward order, from death towards rebirth.",
+    chonyidNote: "Chonyid is also written Chönyid.",
+    enter: "Enter the tour",
+    directionJung: "Jung’s reverse",
+    directionBook: "Book order",
+    helpJung: "The scrubber starts at the Sidpa end and walks towards day 0, the Clear Light. This is Jung’s suggested reading, not the book’s own sequence.",
+    helpBook: "The scrubber starts at day 0 and walks towards day 49, the order the book uses when it addresses the deceased.",
+    walkJung: "Walk towards the Clear Light",
+    walkBook: "Walk towards rebirth",
+    dayLabel: "Day",
+    of: "of",
+    phase0: "Chikhai, primary Clear Light",
+    phase1: "Chikhai, secondary Clear Light",
+    phase2: "Chonyid, peaceful day",
+    phase3: "Chonyid, wrathful day",
+    phase4: "After the wrathful deities",
+    phase5: "Sidpa",
+    clarity: "Clarity",
+    intensity: "Intensity",
+    complexity: "Complexity",
+    thousandths: "thousandths",
+    graphSummary: "Curves against the book clock",
+    graphNote: "The curves follow the book clock even when the visit runs in reverse. Clarity is highest at day 0 and falls from there. The numbers are thousandths, from 0 to 1000. They are our model of the source, not figures printed in the book. The colours of the lines are our own.",
+    model: "How this clock is computed",
+    modelBody: "The book gives several clocks at once. This page uses one model of 49 days: the primary Clear Light in the first six hours of day 0, the secondary light until day 4 (the source’s three and a half days, held to the start of the peaceful week), peaceful days 1–7 on calendar days 4–10, wrathful days 8–14 on days 11–17, a short unconsciousness, then Sidpa through day 49. Clarity falls steadily. Intensity and complexity step up through the peaceful days and peak in the wrathful week. Sidpa is a grey interval: strong wind, lower complexity. Ada computes the numbers.",
+    pause: "Pause rain",
+    play: "Play rain",
+    mantraTitle: "What the rain is spelling",
+    mantraBody: "Three mantras, in order, as whole syllables. The six-syllable mantra is the traditional identification of the “Six Syllables” named in the Sidpa prayers; this book does not print the Sanskrit. The Amitābha mantra belongs with the western buddha of peaceful day 4 and is not a quotation from the book. The Vajra Guru mantra belongs with Padmasambhava, who is named in the homage and in the historical note; the mantra itself is not in the book.",
+    m1: "oṃ maṇi padme hūṃ — the jewel in the lotus",
+    m2: "oṃ amitābha hrīḥ — Amitābha’s name and seed syllable",
+    m3: "oṃ āḥ hūṃ vajra guru padma siddhi hūṃ — Padmasambhava’s mantra",
+    note: "Note for the report",
+    noteHint: "A short note helps: what did you expect?",
+    debug: "Debug",
+    f9: "F9 does the same.",
+    reload: "New build: {stamp} — tap to reload",
+    crash: "This page stopped on the last visit ({notice}). The next report includes that notice.",
+    errorWasm: "The Ada module did not start.",
+    axisDay: "Book day",
+    noscript: "This page needs JavaScript."
+  },
+  de: {
+    title: "Die Bardo-Zustände",
+    standfirst: "Ein Gang durch den Zwischenzustand, in Jungs umgekehrter Lesart.",
+    opening: "Das Bardo Thödol ist eine Anleitung für einen Menschen, der gerade gestorben ist. Der Name wird oft wiedergegeben als „Befreiung durch Hören im Zwischenzustand“. Jemand liest sie am Lager, über symbolische neunundvierzig Tage zwischen einem Leben und dem nächsten, und bittet die Toten, jede Erscheinung als das eigene Licht des Geistes zu erkennen und nicht als eine Macht von außen.",
+    sources: "Quellen: W. Y. Evans-Wentz, Das Tibetanische Totenbuch, nach der Übertragung von Lama Kazi Dawa Samdup; psychologischer Kommentar von C. G. Jung; historische Anmerkung von L. Goepfert-March.",
+    history: "Die Anmerkung von L. Goepfert-March folgt der überlieferten Zuschreibung des Buches an Padmasambhava und einer langen mündlichen Weitergabe vor den späteren schriftlichen Fassungen. Den englischen Text, den die meisten Leser kennen, hat Evans-Wentz nach der Übersetzung von Lama Kazi Dawa Samdup erstellt. Die Uhr dieser Führung wurde an einer späteren deutschen Ausgabe dieses Buches geprüft. Die Sätze hier sind unsere eigenen.",
+    caveatLabel: "Jungs Vorbehalt",
+    caveat: "C. G. Jung schlägt vor, das Buch rückwärts zu lesen. Wer Sidpa versteht, den Drang zu einer neuen Geburt, dem öffnet sich Chonyid, der Bardo, in dem Erscheinungen aufsteigen, und darüber öffnet sich Chikhai, das klare Licht im Augenblick des Todes. Die Umkehr ist bei ihm eine umgekehrte Einweihung: eine Karte innerer Vorgänge für westliche Leser. Er sagt deutlich, dass dies nicht die ursprüngliche Absicht des Bardo Thödol ist. Das Buch selbst spricht die Verstorbenen in der Reihenfolge des Textes an, vom Tod zur Wiedergeburt.",
+    chonyidNote: "Chonyid wird auch Chönyid geschrieben.",
+    enter: "Die Führung beginnen",
+    directionJung: "Jungs Umkehr",
+    directionBook: "Buchreihenfolge",
+    helpJung: "Der Regler beginnt am Sidpa-Ende und geht auf Tag 0 zu, das klare Licht. Das ist Jungs Lesevorschlag, nicht die eigene Folge des Buches.",
+    helpBook: "Der Regler beginnt bei Tag 0 und geht auf Tag 49 zu, in der Ordnung, in der das Buch die Verstorbenen anspricht.",
+    walkJung: "Zum klaren Licht gehen",
+    walkBook: "Zur Wiedergeburt gehen",
+    dayLabel: "Tag",
+    of: "von",
+    phase0: "Chikhai, erstes klares Licht",
+    phase1: "Chikhai, zweites klares Licht",
+    phase2: "Chonyid, friedvoller Tag",
+    phase3: "Chonyid, zornvoller Tag",
+    phase4: "Nach den zornvollen Gottheiten",
+    phase5: "Sidpa",
+    clarity: "Klarheit",
+    intensity: "Intensität",
+    complexity: "Komplexität",
+    thousandths: "Tausendstel",
+    graphSummary: "Kurven auf der Uhr des Buches",
+    graphNote: "Die Kurven folgen der Uhr des Buches, auch wenn der Gang umgekehrt läuft. Die Klarheit ist an Tag 0 am höchsten und fällt danach. Die Zahlen sind Tausendstel von 0 bis 1000. Sie sind unser Modell der Quelle, keine Zahlen aus dem Buch. Die Farben der Linien sind unsere eigenen.",
+    model: "Wie diese Uhr gerechnet ist",
+    modelBody: "Das Buch nennt mehrere Uhren zugleich. Diese Seite benutzt ein Modell von 49 Tagen: das erste klare Licht in den ersten sechs Stunden von Tag 0, das zweite Licht bis Tag 4 (die dreieinhalb Tage der Quelle, gehalten bis zum Beginn der friedvollen Woche), die friedvollen Tage 1–7 an den Kalendertagen 4–10, die zornvollen Tage 8–14 an den Tagen 11–17, eine kurze Bewusstlosigkeit, dann Sidpa bis Tag 49. Die Klarheit fällt stetig. Intensität und Komplexität steigen in Stufen durch die friedvollen Tage und erreichen ihren Höhepunkt in der zornvollen Woche. Sidpa ist eine graue Zwischenzeit: starker Wind, geringere Komplexität. Ada rechnet die Zahlen.",
+    pause: "Regen anhalten",
+    play: "Regen abspielen",
+    mantraTitle: "Was der Regen buchstabiert",
+    mantraBody: "Drei Mantren, der Reihe nach, in ganzen Silben. Das sechssilbige Mantra ist die überlieferte Deutung der „sechs Silben“, die in den Sidpa-Gebeten genannt werden; dieses Buch druckt das Sanskrit nicht. Das Amitabha-Mantra gehört zum westlichen Buddha des friedvollen Tages 4 und ist kein Zitat aus dem Buch. Das Vajra-Guru-Mantra gehört zu Padmasambhava, der in der Huldigung und in der historischen Anmerkung genannt wird; das Mantra selbst steht nicht im Buch.",
+    m1: "oṃ maṇi padme hūṃ — das Juwel im Lotus",
+    m2: "oṃ amitābha hrīḥ — Name und Keimsilbe Amitābhas",
+    m3: "oṃ āḥ hūṃ vajra guru padma siddhi hūṃ — Mantra Padmasambhavas",
+    note: "Notiz für den Bericht",
+    noteHint: "Eine kurze Notiz hilft: was haben Sie erwartet?",
+    debug: "Debug",
+    f9: "F9 tut dasselbe.",
+    reload: "Neuer Stand: {stamp} — zum Neuladen tippen",
+    crash: "Diese Seite ist beim letzten Besuch stehen geblieben ({notice}). Der nächste Bericht enthält diesen Hinweis.",
+    errorWasm: "Das Ada-Modul ist nicht gestartet.",
+    axisDay: "Buchtag",
+    noscript: "Diese Seite braucht JavaScript."
+  }
+};
+
+// Evolved from interactive-formulas rain.js (v0.11).
+// Pitch 14, glyph 13, gap 14, head #d9ffc3, trail #83c79d, 60 ms frames.
+// Columns spell whole grapheme clusters. A lone virama is never drawn.
+const RAIN = {
+  columnPitch: 14,
+  fontSize: 13,
+  glyphGap: 14,
+  minTrail: 36,
+  head: "#d9ffc3",
+  body: "#83c79d",
+  frameMs: 60
+};
+
+function startRain(opts) {
+  const canvas = opts.canvas;
+  const button = opts.button;
+  const ctx = canvas.getContext("2d");
+  const media = matchMedia("(prefers-reduced-motion: reduce)");
+  let paused = media.matches;
+  let width = 0;
+  let height = 0;
+  let columns = [];
+  let last = 0;
+
+  function trailLength(h) {
+    return Math.max(RAIN.minTrail, Math.ceil(h / RAIN.glyphGap));
+  }
+
+  function fillGlyphs(mantra, trail) {
+    const seq = opts.sequences[mantra];
+    const glyphs = new Array(trail);
+    for (let i = 0; i < trail; i++) {
+      const fromTop = trail - 1 - i;
+      glyphs[i] = seq[fromTop % seq.length];
+    }
+    return glyphs;
+  }
+
+  function makeColumns() {
+    const count = Math.max(0, Math.ceil(width / RAIN.columnPitch));
+    const trail = trailLength(height);
+    columns = [];
+    for (let i = 0; i < count; i++) {
+      const mantra = (i % 3) + 1;
+      columns.push({
+        x: i * RAIN.columnPitch + RAIN.columnPitch / 2,
+        y: Math.random() * (height + trail * RAIN.glyphGap) - trail * RAIN.glyphGap,
+        speed: 0.7 + Math.random() * 1.6,
+        mantra: mantra,
+        glyphs: fillGlyphs(mantra, trail)
+      });
+    }
+  }
+
+  function resize() {
+    width = innerWidth;
+    height = innerHeight;
+    const dpr = Math.min(devicePixelRatio || 1, 1.5);
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    makeColumns();
+    draw(false);
+  }
+
+  function draw(move) {
+    const scale = opts.scales();
+    const speedScale = scale.speed / 1000;
+    const alphaScale = scale.alpha / 1000;
+    const stride = scale.stride;
+    ctx.clearRect(0, 0, width, height);
+    ctx.font = RAIN.fontSize + 'px "Rain Devanagari", serif';
+    ctx.textAlign = "center";
+    const trail = trailLength(height);
+    for (let c = 0; c < columns.length; c++) {
+      const column = columns[c];
+      if (move) {
+        column.y += column.speed * 3.2 * speedScale;
+        if (column.y - column.glyphs.length * RAIN.glyphGap > height) {
+          column.y = -RAIN.glyphGap;
+          column.mantra = (column.mantra % 3) + 1;
+          column.glyphs = fillGlyphs(column.mantra, trail);
+        }
+      }
+      if (c % stride !== 0) continue;
+      for (let i = 0; i < column.glyphs.length; i++) {
+        const base = Math.max(0.08, (1 - i / (column.glyphs.length + 1)) * 0.85);
+        ctx.globalAlpha = Math.min(1, base * alphaScale);
+        ctx.fillStyle = i === 0 ? RAIN.head : RAIN.body;
+        ctx.fillText(column.glyphs[i], column.x, column.y - i * RAIN.glyphGap);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function refreshLabels() {
+    const labels = opts.labels();
+    button.textContent = paused ? labels.play : labels.pause;
+    button.setAttribute("aria-pressed", String(paused));
+  }
+
+  function frame(time) {
+    if (!paused && !document.hidden && time - last >= RAIN.frameMs) {
+      draw(true);
+      last = time;
+      opts.onFrame();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  button.addEventListener("click", function () {
+    paused = !paused;
+    refreshLabels();
+  });
+  media.addEventListener("change", function (event) {
+    paused = event.matches;
+    refreshLabels();
+  });
+  addEventListener("resize", resize);
+  resize();
+  document.fonts.load(RAIN.fontSize + 'px "Rain Devanagari"').then(function () {
+    draw(false);
+  });
+  refreshLabels();
+  requestAnimationFrame(frame);
+
+  return {
+    refreshLabels: refreshLabels,
+    isPaused: function () { return paused; },
+    prefersReduced: function () { return media.matches; }
+  };
+}
+
+const STAMP = "v0.1 b20261122-1954 d0ee170";
+const RAW_VERSION = "https://raw.githubusercontent.com/RobertBoettcherSF/bardo-visualization/main/version.txt";
+const REPO_API = "https://api.github.com/repos/RobertBoettcherSF/bardo-visualization/commits/main";
+
+let lang = "en";
+let direction = 0;
+let milli = 0;
+let fps = 0;
+let frameCount = 0;
+let frameStamp = 0;
+const errors = [];
+let crashNotice = "";
+let ada = null;
+let rain = null;
+const curves = { clarity: [], intensity: [], complexity: [] };
+
+function t(key) {
+  return STRINGS[lang][key];
+}
+
+function ints(ptr, n) {
+  return new Int32Array(ada.exports.memory.buffer, ptr, n);
+}
+
+function output() {
+  return ints(ada.outPtr, 16);
+}
+
+function input() {
+  return ints(ada.inPtr, 8);
+}
+
+function phaseText(code, named) {
+  const key = "phase" + code;
+  const base = t(key);
+  if (code === 2 || code === 3) return base + " " + named;
+  return base;
+}
+
+function applyStaticText() {
+  document.documentElement.lang = lang === "de" ? "de" : "en-GB";
+  document.title = t("title");
+  document.querySelectorAll("[data-k]").forEach(function (el) {
+    el.textContent = t(el.dataset.k);
+  });
+  document.getElementById("lang-en").setAttribute("aria-pressed", String(lang === "en"));
+  document.getElementById("lang-de").setAttribute("aria-pressed", String(lang === "de"));
+  if (rain) rain.refreshLabels();
+  if (crashNotice) {
+    document.getElementById("crash").textContent =
+      t("crash").replace("{notice}", crashNotice);
+  }
+}
+
+function showError(message) {
+  errors.push(message);
+  const box = document.getElementById("errors");
+  box.hidden = false;
+  box.textContent = errors.join("\n");
+}
+
+function compute() {
+  const view = input();
+  view[0] = milli;
+  view[1] = direction;
+  ada.exports.bardo_compute();
+  return output();
+}
+
+function render() {
+  const out = compute();
+  if (out[0] !== 0) {
+    showError("Ada status " + out[0]);
+  }
+  const day = out[2];
+  const named = out[3];
+  const phase = phaseText(out[1], named);
+  const state = document.getElementById("state");
+  state.dataset.day = String(day);
+  state.dataset.phase = phase;
+  state.dataset.clarity = String(out[4]);
+  state.dataset.intensity = String(out[5]);
+  state.dataset.complexity = String(out[6]);
+  state.dataset.mantra = String(out[8]);
+  state.dataset.paused = rain && rain.isPaused() ? "true" : "false";
+  document.getElementById("day").value = String(day);
+  document.getElementById("day-read").textContent =
+    t("dayLabel") + " " + day + " " + t("of") + " 49";
+  document.getElementById("phase-read").textContent = phase;
+  document.getElementById("clarity-read").textContent =
+    t("clarity") + " " + out[4];
+  document.getElementById("intensity-read").textContent =
+    t("intensity") + " " + out[5];
+  document.getElementById("complexity-read").textContent =
+    t("complexity") + " " + out[6];
+  document.getElementById("dir-help").textContent =
+    direction === 0 ? t("helpJung") : t("helpBook");
+  document.getElementById("walk").textContent =
+    direction === 0 ? t("walkJung") : t("walkBook");
+  document.getElementById("dir-jung").setAttribute("aria-pressed", String(direction === 0));
+  document.getElementById("dir-book").setAttribute("aria-pressed", String(direction === 1));
+  for (let id = 1; id <= 3; id++) {
+    document.getElementById("m" + id).classList.toggle("active", out[8] === id);
+  }
+  drawGraph(day);
+}
+
+function sampleCurves() {
+  const savedMilli = milli;
+  const savedDir = direction;
+  for (let day = 0; day <= 49; day++) {
+    milli = ada.exports.bardo_milli_of_day(day);
+    const out = compute();
+    curves.clarity[day] = out[4];
+    curves.intensity[day] = out[5];
+    curves.complexity[day] = out[6];
+  }
+  milli = savedMilli;
+  direction = savedDir;
+  compute();
+}
+
+function drawGraph(day) {
+  const canvas = document.getElementById("curves");
+  const ctx = canvas.getContext("2d");
+  const dpr = Math.min(devicePixelRatio || 1, 1.5);
+  const width = canvas.clientWidth || 320;
+  const height = canvas.clientHeight || 200;
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+  const left = 36;
+  const right = 12;
+  const top = 16;
+  const bottom = 28;
+  const plotW = width - left - right;
+  const plotH = height - top - bottom;
+  ctx.strokeStyle = "#3c4038";
+  ctx.fillStyle = "#b7b1a2";
+  ctx.font = "12px ui-sans-serif, system-ui, sans-serif";
+  ctx.beginPath();
+  ctx.moveTo(left, top);
+  ctx.lineTo(left, top + plotH);
+  ctx.lineTo(left + plotW, top + plotH);
+  ctx.stroke();
+  ctx.fillText("1000", 2, top + 10);
+  ctx.fillText("0", 18, top + plotH);
+  ctx.fillText(t("axisDay"), left, height - 8);
+  ctx.fillText("49", left + plotW - 14, top + plotH + 14);
+  function line(series, colour) {
+    ctx.beginPath();
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = 1.5;
+    for (let d = 0; d <= 49; d++) {
+      const x = left + (d / 49) * plotW;
+      const y = top + plotH - (series[d] / 1000) * plotH;
+      if (d === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+  line(curves.clarity, "#d9ffc3");
+  line(curves.intensity, "#e0b080");
+  line(curves.complexity, "#8aa4c8");
+  const x = left + (day / 49) * plotW;
+  ctx.strokeStyle = "#f5e642";
+  ctx.beginPath();
+  ctx.moveTo(x, top);
+  ctx.lineTo(x, top + plotH);
+  ctx.stroke();
+}
+
+function loadGlyphs() {
+  const sequences = { 1: [], 2: [], 3: [] };
+  for (let mantra = 1; mantra <= 3; mantra++) {
+    for (let index = 0; index < 32; index++) {
+      ada.exports.bardo_mantra_glyph(mantra, index);
+      const out = output();
+      if (out[0] === 4) break;
+      if (out[0] !== 0) throw new Error("glyph status " + out[0]);
+      const bytes = new Uint8Array(ada.exports.memory.buffer, ada.glyphPtr, out[12]);
+      const text = new TextDecoder("utf-8").decode(bytes);
+      if (text === "\u094D" || text.endsWith("\u094D")) {
+        throw new Error("virama cluster");
+      }
+      sequences[mantra].push(text);
+    }
+    if (sequences[mantra].length < 1) throw new Error("empty mantra");
+  }
+  return sequences;
+}
+
+function report() {
+  const state = document.getElementById("state");
+  return {
+    schema: "bardo-d009",
+    stamp: STAMP,
+    settings: {
+      language: lang === "de" ? "de" : "en-GB",
+      direction: direction === 0 ? "jung-reverse" : "book-order",
+      day: Number(state.dataset.day),
+      phase: state.dataset.phase,
+      rainPaused: rain ? rain.isPaused() : true,
+      reducedMotion: rain ? rain.prefersReduced() : matchMedia("(prefers-reduced-motion: reduce)").matches
+    },
+    fps: Math.round(fps * 10) / 10,
+    errors: errors.slice(),
+    crash: { afterReload: crashNotice !== "", notice: crashNotice },
+    note: document.getElementById("note").value
+  };
+}
+
+function downloadReport() {
+  const blob = new Blob([JSON.stringify(report(), null, 2)], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "bardo-report.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
+}
+
+function readCString(ptr) {
+  const mem = new Uint8Array(ada.exports.memory.buffer);
+  let end = ptr;
+  const limit = Math.min(mem.length, ptr + 180);
+  while (end < limit && mem[end] !== 0) end++;
+  return new TextDecoder().decode(mem.subarray(ptr, end));
+}
+
+async function boot() {
+  document.getElementById("stamp").textContent = STAMP;
+  try {
+    crashNotice = sessionStorage.getItem("bardo-crash") || "";
+    if (crashNotice) sessionStorage.removeItem("bardo-crash");
+  } catch (err) {
+    crashNotice = "";
+  }
+  if (crashNotice) {
+    const banner = document.getElementById("crash");
+    banner.hidden = false;
+    banner.textContent = t("crash").replace("{notice}", crashNotice);
+  }
+  const bytes = Uint8Array.from(atob(WASM_BASE64), function (c) { return c.charCodeAt(0); });
+  const env = new Proxy({
+    bardo_host_trap: function (ptr, line) {
+      const notice = readCString(ptr >>> 0) + ":" + line;
+      try { sessionStorage.setItem("bardo-crash", notice); } catch (err) { /* private mode */ }
+      showError(notice);
+      throw new Error(notice);
+    }
+  }, {
+    get: function (target, prop) {
+      if (prop in target) return target[prop];
+      if (typeof prop !== "string") return undefined;
+      showError("unknown wasm import " + prop);
+      return function () { return 0; };
+    }
+  });
+  const instantiated = await WebAssembly.instantiate(bytes, { env: env });
+  const exports = instantiated.instance.exports;
+  if (typeof exports.adainit === "function") exports.adainit();
+  ada = {
+    exports: exports,
+    inPtr: exports.bardo_input() >>> 0,
+    outPtr: exports.bardo_output() >>> 0,
+    glyphPtr: exports.bardo_glyph() >>> 0
+  };
+  const sequences = loadGlyphs();
+  direction = 0;
+  milli = ada.exports.bardo_start(direction);
+  sampleCurves();
+  applyStaticText();
+  rain = startRain({
+    canvas: document.getElementById("rain"),
+    button: document.getElementById("rain-toggle"),
+    sequences: sequences,
+    labels: function () { return { pause: t("pause"), play: t("play") }; },
+    scales: function () {
+      const out = output();
+      return { speed: out[9], alpha: out[10], stride: out[11] || 1 };
+    },
+    onFrame: function () {
+      frameCount += 1;
+      const now = performance.now();
+      if (frameStamp === 0) frameStamp = now;
+      if (now - frameStamp >= 1000) {
+        fps = frameCount * 1000 / (now - frameStamp);
+        frameCount = 0;
+        frameStamp = now;
+      }
+    }
+  });
+  render();
+  window.__bardoReady = true;
+}
+
+function setDirection(next) {
+  direction = next;
+  milli = ada.exports.bardo_start(direction);
+  render();
+}
+
+function pollVersion() {
+  if (location.protocol === "file:") return;
+  fetch(RAW_VERSION, { cache: "no-store" })
+    .then(function (res) { return res.ok ? res.text() : ""; })
+    .then(function (text) {
+      const remote = text.trim();
+      if (!remote || remote === STAMP) return;
+      const button = document.getElementById("reload");
+      button.hidden = false;
+      button.textContent = t("reload").replace("{stamp}", remote);
+      button.onclick = function () {
+        fetch(REPO_API, { cache: "no-store" })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (data && /^[0-9a-f]{40}$/.test(data.sha)) {
+              location.assign("https://rawcdn.githack.com/RobertBoettcherSF/bardo-visualization/" + data.sha + "/index.html");
+            } else {
+              location.reload();
+            }
+          })
+          .catch(function () { location.reload(); });
+      };
+    })
+    .catch(function () { /* a failed poll is not a new build */ });
+}
+
+document.getElementById("lang-en").addEventListener("click", function () {
+  lang = "en";
+  applyStaticText();
+  render();
+});
+document.getElementById("lang-de").addEventListener("click", function () {
+  lang = "de";
+  applyStaticText();
+  render();
+});
+document.getElementById("dir-jung").addEventListener("click", function () { setDirection(0); });
+document.getElementById("dir-book").addEventListener("click", function () { setDirection(1); });
+document.getElementById("walk").addEventListener("click", function () {
+  milli = ada.exports.bardo_walk(milli, direction);
+  render();
+});
+document.getElementById("day").addEventListener("input", function (event) {
+  milli = ada.exports.bardo_milli_of_day(Number(event.target.value));
+  render();
+});
+document.getElementById("enter").addEventListener("click", function () {
+  document.getElementById("tour").scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("day").focus();
+});
+document.getElementById("debug").addEventListener("click", downloadReport);
+document.addEventListener("keydown", function (event) {
+  if (event.key === "F9" && event.target.id !== "note") {
+    event.preventDefault();
+    downloadReport();
+  }
+});
+const wide = matchMedia("(min-width: 900px)");
+function foldGraph() {
+  document.getElementById("graph-fold").open = wide.matches;
+}
+wide.addEventListener("change", foldGraph);
+foldGraph();
+document.getElementById("graph-fold").addEventListener("toggle", function () {
+  if (ada) drawGraph(Number(document.getElementById("state").dataset.day || "0"));
+});
+addEventListener("resize", function () {
+  if (ada) drawGraph(Number(document.getElementById("state").dataset.day || "0"));
+});
+
+boot().catch(function (err) {
+  showError(t("errorWasm") + " " + (err && err.message ? err.message : String(err)));
+  window.__bardoReady = false;
+  window.__bardoError = String(err);
+});
+pollVersion();
+setInterval(pollVersion, 120000);
+
+</script>
+</body>
+</html>
