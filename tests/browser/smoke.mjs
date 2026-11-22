@@ -49,6 +49,9 @@ async function open(browser, width, height, reduced) {
     if (where.includes("raw.githubusercontent.com")) return;
     logs.push("console " + msg.text() + " @ " + where);
   });
+  page.on("request", (req) => {
+    if (/\.(mp3|ogg|wav|m4a)(\?|$)/i.test(req.url())) logs.push("audio file " + req.url());
+  });
   page.on("response", (res) => {
     if (res.status() < 400) return;
     if (res.url().endsWith("/favicon.ico")) return;
@@ -105,7 +108,29 @@ try {
     assert(state.clarity === "0", name + " clarity " + state.clarity);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     assert(overflow <= 1, name + " overflow " + overflow);
-    await page.screenshot({ path: join(outDir, name + ".png"), fullPage: true });
+    const enterBox = await page.$eval("#enter", (el) => {
+      const r = el.getBoundingClientRect();
+      return { top: r.top, bottom: r.bottom };
+    });
+    const vh = await page.evaluate(() => innerHeight);
+    assert(enterBox.top >= 0 && enterBox.bottom <= vh + 1, name + " enter below the fold " + enterBox.bottom + "/" + vh);
+    const soundOff = await page.$eval("#sound", (el) => el.getAttribute("aria-pressed"));
+    assert(soundOff === "false", name + " sound was on");
+    await page.screenshot({ path: join(outDir, name + "-open.png"), fullPage: false });
+    await page.click("#enter");
+    const scene = await page.$eval("#state", (el) => el.dataset.scene);
+    assert(scene === "1", name + " expected womb, got " + scene);
+    const stageH = await page.$eval("#stage", (el) => el.getBoundingClientRect().height);
+    assert(stageH > vh * 0.35, name + " stage short " + stageH);
+    const barTop = await page.$eval("#bar", (el) => el.getBoundingClientRect().top);
+    assert(barTop < vh, name + " bar off screen");
+    await page.click("#next");
+    const lights = await page.$eval("#state", (el) => el.dataset.scene);
+    assert(lights === "2", name + " expected lights, got " + lights);
+    await page.click("#cards button");
+    const bright = await page.$eval("#state", (el) => el.dataset.brightest);
+    assert(bright === "0", name + " brightest " + bright);
+    await page.screenshot({ path: join(outDir, name + ".png"), fullPage: false });
     await page.$eval("#day", (el) => {
       el.value = "0";
       el.dispatchEvent(new Event("input", { bubbles: true }));
@@ -120,6 +145,9 @@ try {
     await page.click("#dir-jung");
     const jung = await page.$eval("#state", (el) => el.dataset.day);
     assert(jung === "49", name + " jung day " + jung);
+    await page.click("#sound");
+    const soundOn = await page.$eval("#sound", (el) => el.getAttribute("aria-pressed"));
+    assert(soundOn === "true", name + " sound did not switch on");
     await page.click("#rain-toggle");
     const paused = await page.$eval("#rain-toggle", (el) => el.getAttribute("aria-pressed"));
     assert(paused === "true", name + " pause");

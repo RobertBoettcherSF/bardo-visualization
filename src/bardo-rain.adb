@@ -128,7 +128,7 @@ package body Bardo.Rain is
             return (Mantra => 3, Speed => 1_450, Alpha => 1_200, Stride => 1);
          when Post_Wrathful =>
             return (Mantra => 3, Speed => 700, Alpha => 600, Stride => 1);
-         when Sidpa =>
+         when Sidpa_Phase =>
             return (Mantra => 1, Speed => 850, Alpha => 700, Stride => 1);
       end case;
    end Parameters;

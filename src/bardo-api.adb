@@ -1,6 +1,7 @@
 with Bardo.Calendar;
 with Bardo.Curves;
 with Bardo.Rain;
+with Bardo.Sidpa;
 
 package body Bardo.API is
 
@@ -20,6 +21,7 @@ package body Bardo.API is
    function Input_Address return System.Address is (Input'Address);
    function Output_Address return System.Address is (Output'Address);
    function Glyph_Address return System.Address is (Glyph'Address);
+   function Sidpa_Address return System.Address is (Sidpa'Address);
 
    function Direction_Of (Code : Integer) return Direction_Kind is
      (if Code = 0 then Jung_Reverse else Book_Order);
@@ -39,6 +41,13 @@ package body Bardo.API is
          Output (0) := 2;
          return;
       end if;
+      if Input (2) not in 0 .. 7
+        or else Input (4) not in 0 .. 5
+        or else Input (6) < 0
+      then
+         Output (0) := 5;
+         return;
+      end if;
       Time := Milli_Time (Time_Code);
       Dir := Direction_Of (Dir_Code);
       Scales := Bardo.Rain.Parameters (Time);
@@ -55,6 +64,29 @@ package body Bardo.API is
       Output (10) := Scales.Alpha;
       Output (11) := Scales.Stride;
       Output (15) := Integer (Bardo.Calendar.Start_Time (Dir));
+      declare
+         Value : Bardo.Sidpa.Result;
+      begin
+         Bardo.Sidpa.Evaluate
+           (Time, Dir, Input (2), Input (3), Input (4), Input (5), Input (6),
+            Value);
+         Sidpa (0) := Bardo.Sidpa.Scene_Kind'Pos (Value.Scene);
+         Sidpa (1) := Value.Outcome;
+         Sidpa (2) := Value.Methods;
+         Sidpa (3) := Value.Brightest;
+         Sidpa (4) := Value.Instruct;
+         Sidpa (5) := Value.Allow;
+         Sidpa (6) := Value.Poison;
+         Sidpa (7) := Value.Wind;
+         Sidpa (8) := Value.X;
+         Sidpa (9) := Value.Y;
+         Sidpa (10) := Value.White;
+         Sidpa (11) := Value.Black;
+         Sidpa (12) := Integer (Value.Anchor);
+         Sidpa (13) := Value.Next_Scene;
+         Sidpa (14) := Value.Prev_Scene;
+         Sidpa (15) := Value.Closed;
+      end;
    end Compute;
 
    Tick_Count : Integer := 0;
@@ -101,5 +133,15 @@ package body Bardo.API is
       then -1
       else Integer
         (Bardo.Calendar.Walk (Milli_Time (Time), Direction_Of (Direction))));
+
+   function Anchor_Host (Scene : Integer) return Integer is
+     (if Scene not in 0 .. 4 then -1
+      else Integer
+        (Bardo.Sidpa.Anchor_Day (Bardo.Sidpa.Scene_Kind'Val (Scene))));
+
+   function First_Host (Direction : Integer) return Integer is
+     (if Direction = 0 then 1
+      elsif Direction = 1 then 4
+      else -1);
 
 end Bardo.API;

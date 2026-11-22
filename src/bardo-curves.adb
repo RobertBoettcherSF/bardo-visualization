@@ -25,7 +25,7 @@ package body Bardo.Curves is
             return Thousandth (620 + (Integer (D) - 8) * 48);
          when Post_Wrathful =>
             return 340;
-         when Sidpa =>
+         when Sidpa_Phase =>
             return 580;
       end case;
    end Intensity;
@@ -45,7 +45,7 @@ package body Bardo.Curves is
             return Thousandth (640 + (Integer (D) - 8) * 46);
          when Post_Wrathful =>
             return 160;
-         when Sidpa =>
+         when Sidpa_Phase =>
             return 220;
       end case;
    end Complexity;

@@ -5,8 +5,12 @@ with Bardo.API;
 with Host_Stub;
 with Bardo.Calendar;
 with Bardo.Curves;
+with Bardo.Lights;
 with Bardo.Rain;
+with Bardo.Sidpa;
 with Bardo.Version;
+use type Bardo.Sidpa.Scene_Kind;
+use type Bardo.Lights.Realm;
 use type Bardo.Byte;
 use type Bardo.Phase_Kind;
 use type Bardo.Rain.Mantra_Id;
@@ -95,8 +99,8 @@ procedure Smoke is
       pragma Assert (Bardo.Calendar.Phase (18_000) = Bardo.Post_Wrathful);
       pragma Assert (Bardo.Calendar.Phase (21_999) = Bardo.Post_Wrathful);
       pragma Assert (Bardo.Calendar.Named_Day (18_000) = 0);
-      pragma Assert (Bardo.Calendar.Phase (22_000) = Bardo.Sidpa);
-      pragma Assert (Bardo.Calendar.Phase (49_000) = Bardo.Sidpa);
+      pragma Assert (Bardo.Calendar.Phase (22_000) = Bardo.Sidpa_Phase);
+      pragma Assert (Bardo.Calendar.Phase (49_000) = Bardo.Sidpa_Phase);
       pragma Assert (Bardo.Calendar.Calendar_Day (0) = 0);
       pragma Assert (Bardo.Calendar.Calendar_Day (3_500) = 3);
       pragma Assert (Bardo.Calendar.Calendar_Day (49_000) = 49);
@@ -167,14 +171,14 @@ procedure Smoke is
       Bardo.API.Input (1) := 0;
       Bardo.API.Compute;
       pragma Assert (Bardo.API.Output (0) = 0);
-      pragma Assert (Bardo.API.Output (1) = Bardo.Phase_Kind'Pos (Bardo.Sidpa));
+      pragma Assert (Bardo.API.Output (1) = Bardo.Phase_Kind'Pos (Bardo.Sidpa_Phase));
       pragma Assert (Bardo.API.Output (2) = 49);
       pragma Assert (Bardo.API.Output (4) = 0);
       pragma Assert (Bardo.API.Output (15) = 49_000);
 
       Bardo.API.Input (1) := 1;
       Bardo.API.Compute;
-      pragma Assert (Bardo.API.Output (1) = Bardo.Phase_Kind'Pos (Bardo.Sidpa));
+      pragma Assert (Bardo.API.Output (1) = Bardo.Phase_Kind'Pos (Bardo.Sidpa_Phase));
       pragma Assert (Bardo.API.Output (4) = 0);
       pragma Assert (Bardo.API.Output (15) = 0);
 
@@ -215,7 +219,103 @@ procedure Smoke is
       pragma Assert (Bardo.API.Walk_Host (49_000, 0) = 48_000);
       pragma Assert (Bardo.API.Walk_Host (0, 0) = 0);
       pragma Assert (Bardo.API.Walk_Host (-1, 0) = -1);
+      pragma Assert (Bardo.API.Anchor_Host (1) = 49);
+      pragma Assert (Bardo.API.Anchor_Host (4) = 22);
+      pragma Assert (Bardo.API.First_Host (0) = 1);
+      pragma Assert (Bardo.API.First_Host (1) = 4);
+      pragma Assert (Bardo.API.First_Host (3) = -1);
    end Check_API;
+
+   procedure Check_Sidpa is
+      Value : Bardo.Sidpa.Result;
+   begin
+      pragma Assert (Bardo.Sidpa.Scene_Of (21) = Bardo.Sidpa.None);
+      pragma Assert (Bardo.Sidpa.Scene_Of (22) = Bardo.Sidpa.Wish_Body);
+      pragma Assert (Bardo.Sidpa.Scene_Of (28) = Bardo.Sidpa.Wish_Body);
+      pragma Assert (Bardo.Sidpa.Scene_Of (29) = Bardo.Sidpa.Judgement);
+      pragma Assert (Bardo.Sidpa.Scene_Of (35) = Bardo.Sidpa.Judgement);
+      pragma Assert (Bardo.Sidpa.Scene_Of (36) = Bardo.Sidpa.Lights);
+      pragma Assert (Bardo.Sidpa.Scene_Of (42) = Bardo.Sidpa.Lights);
+      pragma Assert (Bardo.Sidpa.Scene_Of (43) = Bardo.Sidpa.Womb);
+      pragma Assert (Bardo.Sidpa.Scene_Of (49) = Bardo.Sidpa.Womb);
+      pragma Assert (Bardo.Sidpa.Anchor_Day (Bardo.Sidpa.Womb) = 49);
+      pragma Assert (Bardo.Sidpa.Anchor_Day (Bardo.Sidpa.Wish_Body) = 22);
+      pragma Assert
+        (Bardo.Sidpa.Neighbour (Bardo.Jung_Reverse, Bardo.Sidpa.Womb, 1) =
+           Bardo.Sidpa.Lights);
+      pragma Assert
+        (Bardo.Sidpa.Neighbour (Bardo.Book_Order, Bardo.Sidpa.Wish_Body, 1) =
+           Bardo.Sidpa.Judgement);
+      pragma Assert
+        (Bardo.Sidpa.Neighbour (Bardo.Jung_Reverse, Bardo.Sidpa.Wish_Body, 1) =
+           Bardo.Sidpa.Wish_Body);
+      pragma Assert (Bardo.Sidpa.Apply_Method (0, 1) = 1);
+      pragma Assert (Bardo.Sidpa.Apply_Method (0, 3) = 0);
+      pragma Assert (Bardo.Sidpa.Apply_Method (4, 5) = 5);
+      pragma Assert (Bardo.Sidpa.Apply_Method (5, 1) = 5);
+      pragma Assert (Bardo.Sidpa.Entry_Allowed (1));
+      pragma Assert (Bardo.Sidpa.Entry_Allowed (10));
+      pragma Assert (Bardo.Sidpa.Entry_Allowed (12));
+      pragma Assert (not Bardo.Sidpa.Entry_Allowed (0));
+      pragma Assert (not Bardo.Sidpa.Entry_Allowed (11));
+      pragma Assert (not Bardo.Sidpa.Entry_Allowed (15));
+      pragma Assert (Bardo.Sidpa.Poison (0) = 0);
+      pragma Assert (Bardo.Sidpa.Poison (1) = 1);
+      pragma Assert (Bardo.Sidpa.Poison (2) = 2);
+      pragma Assert (Bardo.Sidpa.Poison (3) = -1);
+      pragma Assert (Bardo.Sidpa.Wind_Force (0) = 0);
+      pragma Assert (Bardo.Sidpa.Wind_Force (22_000) = 640);
+      pragma Assert (Bardo.Sidpa.Wind_Force (49_000) > Bardo.Sidpa.Wind_Force (22_000));
+      pragma Assert
+        (Bardo.Lights.Brightest (Bardo.Lights.Hell) = Bardo.Lights.Hell);
+      pragma Assert
+        (Bardo.Lights.Is_Bright (Bardo.Lights.Human, Bardo.Lights.Human));
+      pragma Assert
+        (not Bardo.Lights.Is_Bright (Bardo.Lights.Human, Bardo.Lights.Deva));
+      pragma Assert (Bardo.Lights.Colour_Index (Bardo.Lights.Preta) = 4);
+      pragma Assert (Bardo.Lights.Instruction (-1) = 0);
+      pragma Assert (Bardo.Lights.Instruction (2) = 2);
+      Bardo.Sidpa.Evaluate
+        (49_000, Bardo.Jung_Reverse, 1, 1, 0, -1, 0, Value);
+      pragma Assert (Value.Scene = Bardo.Sidpa.Womb);
+      pragma Assert (Value.Methods = 1);
+      pragma Assert (Value.Outcome = 0);
+      Bardo.Sidpa.Evaluate
+        (49_000, Bardo.Jung_Reverse, 1, 5, 4, -1, 0, Value);
+      pragma Assert (Value.Methods = 5);
+      pragma Assert (Value.Outcome = 1);
+      pragma Assert (Value.Closed = 1);
+      Bardo.Sidpa.Evaluate
+        (49_000, Bardo.Jung_Reverse, 1, 4, 0, -1, 0, Value);
+      pragma Assert (Value.Outcome = 8);
+      pragma Assert (Value.Methods = 0);
+      Bardo.Sidpa.Evaluate
+        (49_000, Bardo.Jung_Reverse, 3, 1, 0, -1, 0, Value);
+      pragma Assert (Value.Outcome = 4);
+      Bardo.Sidpa.Evaluate
+        (49_000, Bardo.Jung_Reverse, 3, 0, 0, -1, 0, Value);
+      pragma Assert (Value.Outcome = 5);
+      Bardo.Sidpa.Evaluate
+        (49_000, Bardo.Jung_Reverse, 2, 0, 0, -1, 0, Value);
+      pragma Assert (Value.Outcome = 2);
+      Bardo.Sidpa.Evaluate
+        (39_000, Bardo.Jung_Reverse, 4, 4, 0, -1, 0, Value);
+      pragma Assert (Value.Scene = Bardo.Sidpa.Lights);
+      pragma Assert (Value.Brightest = 4);
+      pragma Assert (Value.Instruct = 2);
+      Bardo.Sidpa.Evaluate
+        (32_000, Bardo.Book_Order, 5, 0, 0, -1, 0, Value);
+      pragma Assert (Value.Scene = Bardo.Sidpa.Judgement);
+      pragma Assert (Value.Outcome = 6);
+      pragma Assert (Value.White = 1 and then Value.Black = 1);
+      Bardo.Sidpa.Evaluate
+        (22_000, Bardo.Book_Order, 7, 0, 0, -1, 3, Value);
+      pragma Assert (Value.Scene = Bardo.Sidpa.Wish_Body);
+      pragma Assert (Value.Outcome = 9);
+      pragma Assert (Value.Poison = 0);
+      pragma Assert (Value.Wind = 640);
+      pragma Assert (Bardo.Sidpa.Scene_Of (0) = Bardo.Sidpa.None);
+   end Check_Sidpa;
 
 begin
    pragma Assert (Host_Stub.Ready);
@@ -223,6 +323,7 @@ begin
    Check_Curves;
    Check_Rain;
    Check_All_Graphemes;
+   Check_Sidpa;
    Check_API;
    Ada.Text_IO.Put_Line ("smoke ok");
 end Smoke;

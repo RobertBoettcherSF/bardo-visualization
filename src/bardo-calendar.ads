@@ -11,7 +11,7 @@ package Bardo.Calendar is
         elsif Time < Wrathful_Start then Phase'Result = Chonyid_Peaceful
         elsif Time < Post_Start then Phase'Result = Chonyid_Wrathful
         elsif Time < Sidpa_Start then Phase'Result = Post_Wrathful
-        else Phase'Result = Sidpa);
+        else Phase'Result = Sidpa_Phase);
 
    function Named_Day (Time : Milli_Time) return Chonyid_Day with
      Post =>

@@ -32,14 +32,14 @@ package Bardo is
       Chonyid_Peaceful,
       Chonyid_Wrathful,
       Post_Wrathful,
-      Sidpa);
+      Sidpa_Phase);
    for Phase_Kind use
      (Chikhai_Primary   => 0,
       Chikhai_Secondary => 1,
       Chonyid_Peaceful  => 2,
       Chonyid_Wrathful  => 3,
       Post_Wrathful     => 4,
-      Sidpa             => 5);
+      Sidpa_Phase       => 5);
 
    --  Day 49 is the Sidpa end of the clock, not the morning of that day.
    function Milli_Of_Day (Day : Day_Number) return Milli_Time with

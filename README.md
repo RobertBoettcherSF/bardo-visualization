@@ -2,7 +2,7 @@
 
 An interactive tour of the Bardo states. The clock, the curves and the mantra syllables are Plain Ada, compiled to WebAssembly. The page draws, and nothing else.
 
-Item 1 is the shell: an opening in UK English and German, a 49-day scrubber (Jung’s reverse by default, book order as a toggle), live curves, and mantra rain. Later scenes are not in this build.
+The tour is in UK English and German. Jung’s reverse order is the default. Item 2 adds the four Sidpa scenes (womb, six lights, judgement, wish-body), a fixed Previous / Start / Next bar, and a browser-generated soundscape that stays off until Sound is tapped. Wrathful days, peaceful days, and the Clear Light scenes are not in this build.
 
 ## Build
 
