@@ -143,6 +143,7 @@ function updateChrome(out) {
   const sound = document.getElementById("sound");
   sound.textContent = soundEnabled() ? t("soundOn") : t("soundOff");
   sound.setAttribute("aria-pressed", String(soundEnabled()));
+  document.body.classList.toggle("is-opening", viewMode === "opening");
   document.getElementById("enter").textContent = t(infoKey(side[0]));
   const names = sceneCopy(viewMode === "opening" ? -1 : side[0]);
   const moreBody = viewMode === "opening" ? t("lead") + " " + t("moreEnter") : t(names[1]);
@@ -206,209 +207,42 @@ function drawGraph(day) {
   paintAxes(ctx, width, height, day);
 }
 
-let regions = [];
-
-function addDisc(action, arg, x, y, r) {
-  regions.push({ kind: "disc", action: action, arg: arg, x: x, y: y, r: r });
+function modelNow() {
+  const side = sidpa();
+  return {
+    opening: viewMode === "opening",
+    scene: side[0],
+    methods: side[2],
+    bright: side[3],
+    x: side[8],
+    y: side[9],
+    curves: curves
+  };
 }
 
 function drawCanvas() {
-  const canvas = document.getElementById("viz");
-  const ctx = canvas.getContext("2d");
-  const dpr = Math.min(devicePixelRatio || 1, 1.5);
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-  canvas.width = Math.round(width * dpr);
-  canvas.height = Math.round(height * dpr);
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = "rgba(7, 8, 7, 0.62)";
-  ctx.fillRect(0, 0, width, height);
-  regions = [];
-  const side = sidpa();
-  const scene = viewMode === "opening" ? -1 : side[0];
-  const cx = width / 2;
-  const cy = height * 0.40;
-  const span = Math.min(width, height);
-  if (scene === -1 || scene === 0) {
-    paintAxes(ctx, width, height * 0.72, Number(document.getElementById("state").dataset.day || "0"));
-  } else if (scene === 1) {
-    drawLotus(ctx, cx, cy, span * 0.34, side[2]);
-  } else if (scene === 2) {
-    drawWheel(ctx, cx, cy, span * 0.34, side[3]);
-  } else if (scene === 3) {
-    drawMirror(ctx, cx, cy, span);
-  } else if (scene === 4) {
-    drawWish(ctx, width, height, side);
-  }
-  const rect = canvas.getBoundingClientRect();
-  window.__regions = regions.map(function (region) {
-    const x = region.kind === "disc" ? region.x : region.hitX;
-    const y = region.kind === "disc" ? region.y : region.hitY;
-    return {
-      action: region.action,
-      arg: region.arg,
-      clientX: rect.left + x,
-      clientY: rect.top + y
-    };
-  });
+  paintAll(performance.now(), modelNow());
 }
 
-function drawLotus(ctx, cx, cy, radius, done) {
-  const next = done < 5 ? done : -1;
-  for (let i = 0; i < 5; i++) {
-    const angle = -Math.PI / 2 + i * (Math.PI * 2 / 5);
-    const px = cx + Math.cos(angle) * radius * 0.62;
-    const py = cy + Math.sin(angle) * radius * 0.62;
-    ctx.save();
-    ctx.translate(px, py);
-    ctx.rotate(angle);
-    ctx.beginPath();
-    ctx.ellipse(0, 0, radius * 0.34, radius * 0.16, 0, 0, Math.PI * 2);
-    if (i < done) {
-      ctx.fillStyle = "#3A6B48";
-      ctx.fill();
-    } else {
-      ctx.fillStyle = i === next ? "rgba(245, 230, 66, 0.45)" : "rgba(231, 226, 212, 0.12)";
-      ctx.fill();
-      ctx.lineWidth = i === next ? 5 : 2;
-      ctx.strokeStyle = i === next ? "#f5e642" : "#d9ffc3";
-      ctx.stroke();
+let looping = false;
+function ensureLoop() {
+  if (looping) return;
+  looping = true;
+  requestAnimationFrame(function tick(now) {
+    if (ada && viewMode === "tour" && sidpa()[0] === 4 && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      wanderTick = (wanderTick + 1) % 100000;
+      compute();
     }
-    ctx.restore();
-    addDisc(1, i + 1, px, py, Math.max(26, radius * 0.2));
-  }
-  ctx.beginPath();
-  ctx.arc(cx, cy, 14 + done * 7, 0, Math.PI * 2);
-  ctx.fillStyle = done >= 5 ? "#F7F4EA" : "#1a1e1a";
-  ctx.fill();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = "#d9ffc3";
-  ctx.stroke();
-  const places = [
-    [0, 3, 0, "#8aa4c8"],
-    [Math.PI / 2, 3, 1, "#C4A24A"],
-    [Math.PI, 3, 2, "#7A4548"],
-    [-Math.PI / 2, 3, 3, "#4A5E48"],
-    [Math.PI * 0.72, 2, 0, "#8E3A3A"],
-    [Math.PI * 1.15, 2, 1, "#E0D3B0"]
-  ];
-  places.forEach(function (place) {
-    const dist = place[1] === 2 ? radius * 0.95 : radius * 1.22;
-    const x = cx + Math.cos(place[0]) * dist;
-    const y = cy + Math.sin(place[0]) * dist;
-    ctx.beginPath();
-    ctx.arc(x, y, 16, 0, Math.PI * 2);
-    ctx.fillStyle = place[3];
-    ctx.fill();
-    addDisc(place[1], place[2], x, y, 24);
+    if (ada) paintAll(now, modelNow());
+    requestAnimationFrame(tick);
   });
-}
-
-function drawWheel(ctx, cx, cy, radius, bright) {
-  for (let i = 0; i < 6; i++) {
-    const a0 = -Math.PI / 2 + i * Math.PI / 3;
-    const a1 = a0 + Math.PI / 3;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, radius, a0, a1);
-    ctx.closePath();
-    ctx.fillStyle = REALM_COLOUR[i];
-    ctx.globalAlpha = bright === i ? 1 : 0.55;
-    ctx.fill();
-    ctx.globalAlpha = 1;
-    ctx.lineWidth = bright === i ? 4 : 1;
-    ctx.strokeStyle = bright === i ? "#f5e642" : "#070807";
-    ctx.stroke();
-    const mid = (a0 + a1) / 2;
-    regions.push({
-      kind: "sector", action: 4, arg: i,
-      cx: cx, cy: cy, radius: radius, a0: a0, a1: a1,
-      hitX: cx + Math.cos(mid) * radius * 0.62,
-      hitY: cy + Math.sin(mid) * radius * 0.62
-    });
-  }
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius * 0.18, 0, Math.PI * 2);
-  ctx.fillStyle = "#070807";
-  ctx.fill();
-}
-
-function drawMirror(ctx, cx, cy, span) {
-  const rx = span * 0.22;
-  const ry = span * 0.28;
-  ctx.beginPath();
-  ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
-  ctx.fillStyle = "#F7F4EA";
-  ctx.globalAlpha = 0.92;
-  ctx.fill();
-  ctx.globalAlpha = 1;
-  ctx.strokeStyle = "#d9ffc3";
-  ctx.lineWidth = 3;
-  ctx.stroke();
-  addDisc(5, 0, cx, cy, Math.min(rx, ry));
-  for (let i = 0; i < 5; i++) {
-    ctx.beginPath();
-    ctx.arc(cx - rx - 28, cy - 20 + i * 14, 6, 0, Math.PI * 2);
-    ctx.fillStyle = "#F4F1E6";
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(cx + rx + 28, cy - 20 + i * 14, 6, 0, Math.PI * 2);
-    ctx.fillStyle = "#1C1C1C";
-    ctx.fill();
-  }
-  const passY = cy + ry + 36;
-  ctx.beginPath();
-  ctx.arc(cx, passY, 14, 0, Math.PI * 2);
-  ctx.strokeStyle = "#5C5550";
-  ctx.lineWidth = 3;
-  ctx.stroke();
-  addDisc(6, 0, cx, passY, 22);
-}
-
-function drawWish(ctx, width, height, side) {
-  const x = (side[8] / 1000) * width;
-  const y = (side[9] / 1000) * (height * 0.55) + height * 0.08;
-  ctx.beginPath();
-  ctx.arc(x, y, 22, 0, Math.PI * 2);
-  ctx.fillStyle = "#E6E0D4";
-  ctx.fill();
-  const colours = ["#E6E0D4", "#1C1C1C", "#8E3A3A"];
-  const yA = height * 0.62;
-  colours.forEach(function (colour, i) {
-    const ax = width * (0.22 + i * 0.28);
-    ctx.beginPath();
-    ctx.arc(ax, yA, 20, 0, Math.PI * 2);
-    ctx.fillStyle = colour;
-    ctx.fill();
-    ctx.strokeStyle = "#d9ffc3";
-    ctx.stroke();
-    addDisc(7, i, ax, yA, 26);
-  });
-}
-
-function hitContains(region, x, y) {
-  if (region.kind === "disc") {
-    const dx = x - region.x;
-    const dy = y - region.y;
-    return dx * dx + dy * dy <= region.r * region.r;
-  }
-  const dx = x - region.cx;
-  const dy = y - region.cy;
-  const dist = Math.hypot(dx, dy);
-  if (dist > region.radius || dist < region.radius * 0.18) return false;
-  let ang = Math.atan2(dy, dx);
-  const start = region.a0;
-  while (ang < start) ang += Math.PI * 2;
-  while (ang >= start + Math.PI * 2) ang -= Math.PI * 2;
-  return ang >= start && ang <= region.a1;
 }
 
 function render() {
   const out = compute();
   updateChrome(out);
   drawCanvas();
-  if (viewMode === "tour") maybeAnimate();
+  ensureLoop();
   drawGraph(out[2]);
 }
 
@@ -471,25 +305,6 @@ function goPrev() {
   const side = sidpa();
   if (side[0] === 0 || side[14] < 0) { showOpening(); return; }
   goScene(side[14]);
-}
-
-function maybeAnimate() {
-  const scene = sidpa()[0];
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (viewMode === "tour" && scene === 4 && !reduced && !animating) {
-    animating = true;
-    requestAnimationFrame(stepWish);
-  }
-  if (viewMode !== "tour" || scene !== 4 || reduced) animating = false;
-}
-
-function stepWish() {
-  if (!animating) return;
-  wanderTick = (wanderTick + 1) % 100000;
-  const out = compute();
-  updateChrome(out);
-  drawCanvas();
-  requestAnimationFrame(stepWish);
 }
 
 function act(action, arg) {
@@ -674,6 +489,9 @@ document.getElementById("day").addEventListener("input", function (event) {
   milli = ada.exports.bardo_milli_of_day(Number(event.target.value));
   cardsKey = "";
   render();
+});
+document.getElementById("go").addEventListener("click", function () {
+  if (viewMode === "opening") enterTour();
 });
 document.getElementById("enter").addEventListener("click", function () {
   const more = document.getElementById("more");

@@ -92,7 +92,7 @@ const browser = await puppeteer.launch({
 });
 
 try {
-  for (const [name, width, height] of [["desktop", 1280, 800], ["phone", 390, 844], ["narrow", 320, 700]]) {
+  for (const [name, width, height] of [["phone", 390, 844], ["narrow", 320, 568], ["desktop", 1366, 768], ["wide", 1920, 1080]]) {
     const { page, logs } = await open(browser, width, height, false);
     const shown = await page.$eval("#stamp", (el) => el.textContent.trim());
     assert(shown === stamp, name + " stamp " + shown);
@@ -116,6 +116,28 @@ try {
       });
     }
     assert(await onScreen("#enter"), name + " info line missing");
+    assert(await onScreen("#go"), name + " enter missing");
+    const edge = await page.evaluate(() => {
+      const c = document.getElementById("viz");
+      const px = c.getContext("2d").getImageData(c.width - 2, Math.floor(c.height / 2), 1, 1).data;
+      const stage = window.__stage;
+      return { g: px[1], a: px[3], x: stage.x, w: stage.w, h: stage.h };
+    });
+    assert(edge.g < 40 && edge.a < 20, name + " edge pixel " + edge.g + "/" + edge.a);
+    assert(Math.abs(edge.w / edge.h - 0.75) < 0.04, name + " aspect " + (edge.w / edge.h));
+    if (width >= 1366) assert(edge.x > 80, name + " stage not letterboxed " + edge.x);
+    await page.evaluate(() => {
+      const b = document.getElementById("reload");
+      const hide = () => { if (!b.hidden) b.hidden = true; };
+      hide();
+      new MutationObserver(hide).observe(b, { attributes: true, attributeFilter: ["hidden"] });
+    });
+    const shot = async (label) => {
+      if (width !== 390 && width !== 1366) return;
+      await page.evaluate(() => { const b = document.getElementById("reload"); if (b) b.hidden = true; });
+      await page.screenshot({ path: join(outDir, label + "-" + width + ".png"), fullPage: false });
+    };
+    await shot("opening");
     assert(await onScreen("#menu"), name + " menu missing");
     assert(await onScreen("#prev") && await onScreen("#start") && await onScreen("#next"), name + " nav missing");
     assert(await onScreen("#viz"), name + " drawing missing");
@@ -138,7 +160,7 @@ try {
     assert(scene === "1", name + " expected womb, got " + scene);
     const regions = await page.evaluate(() => window.__regions.map((r) => r.action));
     assert(regions.includes(1) && !regions.includes(4), name + " lights leaked into the womb " + regions.join(","));
-    if (width === 390) await page.screenshot({ path: join(outDir, "sidpa-womb-390.png"), fullPage: false });
+    await shot("sidpa-womb");
     const petal = await page.evaluate(() => window.__regions.find((r) => r.action === 1 && r.arg === 1));
     await page.mouse.click(petal.clientX, petal.clientY);
     const methods = await page.$eval("#state", (el) => el.dataset.methods);
@@ -150,15 +172,15 @@ try {
     await page.mouse.click(light.clientX, light.clientY);
     const bright = await page.$eval("#state", (el) => el.dataset.brightest);
     assert(bright === "0", name + " brightest " + bright);
-    if (width === 390) await page.screenshot({ path: join(outDir, "sidpa-lights-390.png"), fullPage: false });
+    await shot("sidpa-lights");
     await page.click("#next");
     scene = await page.$eval("#state", (el) => el.dataset.scene);
     assert(scene === "3", name + " expected judgement, got " + scene);
-    if (width === 390) await page.screenshot({ path: join(outDir, "sidpa-judgement-390.png"), fullPage: false });
+    await shot("sidpa-judgement");
     await page.click("#next");
     scene = await page.$eval("#state", (el) => el.dataset.scene);
     assert(scene === "4", name + " expected wish-body, got " + scene);
-    if (width === 390) await page.screenshot({ path: join(outDir, "sidpa-wish-390.png"), fullPage: false });
+    await shot("sidpa-wish");
     await page.click("#menu");
     await page.$eval("#day", (el) => {
       el.value = "0";
@@ -210,7 +232,7 @@ try {
   assert(reportPage.logs.length === 0, "report console");
   await reportPage.page.close();
   await mkdir("/opt/cursor/artifacts", { recursive: true });
-  for (const name of ["sidpa-womb-390.png", "sidpa-lights-390.png", "sidpa-judgement-390.png", "sidpa-wish-390.png"]) {
+  for (const name of ["opening-390.png", "opening-1366.png", "sidpa-womb-390.png", "sidpa-womb-1366.png", "sidpa-lights-390.png", "sidpa-lights-1366.png", "sidpa-judgement-390.png", "sidpa-judgement-1366.png", "sidpa-wish-390.png", "sidpa-wish-1366.png"]) {
     await copyFile(join(outDir, name), join("/opt/cursor/artifacts", name));
   }
   console.log("browser smoke ok", stamp);
