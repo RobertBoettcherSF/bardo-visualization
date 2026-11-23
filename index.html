@@ -7,7 +7,7 @@
 <style>
 @font-face {
   font-family: "Rain Devanagari";
-  src: url("assets/devanagari-subset.woff2?v=df185f1") format("woff2");
+  src: url("assets/devanagari-subset.woff2?v=d16257e") format("woff2");
   font-display: swap;
 }
 * { box-sizing: border-box; }
@@ -82,7 +82,11 @@ button[aria-pressed="true"] { background: #e7e2d4; color: #111; }
   background: transparent; border: 0; color: #f7f4ea;
   font: 500 1.15rem/1.3 Georgia, "Iowan Old Style", Palatino, serif;
   text-shadow: 0 1px 6px #000;
+  user-select: none; -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none; cursor: pointer;
 }
+#enter:focus, #enter:focus-visible { outline: none; background: transparent; color: #f7f4ea; }
 #go, #again { margin-top: 6px; }
 body:not(.is-opening) #go { display: none; }
 body:not(.is-ending) #again, body:not(.is-ending) #quote { display: none; }
@@ -94,7 +98,7 @@ body:not(.is-ending) #again, body:not(.is-ending) #quote { display: none; }
   text-shadow: 0 1px 6px #000;
 }
 #choices {
-  position: fixed; z-index: 4;
+  position: fixed; z-index: 6;
   display: none; gap: 8px; justify-content: center;
   pointer-events: none;
 }
@@ -104,13 +108,11 @@ body.has-choice #choices { display: flex; }
   font-size: 14px; line-height: 1.2; padding: 4px 8px;
 }
 #more {
-  position: fixed; z-index: 4;
-  left: 50%; bottom: calc(env(safe-area-inset-bottom) + 8.2rem);
-  transform: translateX(-50%);
-  width: min(36rem, calc(100vw - 1.5rem));
-  max-height: 34vh; overflow: auto;
-  background: rgba(7, 8, 7, 0.88);
+  position: fixed; z-index: 5;
+  overflow: auto;
+  background: rgba(7, 8, 7, 0.92);
   padding: 0.7rem 0.9rem; text-align: center;
+  user-select: none; -webkit-user-select: none;
 }
 #curves { width: 100%; height: 120px; background: #0c0e0c; }
 .bar {
@@ -130,13 +132,9 @@ body.has-choice #choices { display: flex; }
 <body>
 <canvas id="rain" aria-hidden="true"></canvas>
 <canvas id="viz"></canvas>
-<p id="stamp" class="stamp" data-dbg>v0.4 b20261123-1302 df185f1</p>
+<p id="stamp" class="stamp" data-dbg>v0.5 b20261123-1339 d16257e</p>
 <button type="button" id="menu" aria-expanded="false" aria-controls="menu-panel"></button>
 <div id="menu-panel" hidden>
-  <div class="row">
-    <button type="button" id="lang-en" aria-pressed="true" aria-label="English">EN</button>
-    <button type="button" id="lang-de" aria-pressed="false" aria-label="Deutsch">DE</button>
-  </div>
   <div class="row">
     <button type="button" id="dir-jung" aria-pressed="true"></button>
     <button type="button" id="dir-book" aria-pressed="false"></button>
@@ -177,7 +175,7 @@ body.has-choice #choices { display: flex; }
   <button type="button" id="auto" data-k="auto" aria-pressed="false"></button>
   <button type="button" id="next"></button>
 </div>
-<noscript><p>This page needs JavaScript. Diese Seite braucht JavaScript.</p></noscript>
+<noscript><p>This page needs JavaScript.</p></noscript>
 <script>
 const WASM_BASE64 = "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";
 const STRINGS = {
@@ -315,143 +313,60 @@ const STRINGS = {
     crash: "This page stopped on the last visit ({notice}). The next report includes that notice.",
     errorWasm: "The Ada module did not start.",
     axisDay: "Book day",
+    stop: "Stop",
+    arriveJudge: "You did not rest in the wish-body, and the wind draws you on towards the mirror.",
+    arriveLights: "You turned away from the mirror and are drawn closer to birth.",
+    arriveWomb: "You followed a dull light, and a womb is opening.",
+    arriveDeva: "You left the door open. Karma draws you into the dull white light of the gods.",
+    arriveAsura: "You left the door open. Karma draws you into the dull green light of the demigods.",
+    arriveHuman: "You left the door open. Karma draws you into a human birth, not the precious one.",
+    arriveAnimal: "You left the door open. Karma draws you into the dull blue light of the animals.",
+    arrivePreta: "You left the door open. Karma draws you into the dull red light of the hungry ghosts.",
+    arriveHell: "You left the door open. Karma draws you into the smoke-coloured light of the hells.",
+    tapPetal1: "First petal: one resolve not to enter a womb.",
+    tapPetal2: "Second petal: see the parents as teacher and divine mother.",
+    tapPetal3: "Third petal: drop attraction and aversion.",
+    tapPetal4: "Fourth petal: see what appears as illusion.",
+    tapPetal5: "Fifth petal: rest in the Clear Light.",
+    tapClosed: "That method is taken. The next petal is still waiting.",
+    detailPetal1: "The first closing is a resolve: do not enter. The methods count only in this order. Tap the same petal again to take it.",
+    detailPetal2: "See the father as your teacher and the mother as the divine mother. Attraction and aversion have not yet been dropped. Tap again to take this method if it is the next one.",
+    detailPetal3: "Drop attraction to one parent and aversion to the other. Until this is done, the door stays open. Tap again to take this method if it is the next one.",
+    detailPetal4: "See the whole scene as illusion, not as a solid place. Tap again to take this method if it is the next one.",
+    detailPetal5: "Rest in the Clear Light. When all five petals have closed, in order, the womb door is shut.",
+    tapLight0: "Dull white light of the gods. A second tap marks it as the light karma is holding.",
+    tapLight1: "Dull green light of the demigods. A second tap marks it as the light karma is holding.",
+    tapLight2: "Dull yellow light of human beings. A second tap marks it as the light karma is holding.",
+    tapLight3: "Dull blue light of animals. A second tap marks it as the light karma is holding.",
+    tapLight4: "Dull red light of the hungry ghosts. A second tap marks it as the light karma is holding.",
+    tapLight5: "Smoke-coloured light of the hells. A second tap marks it as the light karma is holding.",
+    detailLight0: "Evans-Wentz: be not fond of the dull white light of the devas. If you are attached to it, you wander into their abodes. See it as the Compassionate One, or let it dissolve into the Clear Light.",
+    detailLight1: "A dull green light from the asuras. Attachment to it leads to a birth among the demigods, whose long strife is not liberation.",
+    detailLight2: "A dull yellow light from human beings. This is the ordinary human pull, not the precious birth chosen on purpose at the womb door.",
+    detailLight3: "A dull blue light from the brutes. Attachment here is a birth with little chance of hearing the teaching.",
+    detailLight4: "A dull red light from the pretas. Attachment here is the hunger that is never filled.",
+    detailLight5: "Evans-Wentz: be not fond of the dull, smoke-coloured light from Hell. It opens because of anger, and the misery there has no certain end.",
+    tapMirror: "The mirror of karma. A second tap recognises it as your own mind.",
+    detailMirror: "The Lord of Death consults the mirror. The text says the whole court is one’s own mind, which cannot die. Recognising that emptiness and clarity is liberation.",
+    tapPass: "The moment passing. A second tap lets it pass without recognition.",
+    detailPass: "Without the recognition, the interval continues and the wind draws you closer to a birth.",
+    tapPebbleW: "White pebbles: the good genius counting what was done well.",
+    tapPebbleB: "Black pebbles: the evil genius counting what was done ill.",
+    detailPebbleW: "The good genius counts with white pebbles. They are not a score kept by this page. The text says the counting, like the judge, is the mind’s own image.",
+    detailPebbleB: "The evil genius counts with black pebbles. The pair of counts is shown together. Neither tally is a verdict from outside.",
+    tapAbyss0: "White abyss: anger. A second tap names it.",
+    tapAbyss1: "Black abyss: desire. A second tap names it.",
+    tapAbyss2: "Red abyss: ignorance. A second tap names it.",
+    detailAbyss0: "The white abyss is anger. Naming it does not close it. The wish-body is still moved by the karma-wind.",
+    detailAbyss1: "The black abyss is desire. Naming it does not close it. The wish-body is still moved by the karma-wind.",
+    detailAbyss2: "The red abyss is ignorance. Naming it does not close it. The wish-body is still moved by the karma-wind.",
+    detailSign0: "East, the continent Lüpah, is seen as a lake with swans. The teaching says do not go there.",
+    detailSign1: "South, the continent Jambu, is seen as dwellings. If a womb must be taken, the text prefers this one, where the teaching is current.",
+    detailSign2: "West, Balang-Tschöd, is seen as a lake with horses. The teaching says do not go there.",
+    detailSign3: "North, Daminyan, is seen as cattle or trees. The teaching says do not go there.",
+    detailAmitabha: "A transfer towards Amitābha’s western realm, for one who can aim the wish there rather than at a womb.",
+    detailTusita: "A transfer towards Maitreya in Tuṣita, the pure realm named for that waiting.",
     noscript: "This page needs JavaScript."
-  },
-  de: {
-    title: "Die Bardo-Zustände",
-    standfirst: "Ein Gang durch den Zwischenzustand, in Jungs umgekehrter Lesart.",
-    lead: "Eine Anleitung für die gerade Gestorbenen, über symbolische neunundvierzig Tage. Jung liest rückwärts: zuerst Sidpa, auf das klare Licht zu.",
-    menu: "Menü",
-    infoWomb: "Eine Lotustür. Jedes Blütenblatt ist eine Weise, der Reihe nach.",
-    infoLights: "Sechs matte Lichter. Der helle Ausschnitt ist das Ziel.",
-    infoJudge: "Der Spiegel des Karma, weiße Steine und schwarze.",
-    infoWish: "Der Wunschkörper, vom grauen Wind bewegt.",
-    infoWishTurn: "Der Wunschkörper ist der eigene Geist. Der nächste Bardo ist in diesem Teil der Führung noch nicht da.",
-    infoGood: "Die Schoßpforte ist geschlossen. Eine kostbare menschliche Geburt kann gewählt werden.",
-    infoDeva: "Karmische Wiedergeburt als Gott.",
-    infoAsura: "Karmische Wiedergeburt als Halbgott.",
-    infoHuman: "Eine karmische Menschengeburt, nicht die kostbare.",
-    infoAnimal: "Karmische Wiedergeburt als Tier.",
-    infoPreta: "Karmische Wiedergeburt als Hungergeist.",
-    infoHell: "Karmische Wiedergeburt in den Höllen.",
-    quoteGood: "Fünf Weisen können den Schoß schließen. Muss eine Geburt genommen werden, bevorzugt das Buch den südlichen Kontinent, wo die Lehre gilt.",
-    quoteDeva: "Hänge nicht am matten weißen Licht der Götter.",
-    quoteAsura: "Ein mattes grünes Licht von den Asuras.",
-    quoteHuman: "Ein mattes gelbes Licht von den Menschen.",
-    quoteAnimal: "Ein mattes blaues Licht von den Tieren.",
-    quotePreta: "Ein mattes rotes Licht von den Pretas.",
-    quoteHell: "Hänge nicht am matten, rauchfarbenen Licht aus der Hölle.",
-    beingDeva: "Ein Gott: langlebig, dann dem Fall verfallen.",
-    beingAsura: "Ein Halbgott, zum Streit geboren.",
-    beingHuman: "Ein Mensch, durch Karma eingetreten.",
-    beingAnimal: "Ein Tier, stumpf und getrieben.",
-    beingPreta: "Ein Hungergeist, nie gesättigt.",
-    beingHell: "Ein Wesen der Höllen, in Hitze oder Kälte.",
-    infoClock: "Die Uhr der 49 Tage. Die Klarheit fällt.",
-    moreEnter: "Weiter beginnt die Führung am Sidpa-Ende.",
-    readMore: "Weiterlesen",
-    about: "Zu dieser Szene",
-    prev: "Zurück",
-    start: "Anfang",
-    auto: "Auto",
-    next: "Weiter",
-    follow: "Dem Rat folgen",
-    dont: "Ihm nicht folgen",
-    again: "Von vorn beginnen",
-    soundOff: "Ton aus",
-    soundOn: "Ton an",
-    jungShort: "Jung",
-    bookShort: "Buch",
-    durationNote: "Die Quelle sagt, das Sidpa-Leiden dauere gewöhnlich 22 Tage, und das Karma könne die Dauer unsicher machen, bis zum Rest der 49. Diese vier Szenen teilen sich die Tage 22–49 der Modelluhr.",
-    colourNote: "Die Hex-Farben sind unsere Wahl. Das Buch nennt die Lichter nur in Worten.",
-    sceneWomb: "Den Schoß schließen und wählen",
-    sceneLights: "Lichter der sechs Bereiche",
-    sceneJudge: "Der Spiegel des Karma",
-    sceneWish: "Der Wunschkörper",
-    sceneClock: "Die Uhr der 49 Tage",
-    bodyWomb: "Fünf Weisen schließen den Schoß, und nur in dieser Reihenfolge: ein Entschluss; die Eltern als Lehrer und göttliche Mutter sehen; Anziehung und Abneigung loslassen; die Erscheinungen als Illusion sehen; im klaren Licht ruhen. Bleibt die Tür offen, erscheinen die Zeichen der Kontinente und Bereiche. Eine Übertragung in ein reines Reich ist möglich. Muss ein Schoß genommen werden, bevorzugt der Text den südlichen Kontinent Jambu oder das weiße Licht der Götter.",
-    bodyLights: "Sechs matte Lichter erscheinen, und das Licht des Ortes der Wiedergeburt leuchtet am hellsten. Der Wunschkörper nimmt diese Farbe an. Sieh jedes Licht als den Gütigen, oder löse es ins klare Licht auf.",
-    bodyJudge: "Der gute Genius zählt mit weißen Steinen, der böse mit schwarzen. Der Herr des Todes befragt den Spiegel des Karma. Der Text sagt, all das sei der eigene Geist, der nicht sterben kann. Dieses Leer-und-Klar zu erkennen ist Befreiung. Das Bild bleibt geometrisch.",
-    bodyWish: "Nach den zornvollen Erscheinungen eine graue Dämmerung. Ein strahlender Wunschkörper entsteht, dem früheren Körper gleich und schon auf den nächsten deutend. Er geht durch Berge, außer Bodh Gayā und den Schoß. Karmawind bewegt ihn. Drei Abgründe: weiß ist Zorn, schwarz ist Begierde, rot ist Unwissenheit.",
-    bodyClock: "Vor Tag 22 liegt im Modell noch das klare Licht, die Göttertage oder die kurze Bewusstlosigkeit. Diese Szenen gehören nicht zu diesem Teil der Führung. Die Kurven laufen schon.",
-    outClosed: "Die fünf Weisen sind erfüllt. Der Eingang ist geschlossen.",
-    outOrder: "Die Weisen gelten nur der Reihe nach. Die nächste wartet noch.",
-    outAllow: "Der Text erlaubt diesen Weg.",
-    outRefuse: "Tritt nicht ein. Die Lehre gilt dort nicht, oder der Weg führt von ihr fort.",
-    outAmitabha: "Übertragung zum Westreich Amitābhas.",
-    outTusita: "Übertragung zu Maitreya in Tuṣita.",
-    outFree: "Erkenntnis: der Spiegel ist der eigene Geist. Befreiung, in den Worten des Textes.",
-    outStay: "Ohne diese Erkenntnis geht der Zwischenzustand weiter.",
-    outAnger: "Weißer Abgrund: Zorn.",
-    outDesire: "Schwarzer Abgrund: Begierde.",
-    outIgnorance: "Roter Abgrund: Unwissenheit.",
-    method1: "1 Entschluss",
-    method2: "2 Lehrer und Mutter",
-    method3: "3 Anziehung lassen",
-    method4: "4 Illusion",
-    method5: "5 Klares Licht",
-    transferA: "Übertragung: Amitābha",
-    transferT: "Übertragung: Tuṣita",
-    deva: "Götter, mattweiß",
-    asura: "Asuras, mattgrün",
-    human: "Menschen, mattgelb",
-    animal: "Tiere, mattblau",
-    preta: "Pretas, mattrot",
-    hell: "Höllen, rauchig",
-    east: "Ost Lüpah: Schwäne. Nicht hingehen.",
-    south: "Süd Jambu: Wohnstätten. Bevorzugt.",
-    west: "West Balang-Tschöd: Pferde. Nicht hingehen.",
-    north: "Nord Daminyan: Vieh oder Bäume. Nicht hingehen.",
-    recognise: "Den Spiegel erkennen",
-    notYet: "Der Augenblick vergeht",
-    abyssW: "Weißer Abgrund",
-    abyssB: "Schwarzer Abgrund",
-    abyssR: "Roter Abgrund",
-    opening: "Das Bardo Thödol ist eine Anleitung für einen Menschen, der gerade gestorben ist. Der Name wird oft wiedergegeben als „Befreiung durch Hören im Zwischenzustand“. Jemand liest sie am Lager, über symbolische neunundvierzig Tage zwischen einem Leben und dem nächsten, und bittet die Toten, jede Erscheinung als das eigene Licht des Geistes zu erkennen und nicht als eine Macht von außen.",
-    sources: "Quellen: W. Y. Evans-Wentz, Das Tibetanische Totenbuch, nach der Übertragung von Lama Kazi Dawa Samdup; psychologischer Kommentar von C. G. Jung; historische Anmerkung von L. Goepfert-March.",
-    history: "Die Anmerkung von L. Goepfert-March folgt der überlieferten Zuschreibung des Buches an Padmasambhava und einer langen mündlichen Weitergabe vor den späteren schriftlichen Fassungen. Den englischen Text, den die meisten Leser kennen, hat Evans-Wentz nach der Übersetzung von Lama Kazi Dawa Samdup erstellt. Die Uhr dieser Führung wurde an einer späteren deutschen Ausgabe dieses Buches geprüft. Die Sätze hier sind unsere eigenen.",
-    caveatLabel: "Jungs Vorbehalt",
-    caveat: "C. G. Jung schlägt vor, das Buch rückwärts zu lesen. Wer Sidpa versteht, den Drang zu einer neuen Geburt, dem öffnet sich Chonyid, der Bardo, in dem Erscheinungen aufsteigen, und darüber öffnet sich Chikhai, das klare Licht im Augenblick des Todes. Die Umkehr ist bei ihm eine umgekehrte Einweihung: eine Karte innerer Vorgänge für westliche Leser. Er sagt deutlich, dass dies nicht die ursprüngliche Absicht des Bardo Thödol ist. Das Buch selbst spricht die Verstorbenen in der Reihenfolge des Textes an, vom Tod zur Wiedergeburt.",
-    chonyidNote: "Chonyid wird auch Chönyid geschrieben.",
-    enter: "Die Führung beginnen",
-    directionJung: "Jungs Umkehr",
-    directionBook: "Buchreihenfolge",
-    helpJung: "Der Regler beginnt am Sidpa-Ende und geht auf Tag 0 zu, das klare Licht. Das ist Jungs Lesevorschlag, nicht die eigene Folge des Buches.",
-    helpBook: "Der Regler beginnt bei Tag 0 und geht auf Tag 49 zu, in der Ordnung, in der das Buch die Verstorbenen anspricht.",
-    walkJung: "Zum klaren Licht gehen",
-    walkBook: "Zur Wiedergeburt gehen",
-    dayLabel: "Tag",
-    of: "von",
-    phase0: "Chikhai, erstes klares Licht",
-    phase1: "Chikhai, zweites klares Licht",
-    phase2: "Chonyid, friedvoller Tag",
-    phase3: "Chonyid, zornvoller Tag",
-    phase4: "Nach den zornvollen Gottheiten",
-    phase5: "Sidpa",
-    clarity: "Klarheit",
-    intensity: "Intensität",
-    complexity: "Komplexität",
-    thousandths: "Tausendstel",
-    graphSummary: "Kurven auf der Uhr des Buches",
-    graphNote: "Die Kurven folgen der Uhr des Buches, auch wenn der Gang umgekehrt läuft. Die Klarheit ist an Tag 0 am höchsten und fällt danach. Die Zahlen sind Tausendstel von 0 bis 1000. Sie sind unser Modell der Quelle, keine Zahlen aus dem Buch. Die Farben der Linien sind unsere eigenen.",
-    model: "Wie diese Uhr gerechnet ist",
-    modelBody: "Das Buch nennt mehrere Uhren zugleich. Diese Seite benutzt ein Modell von 49 Tagen: das erste klare Licht in den ersten sechs Stunden von Tag 0, das zweite Licht bis Tag 4 (die dreieinhalb Tage der Quelle, gehalten bis zum Beginn der friedvollen Woche), die friedvollen Tage 1–7 an den Kalendertagen 4–10, die zornvollen Tage 8–14 an den Tagen 11–17, eine kurze Bewusstlosigkeit, dann Sidpa bis Tag 49. Die Klarheit fällt stetig. Intensität und Komplexität steigen in Stufen durch die friedvollen Tage und erreichen ihren Höhepunkt in der zornvollen Woche. Sidpa ist eine graue Zwischenzeit: starker Wind, geringere Komplexität. Ada rechnet die Zahlen.",
-    pause: "Regen anhalten",
-    play: "Regen abspielen",
-    mantraTitle: "Was der Regen buchstabiert",
-    mantraBody: "Drei Mantren, der Reihe nach, in ganzen Silben. Das sechssilbige Mantra ist die überlieferte Deutung der „sechs Silben“, die in den Sidpa-Gebeten genannt werden; dieses Buch druckt das Sanskrit nicht. Das Amitabha-Mantra gehört zum westlichen Buddha des friedvollen Tages 4 und ist kein Zitat aus dem Buch. Das Vajra-Guru-Mantra gehört zu Padmasambhava, der in der Huldigung und in der historischen Anmerkung genannt wird; das Mantra selbst steht nicht im Buch.",
-    m1: "oṃ maṇi padme hūṃ — das Juwel im Lotus",
-    m2: "oṃ amitābha hrīḥ — Name und Keimsilbe Amitābhas",
-    m3: "oṃ āḥ hūṃ vajra guru padma siddhi hūṃ — Mantra Padmasambhavas",
-    note: "Notiz für den Bericht",
-    noteHint: "Eine kurze Notiz hilft: was haben Sie erwartet?",
-    debug: "Debug",
-    f9: "F9 tut dasselbe.",
-    reload: "Neuer Stand: {stamp} — zum Neuladen tippen",
-    crash: "Diese Seite ist beim letzten Besuch stehen geblieben ({notice}). Der nächste Bericht enthält diesen Hinweis.",
-    errorWasm: "Das Ada-Modul ist nicht gestartet.",
-    axisDay: "Buchtag",
-    noscript: "Diese Seite braucht JavaScript."
   }
 };
 
@@ -975,6 +890,8 @@ function drawMirror(ctx, w, h) {
   ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
   ctx.fill();
   addDisc(5, 0, cx, cy, Math.min(rx, ry) * 0.85);
+  addDisc(8, 0, cx - rx - 22, cy, 28);
+  addDisc(9, 0, cx + rx + 22, cy, 28);
   for (let i = 0; i < 5; i++) {
     ctx.beginPath();
     ctx.arc(cx - rx - 22, cy - 24 + i * 14, 7, 0, Math.PI * 2);
@@ -1176,7 +1093,7 @@ function hitContains(region, x, y) {
   return ang >= start && ang <= region.a1;
 }
 
-const STAMP = "v0.4 b20261123-1302 df185f1";
+const STAMP = "v0.5 b20261123-1339 d16257e";
 const RAW_VERSION = "https://raw.githubusercontent.com/RobertBoettcherSF/bardo-visualization/main/version.txt";
 const REPO_API = "https://api.github.com/repos/RobertBoettcherSF/bardo-visualization/commits/main";
 const REALM_COLOUR = ["#C9C3B5", "#4A5E48", "#A89A55", "#3A4A62", "#7A4548", "#5C5550"];
@@ -1194,6 +1111,16 @@ let endingLocked = false;
 let turned = false;
 let poisonSeen = -1;
 let autoTimer = 0;
+let autoRunning = false;
+let autoStopRequested = false;
+let lineKey = "";
+let detailKey = "";
+let arrivalKey = "";
+let selectedKey = "";
+let lives = [];
+let life = null;
+let seenScreens = {};
+let seenLinks = {};
 const pathLog = [];
 let methodsDone = 0;
 let destination = -1;
@@ -1210,7 +1137,10 @@ let rain = null;
 const curves = { clarity: [], intensity: [], complexity: [] };
 
 function t(key) {
-  return STRINGS[lang][key];
+  const overlay = STRINGS[lang];
+  if (overlay && Object.prototype.hasOwnProperty.call(overlay, key)) return overlay[key];
+  const base = STRINGS.en[key];
+  return base === undefined ? key : base;
 }
 
 function ints(ptr, n) {
@@ -1228,13 +1158,11 @@ function phaseText(code, named) {
 }
 
 function applyStaticText() {
-  document.documentElement.lang = lang === "de" ? "de" : "en-GB";
+  document.documentElement.lang = "en-GB";
   document.title = t("title");
   document.querySelectorAll("[data-k]").forEach(function (el) {
     el.textContent = t(el.dataset.k);
   });
-  document.getElementById("lang-en").setAttribute("aria-pressed", String(lang === "en"));
-  document.getElementById("lang-de").setAttribute("aria-pressed", String(lang === "de"));
   if (rain) rain.refreshLabels();
   if (crashNotice) {
     document.getElementById("crash").textContent = t("crash").replace("{notice}", crashNotice);
@@ -1280,6 +1208,24 @@ const REALM_QUOTE = {
   deva: "quoteDeva", asura: "quoteAsura", human: "quoteHuman",
   animal: "quoteAnimal", preta: "quotePreta", hell: "quoteHell"
 };
+const ARRIVE = {
+  judge: "arriveJudge", lights: "arriveLights", womb: "arriveWomb",
+  deva: "arriveDeva", asura: "arriveAsura", human: "arriveHuman",
+  animal: "arriveAnimal", preta: "arrivePreta", hell: "arriveHell"
+};
+const ALL_SCREENS = ["opening", "clock", "womb", "lights", "judge", "wish", "good"]
+  .concat(REALMS);
+const CHOICE_LINKS = [
+  { from: "wish", button: "follow" }, { from: "wish", button: "dont" },
+  { from: "judge", button: "follow" }, { from: "judge", button: "dont" },
+  { from: "lights", button: "follow" }, { from: "lights", button: "dont" },
+  { from: "womb", button: "follow" }, { from: "womb", button: "dont" },
+  { from: "womb", button: "petals" },
+  { from: "good", button: "again" },
+  { from: "deva", button: "again" }, { from: "asura", button: "again" },
+  { from: "human", button: "again" }, { from: "animal", button: "again" },
+  { from: "preta", button: "again" }, { from: "hell", button: "again" }
+];
 
 function tourList() {
   const teach = direction === 0
@@ -1320,6 +1266,12 @@ function sceneCopy(code) {
   if (code === 3) return ["sceneJudge", "bodyJudge"];
   if (code === 4) return ["sceneWish", "bodyWish"];
   return ["sceneClock", "bodyClock"];
+}
+
+function currentInfo(scene) {
+  if (lineKey) return t(lineKey);
+  if (arrivalKey) return t(arrivalKey);
+  return t(infoKey(scene));
 }
 
 function infoKey(scene) {
@@ -1364,7 +1316,9 @@ function updateChrome(out) {
   book.setAttribute("aria-pressed", String(direction === 1));
   document.getElementById("prev").textContent = t("prev");
   document.getElementById("start").textContent = t("start");
-  document.getElementById("auto").textContent = t("auto");
+  const autoButton = document.getElementById("auto");
+  autoButton.textContent = autoRunning ? t("stop") : t("auto");
+  autoButton.setAttribute("aria-pressed", String(autoRunning));
   document.getElementById("next").textContent = t("next");
   document.getElementById("menu").textContent = t("menu");
   document.getElementById("debug").textContent = t("debug");
@@ -1376,14 +1330,17 @@ function updateChrome(out) {
   document.body.classList.toggle("is-opening", viewMode === "opening");
   document.body.classList.toggle("is-ending", ending);
   document.body.classList.toggle("has-choice", teaching);
-  document.getElementById("enter").textContent = t(infoKey(side[0]));
+  document.getElementById("enter").textContent = currentInfo(side[0]);
   const quote = document.getElementById("quote");
   if (ending) {
     quote.textContent = t(screenId === "good" ? "quoteGood" : REALM_QUOTE[screenId]);
   }
   const names = sceneCopy(viewMode === "opening" ? -1 : side[0]);
-  const moreBody = viewMode === "opening" ? t("lead") + " " + t("moreEnter") : t(names[1]);
+  const moreBody = detailKey
+    ? t(detailKey)
+    : (viewMode === "opening" ? t("lead") + " " + t("moreEnter") : t(names[1]));
   document.getElementById("more-body").textContent = moreBody;
+  document.getElementById("curves").style.display = detailKey ? "none" : "block";
   document.getElementById("outcome").textContent = viewMode === "opening" || ending ? "" : outcomeText(side[1]);
   const list = tourList();
   const index = list.indexOf(screenId);
@@ -1492,23 +1449,32 @@ function ensureLoop() {
   });
 }
 
-function placeChoices() {
+function placePanels() {
   const stage = window.__stage;
   const choices = document.getElementById("choices");
-  if (!stage || !choices) return;
+  const more = document.getElementById("more");
+  if (!stage || !choices || !more) return;
   const top = (stage.y + stage.h - 52) + "px";
   const left = stage.x + "px";
   const width = stage.w + "px";
   if (choices.style.top !== top) choices.style.top = top;
   if (choices.style.left !== left) choices.style.left = left;
   if (choices.style.width !== width) choices.style.width = width;
+  const panelTop = stage.y + 8;
+  const choiceTop = stage.y + stage.h - 56;
+  more.style.top = panelTop + "px";
+  more.style.left = left;
+  more.style.width = width;
+  more.style.bottom = "auto";
+  more.style.transform = "none";
+  more.style.maxHeight = Math.max(72, choiceTop - panelTop - 8) + "px";
 }
 
 function render() {
   const out = compute();
   updateChrome(out);
   drawCanvas();
-  placeChoices();
+  placePanels();
   ensureLoop();
   drawGraph(out[2]);
 }
@@ -1528,17 +1494,13 @@ function sampleCurves() {
   compute();
 }
 
-function stopAuto() {
-  if (autoTimer) clearInterval(autoTimer);
-  autoTimer = 0;
-  const button = document.getElementById("auto");
-  if (button) button.setAttribute("aria-pressed", "false");
-}
-
 function showScreen(id, button, extra) {
-  if (button !== "auto") stopAuto();
   screenId = id;
   remember(button, extra);
+  selectedKey = "";
+  lineKey = "";
+  detailKey = "";
+  arrivalKey = button === "dont" && ARRIVE[id] ? ARRIVE[id] : "";
   document.getElementById("more").hidden = true;
   if (id === "opening") {
     viewMode = "opening";
@@ -1600,12 +1562,17 @@ function goPrev() {
   showScreen(tourList()[index - 1], "prev");
 }
 
-function choose(follow) {
-  playClick();
+function choose(follow, via) {
+  if (via !== "auto") playClick();
   if (!SCENE_CODE[screenId]) return;
+  const from = screenId;
   if (follow && screenId === "wish") {
     turned = true;
+    lineKey = "infoWishTurn";
+    detailKey = "bodyWish";
+    arrivalKey = "";
     remember("follow", { onward: "chonyid" });
+    if (via === "auto") noteStep("follow", from, "wish");
     render();
     return;
   }
@@ -1613,30 +1580,220 @@ function choose(follow) {
     ? (screenId === "womb" ? "good" : screenId === "lights" ? "judge" : "wish")
     : (screenId === "wish" ? "judge" : screenId === "judge" ? "lights" : screenId === "lights" ? "womb" : karmicId());
   showScreen(next, follow ? "follow" : "dont");
+  if (via === "auto") noteStep(follow ? "follow" : "dont", from, screenId);
+}
+
+function explainOf(action, arg) {
+  if (action === 1 && arg >= 1 && arg <= 5) {
+    return { line: "tapPetal" + arg, detail: "detailPetal" + arg };
+  }
+  if (action === 2) {
+    return arg === 0
+      ? { line: "transferA", detail: "detailAmitabha" }
+      : { line: "transferT", detail: "detailTusita" };
+  }
+  if (action === 3 && arg >= 0 && arg <= 3) {
+    const names = ["east", "south", "west", "north"];
+    return { line: names[arg], detail: "detailSign" + arg };
+  }
+  if (action === 4 && arg >= 0 && arg <= 5) {
+    return { line: "tapLight" + arg, detail: "detailLight" + arg };
+  }
+  if (action === 5) return { line: "tapMirror", detail: "detailMirror" };
+  if (action === 6) return { line: "tapPass", detail: "detailPass" };
+  if (action === 7 && arg >= 0 && arg <= 2) {
+    return { line: "tapAbyss" + arg, detail: "detailAbyss" + arg };
+  }
+  if (action === 8) return { line: "tapPebbleW", detail: "detailPebbleW" };
+  if (action === 9) return { line: "tapPebbleB", detail: "detailPebbleB" };
+  return null;
+}
+
+function applyAction(action, arg) {
+  pendingAction = action;
+  pendingArg = arg;
+  compute();
+}
+
+function onHit(region, via) {
+  const spec = explainOf(region.action, region.arg);
+  if (!spec) return;
+  const key = region.action + ":" + region.arg;
+  const acts = region.action >= 1 && region.action <= 7;
+  if (selectedKey === key && acts) {
+    const from = screenId;
+    const before = methodsDone;
+    applyAction(region.action, region.arg);
+    if (via !== "auto") playClick();
+    if (region.action === 1 && from === "womb" && methodsDone >= 5) {
+      showScreen("good", "petals");
+      if (via === "auto") noteStep("petals", from, "good");
+      return;
+    }
+    const outcome = sidpa()[1];
+    if (outcome === 8) lineKey = "outOrder";
+    else if (region.action === 1 && methodsDone > before) lineKey = "tapClosed";
+    else if (outcome === 6) lineKey = "outFree";
+    else if (outcome === 7) lineKey = "outStay";
+    else if (outcome === 4) lineKey = "outAllow";
+    else if (outcome === 5) lineKey = "outRefuse";
+    else if (outcome === 2) lineKey = "outAmitabha";
+    else if (outcome === 3) lineKey = "outTusita";
+    else if (outcome === 9) lineKey = region.arg === 0 ? "outAnger" : region.arg === 1 ? "outDesire" : "outIgnorance";
+    else if (region.action === 4) lineKey = spec.line;
+    else lineKey = spec.line;
+    detailKey = spec.detail;
+    arrivalKey = "";
+    if (via === "auto") noteStep("tap", from, screenId);
+    render();
+    return;
+  }
+  selectedKey = key;
+  lineKey = spec.line;
+  detailKey = spec.detail;
+  arrivalKey = "";
+  if (via === "auto") noteStep("tap", screenId, screenId);
+  render();
+}
+
+function noteStep(action, from, led) {
+  seenScreens[from] = true;
+  seenScreens[led] = true;
+  seenLinks[from + ">" + action] = true;
+  if (!life) life = { steps: [] };
+  life.steps.push({ screen: from, action: action, led: led, t: Date.now() });
+  if (led === "good" || REALMS.indexOf(led) >= 0) {
+    life.ended = led;
+    lives.push(life);
+    life = { steps: [] };
+    window.__autoLives = lives.length;
+  }
+}
+
+function runFile() {
+  const totals = { lives: 0, good: 0, incomplete: 0, rebirths: {} };
+  REALMS.forEach(function (name) { totals.rebirths[name] = 0; });
+  lives.forEach(function (item) {
+    if (!item.ended) {
+      totals.incomplete += 1;
+      return;
+    }
+    totals.lives += 1;
+    if (item.ended === "good") totals.good += 1;
+    else if (totals.rebirths[item.ended] !== undefined) totals.rebirths[item.ended] += 1;
+  });
+  return {
+    schema: "bardo-run",
+    stamp: STAMP,
+    lives: lives.map(function (item) {
+      return {
+        steps: item.steps,
+        ended: item.ended || "",
+        incomplete: item.incomplete === true
+      };
+    }),
+    totals: totals,
+    unreached: {
+      screens: ALL_SCREENS.filter(function (id) { return !seenScreens[id]; }),
+      links: CHOICE_LINKS.filter(function (link) {
+        return !seenLinks[link.from + ">" + link.button];
+      })
+    },
+    deadEnds: [{
+      from: "wish",
+      button: "follow",
+      onward: "chonyid",
+      note: "Following here would open Chönyid, which is not in this part of the tour."
+    }]
+  };
+}
+
+function downloadRun() {
+  const blob = new Blob([JSON.stringify(runFile(), null, 2)], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "bardo-run.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
+}
+
+function finishAuto() {
+  if (autoTimer) clearTimeout(autoTimer);
+  autoTimer = 0;
+  if (life && life.steps.length && !life.ended) {
+    life.ended = "";
+    life.incomplete = true;
+    lives.push(life);
+  }
+  life = null;
+  autoRunning = false;
+  autoStopRequested = false;
+  downloadRun();
+  render();
+}
+
+function scheduleAuto() {
+  const pace = window.__autoPace || 3000;
+  autoTimer = setTimeout(autoStep, pace);
+}
+
+function autoStep() {
+  autoTimer = 0;
+  if (!autoRunning) return;
+  performAutoAction();
+  if (autoStopRequested || !autoRunning) {
+    finishAuto();
+    return;
+  }
+  scheduleAuto();
+}
+
+function performAutoAction() {
+  const ended = screenId === "good" || REALMS.indexOf(screenId) >= 0;
+  if (ended || viewMode === "ending") {
+    const from = screenId;
+    goStart();
+    noteStep("again", from, screenId);
+    return;
+  }
+  if (!SCENE_CODE[screenId]) {
+    const from = screenId;
+    showScreen(firstId(), "auto");
+    noteStep("start", from, screenId);
+    return;
+  }
+  const roll = Math.random();
+  if (roll < 0.5) choose(false, "auto");
+  else if (roll < 0.75) choose(true, "auto");
+  else {
+    const list = window.__regions || [];
+    if (!list.length) choose(false, "auto");
+    else onHit(list[Math.floor(Math.random() * list.length)], "auto");
+  }
 }
 
 function startAuto() {
-  stopAuto();
+  if (autoRunning) return;
+  autoRunning = true;
+  autoStopRequested = false;
+  lives = [];
+  life = { steps: [] };
+  seenScreens = {};
+  seenLinks = {};
+  window.__autoLives = 0;
+  seenScreens[screenId] = true;
   if (screenId === "opening" || tourList().indexOf(screenId) < 0) showScreen(firstId(), "auto");
-  const pace = window.__autoPace || 4500;
-  document.getElementById("auto").setAttribute("aria-pressed", "true");
-  autoTimer = setInterval(function () {
-    const list = tourList();
-    const index = list.indexOf(screenId);
-    if (index < 0 || index >= list.length - 1) {
-      stopAuto();
-      return;
-    }
-    showScreen(list[index + 1], "auto");
-  }, pace);
+  seenScreens[screenId] = true;
+  scheduleAuto();
+  render();
 }
 
-function act(action, arg) {
-  pendingAction = action;
-  pendingArg = arg;
-  playClick();
-  cardsKey = "";
-  render();
+function requestStop() {
+  if (!autoRunning) return;
+  autoStopRequested = true;
+  if (!autoTimer) finishAuto();
 }
 
 function loadGlyphs() {
@@ -1662,7 +1819,7 @@ function report() {
     schema: "bardo-d009",
     stamp: STAMP,
     settings: {
-      language: lang === "de" ? "de" : "en-GB",
+      language: "en-GB",
       direction: direction === 0 ? "jung-reverse" : "book-order",
       day: Number(state.dataset.day),
       phase: state.dataset.phase,
@@ -1763,7 +1920,6 @@ async function boot() {
 }
 
 function setDirection(next) {
-  stopAuto();
   direction = next;
   milli = ada.exports.bardo_start(direction);
   methodsDone = 0;
@@ -1771,6 +1927,10 @@ function setDirection(next) {
   poisonSeen = -1;
   endingLocked = false;
   turned = false;
+  lineKey = "";
+  detailKey = "";
+  arrivalKey = "";
+  selectedKey = "";
   cardsKey = "";
   if (viewMode !== "opening") viewMode = "tour";
   render();
@@ -1802,18 +1962,15 @@ function pollVersion() {
     .catch(function () { /* a failed poll is not a new build */ });
 }
 
-document.getElementById("lang-en").addEventListener("click", function () {
-  lang = "en"; applyStaticText(); render();
-});
-document.getElementById("lang-de").addEventListener("click", function () {
-  lang = "de"; applyStaticText(); render();
-});
 document.getElementById("dir-jung").addEventListener("click", function () { setDirection(0); playClick(); });
 document.getElementById("dir-book").addEventListener("click", function () { setDirection(1); playClick(); });
 document.getElementById("day").addEventListener("input", function (event) {
-  stopAuto();
   endingLocked = false;
   turned = false;
+  lineKey = "";
+  detailKey = "";
+  arrivalKey = "";
+  selectedKey = "";
   milli = ada.exports.bardo_milli_of_day(Number(event.target.value));
   if (viewMode === "opening") viewMode = "tour";
   cardsKey = "";
@@ -1826,26 +1983,16 @@ document.getElementById("follow").addEventListener("click", function () { choose
 document.getElementById("dont").addEventListener("click", function () { choose(false); });
 document.getElementById("again").addEventListener("click", goStart);
 document.getElementById("auto").addEventListener("click", function () {
-  if (autoTimer) stopAuto();
+  if (autoRunning) requestStop();
   else startAuto();
-});
-document.addEventListener("pointerdown", function (event) {
-  if (!autoTimer) return;
-  if (event.target && event.target.closest && event.target.closest("#auto")) return;
-  stopAuto();
-}, true);
-document.addEventListener("keydown", function (event) {
-  if (autoTimer && event.key !== "F9") stopAuto();
 });
 document.getElementById("enter").addEventListener("click", function () {
   const more = document.getElementById("more");
-  if (more.hidden) {
-    more.hidden = false;
+  more.hidden = !more.hidden;
+  if (!more.hidden) {
+    placePanels();
     drawGraph(Number(document.getElementById("state").dataset.day || "0"));
-    return;
   }
-  more.hidden = true;
-  if (viewMode === "opening") showScreen(firstId(), "enter");
 });
 document.getElementById("menu").addEventListener("click", function () {
   const panel = document.getElementById("menu-panel");
@@ -1898,7 +2045,7 @@ viz.addEventListener("pointerup", function (event) {
   const y = event.clientY - rect.top;
   for (let i = regions.length - 1; i >= 0; i--) {
     if (hitContains(regions[i], x, y)) {
-      act(regions[i].action, regions[i].arg);
+      onHit(regions[i]);
       return;
     }
   }
@@ -1906,7 +2053,7 @@ viz.addEventListener("pointerup", function (event) {
 addEventListener("resize", function () {
   if (!ada) return;
   drawCanvas();
-  placeChoices();
+  placePanels();
   drawGraph(Number(document.getElementById("state").dataset.day || "0"));
 });
 
