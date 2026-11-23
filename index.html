@@ -7,7 +7,7 @@
 <style>
 @font-face {
   font-family: "Rain Devanagari";
-  src: url("assets/devanagari-subset.woff2?v=c581e23") format("woff2");
+  src: url("assets/devanagari-subset.woff2?v=aa2b3f1") format("woff2");
   font-display: swap;
 }
 * { box-sizing: border-box; }
@@ -163,7 +163,7 @@ body.has-choice #choices { display: flex; }
 <body>
 <canvas id="rain" aria-hidden="true"></canvas>
 <canvas id="viz"></canvas>
-<p id="stamp" class="stamp" data-dbg>v0.8 b20261123-1619 c581e23</p>
+<p id="stamp" class="stamp" data-dbg>v0.9 b20261123-1648 aa2b3f1</p>
 <p id="sid" class="sid"></p>
 <button type="button" id="menu" aria-expanded="false" aria-controls="menu-panel"></button>
 <div id="menu-panel" hidden>
@@ -224,7 +224,7 @@ body.has-choice #choices { display: flex; }
 </div>
 <noscript><p>This page needs JavaScript.</p></noscript>
 <script>
-const WASM_BASE64 = "AGFzbQEAAAABOglgAAF/YAAAYAJ/fwBgAX8Bf2ACf38Bf2ADf39/AX9gBX9/f39/AX9gA39/fwBgCX9/f39/f39/fwADLi0AAAAAAQECAwMEAwMEAAMDAwMDAwQEBAQEBQQEBAQEBgcEBQQEBAQEBAUIBAUFBAEAgAIGCQF/AUHQjMAACwfuAhYGbWVtb3J5AgALYmFyZG9faW5wdXQAAAxiYXJkb19vdXRwdXQAAQtiYXJkb19nbHlwaAACC2JhcmRvX3NpZHBhAAMNYmFyZG9fY29tcHV0ZQAECmJhcmRvX3RpY2sABRJiYXJkb19tYW50cmFfZ2x5cGgABgtiYXJkb19zdGFydAAHEmJhcmRvX21pbGxpX29mX2RheQAICmJhcmRvX3dhbGsACQxiYXJkb19hbmNob3IACgtiYXJkb19maXJzdAALC2JhcmRvX3JlYWxtAAwRYmFyZG9fa2FybWFfc3RhcnQADRNiYXJkb19rYXJtYV9saWdodGVuAA4RYmFyZG9fa2FybWFfaGVhdnkADxFiYXJkb19rYXJtYV9jYXJyeQAQEGJhcmRvX2thcm1hX2JhbmQAERJiYXJkb19rYXJtYV9jaGFuY2UAEhFiYXJkb19rYXJtYV9yZWFsbQATDWJhcmRvX3JlYmlydGgAFArFIC0IAEGAi4CAAAsIAEGgi4CAAAsIAEHgi4CAAAsIAEGAjICAAAu7BQEHfyOAgICAAEHQAGsiACSAgICAAEEAKAKAi4CAACEBQQAoAoSLgIAAIQICQAJAIAFB6P4CTQ0AQQBBATYCoIuAgAAMAQsCQCACQQJJDQBBAEECNgKgi4CAAAwBCwJAQQAoAoiLgIAAQQhPDQBBACgCkIuAgABBBk8NAEEAKAKYi4CAAEEASA0AIAAgASAAEKCAgIAAQQBBADYCoIuAgAAgACgCDCEDIAAoAgghBCAAKAIEIQUgACwAACEGQQAgASAAEJWAgIAAQf8BcTYCpIuAgABBACABIAAQl4CAgAA2AqiLgIAAQQAgASAAEJaAgIAANgKsi4CAAEEAIAEgABCagICAADYCsIuAgABBACABIAAQm4CAgAA2ArSLgIAAQQAgASAAEJyAgIAANgK4i4CAAEEAIAI2AryLgIAAQQAgBjYCwIuAgABBACAFNgLEi4CAAEEAIAQ2AsiLgIAAQQAgAzYCzIuAgABBACACQQBHIgIgABCYgICAADYC3IuAgAAgASACQQAoAoiLgIAAQQAoAoyLgIAAQQAoApCLgIAAQQAoApSLgIAAQQAoApiLgIAAIABBEGogABCqgICAAEEAIAAtABA2AoCMgIAAQQAgACgCFDYChIyAgABBACAAKAIYNgKIjICAAEEAIAAoAhw2AoyMgIAAQQAgACgCIDYCkIyAgABBACAAKAIkNgKUjICAAEEAIAAoAig2ApiMgIAAQQAgACgCLDYCnIyAgABBACAAKAIwNgKgjICAAEEAIAAoAjQ2AqSMgIAAQQAgACgCODYCqIyAgABBACAAKAI8NgKsjICAAEEAIAAoAkA2ArCMgIAAQQAgACgCRDYCtIyAgABBACAAKAJINgK4jICAAEEAIAAoAkw2AryMgIAADAELQQBBBTYCoIuAgAALIABB0ABqJICAgIAACz4BAn9B/////wchAAJAQQAoAsCMgIAAIgFB/////wdGDQBBACABQQFqIgA2AsCMgIAAC0EAIAA2AtiLgIAAC4ABAAJAAkACQCAAQX9qQQNJDQBBAEEDNgKgi4CAAAwBCwJAIAFBf0wNACAAIAAQnoCAgAAgAUwNAEEAIAAgAUHgi4CAAEGAiICAACAAEJ+AgIAANgLQi4CAAEGgi4CAACEADAILQQBBBDYCoIuAgAALQdCLgIAAIQALIABBADYCAAsjAQF/QX8hAQJAIABBAk8NACAAQQBHIAAQmICAgAAhAQsgAQsgAQF/QX8hAQJAIABBMk8NACAAIAAQq4CAgAAhAQsgAQsuAQF/QX8hAgJAIABB6P4CSw0AIAFBAk8NACAAIAFBAEcgABCZgICAACECCyACCyABAX9BfyEBAkAgAEEFTw0AIAAgABChgICAACEBCyABCxEAQQRBfyAAQQFGG0EBIAAbCw4AIAAgASABEKKAgIAACwUAQfQDCwwAIAAgABCjgICAAAsMACAAIAAQpICAgAALDAAgACAAEKWAgIAACwwAIAAgABCmgICAAAsMACAAIAAQp4CAgAALDAAgACAAEKiAgIAACw4AIAAgASABEKmAgIAAC0kBAX9BACECAkAgAEH5AUwNAEEBIQIgAEGgH0kNAEECIQIgAEH41QBJDQBBAyECIABB0IwBSQ0AQQRBBSAAQfCrAUkbIQILIAILTAEBfwJAIABB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";
+const WASM_BASE64 = "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HyAFIB82AgQCQANAIAUoAgghIEEEISEgICEiICEhIyAiICNPISRBASElICQgJXEhJiAmRQ0BIAUoAgwhJyAFKAIEISggJyAoNgIAIAUoAgghKUEEISogKSAqayErIAUgKzYCCCAFKAIMISxBBCEtICwgLWohLiAFIC42AgwMAAsLCwN/IAUoAgghL0EAITAgLyExIDAhMiAxIDJLITNBASE0IDMgNHEhNQJAIDUNACAADwsgBSgCDCE2IDYgEDoAACAFKAIIITdBASE4IDcgOGshOSAFIDk2AgggBSgCDCE6QQEhOyA6IDtqITwgBSA8NgIMDAALCwukAwEAQYAIC5wDAAAAAB8AAAAAAAAAAAAAAOClkOCkruCko+Ckv+CkquCkpuCljeCkruClh+CkueClguCkgeClkOCkheCkruCkv+CkpOCkvuCkreCkueCljeCksOClgOCkg+ClkOCkhuCkg+CkueClguCkgeCkteCknOCljeCksOCkl+ClgeCksOClgeCkquCkpuCljeCkruCkuOCkv+CkpuCljeCkp+Ckv+CkueClguCkgQAAAAAAAAAAAAAAAwAAAAMAAAADAAAABgAAAAYAAAAMAAAAAwAAAA8AAAAMAAAAGwAAAAkAAAAkAAAAAwAAACcAAAADAAAAKgAAAAYAAAAwAAAABgAAADYAAAADAAAAOQAAAA8AAABIAAAAAwAAAEsAAAAGAAAAUQAAAAkAAABaAAAAAwAAAF0AAAAJAAAAZgAAAAYAAABsAAAABgAAAHIAAAADAAAAdQAAAAkAAAB+AAAABgAAAIQAAAAMAAAAkAAAAAkAAAAxAAAAJwAAACAAAAAWAAAAAAAAAAUAAAACAAAABAAAAAEAAAD/////AwAAAA==";
 const STRINGS = {
   en: {
     title: "The Bardo states",
@@ -379,6 +379,12 @@ const STRINGS = {
     arriveAnimal: "You left the door open. Karma draws you into the dull blue light of the animals.",
     arrivePreta: "You left the door open. Karma draws you into the dull red light of the hungry ghosts.",
     arriveHell: "You left the door open. Karma draws you into the smoke-coloured light of the hells.",
+    arrivePeace7: "You went toward the dull blue light. It leads to an animal birth.",
+    arrivePeace5: "You went toward the dull green light. It leads to an asura birth.",
+    arrivePeace4: "You went toward the dull red light. It leads to a preta birth.",
+    arrivePeace3: "You went toward the dull bluish-yellow light. It leads to a human birth. A later day calls this light dull yellow.",
+    arrivePeace2: "You went toward the smoky light. It leads to a hell birth. This day does not say hell.",
+    arrivePeace1: "You went toward the dull white light. It leads to a deva birth.",
     tapPetal1: "First petal: one resolve not to enter a womb.",
     tapPetal2: "Second petal: see the parents as teacher and divine mother.",
     tapPetal3: "Third petal: drop attraction and aversion.",
@@ -449,10 +455,11 @@ const STRINGS = {
     infoW09: "Vajra Heruka and his consort, book day 9.",
     infoW08: "Buddha Heruka and his consort, book day 8.",
     infoPeaceOnward: "Recognising this would open the peaceful days. They are not in this part of the tour.",
-    tapBuddhaH: "Buddha Heruka, dark brown, three faces, six hands.",
+    infoClearOnward: "Recognising this would open the Clear Light. It is not in this part of the tour.",
+    tapBuddhaH: "Buddha Heruka, painted maroon, three faces, six hands.",
     tapBuddhaK: "Buddha Krotishaurima, embracing him, offering a red shell.",
-    detailBuddhaH: "Book day 8. Evans-Wentz: the Great Glorious Buddha Heruka, dark brown, right face white, left face red, centre dark brown. In reality, the text says, he is Vairochana. Know him as your own mind.",
-    detailBuddhaK: "The Mother Buddha-Krotishaurima embraces him. Her right hand is at his neck and her left offers a red shell. The pair is the Father-Mother.",
+    detailBuddhaH: "Book day 8. The root text calls the Great Glorious Buddha Heruka dark brown, right face white, left face red, centre dark brown, and says he is Vairochana. The checked table records the Dudjom card’s central figure as maroon-red. This screen is painted maroon. Uncertain against the root text: the book says dark brown.",
+    detailBuddhaK: "The Mother Buddha-Krotishaurima embraces him. Her right hand is at his neck and her left offers a red shell. The pair is the Father-Mother. Uncertain: her body colour is not stated.",
     tapVajraH: "Vajra Heruka, dark blue. The side-face colours are uncertain here.",
     tapVajraK: "Vajra Krotishaurima, embracing him.",
     detailVajraH: "Book day 9. The book says Vajra Heruka is dark blue, with three faces, six hands and four feet, and names the implements. It does not give the three face colours on this day, unlike the other Herukas. The side faces drawn here (white and red) are uncertain, taken from the pattern of the other days. In reality, the text says, he is Vajrasattva.",
@@ -714,6 +721,329 @@ function playClick() {
 reducedSound.addEventListener("change", function () {
   if (reducedSound.matches) setWind(false);
 });
+
+// Reads data/iconography.json and turns each Chonyid day into paint specs.
+// Visible sentences are stored in STRINGS.en so a later overlay can replace them.
+const WORD_HEX = {
+  white: "#E6E0D4",
+  "brilliant white": "#F4F1E6",
+  red: "#8E3A3A",
+  "dark red": "#6B2428",
+  "darkish red": "#6B2428",
+  "reddish black": "#3A1518",
+  "reddish-black": "#3A1518",
+  yellow: "#C4A24A",
+  "dark yellow": "#A8842A",
+  "darkish yellow": "#A8842A",
+  golden: "#C4A24A",
+  "golden-orange": "#C47A3A",
+  "golden orange": "#C47A3A",
+  green: "#3A6B48",
+  "dark green": "#1A3328",
+  blue: "#2C4A6E",
+  "dark blue": "#1A2A44",
+  "dark-blue": "#1A2A44",
+  "deep blue": "#1B3354",
+  "dark brown": "#4A3228",
+  "dark-brown": "#4A3228",
+  maroon: "#6B2428",
+  black: "#1C1C1C",
+  smoky: "#5C5550",
+  grey: "#6E6A64",
+  "ash-grey": "#6E6A64",
+  "dull white": "#C9C3B5",
+  "dull blue": "#3A4A62",
+  "dull yellow": "#A89A55",
+  "dull bluish-yellow": "#8F9A5C",
+  "bluish-yellow": "#8F9A5C",
+  "dull green": "#4A5E48",
+  "dull red": "#7A4548",
+  "dull reddish": "#7A4548",
+  "five-coloured": "#C4A24A"
+};
+
+const UNSTATED = "#8A8478";
+const MAROON = "#6B2428";
+const JUNG_NOTE = "Jung lists the peaceful days in reverse, from day 7 back toward day 1. This tour follows that order. Colours follow the root text.";
+
+function hexFromWords(text) {
+  const raw = String(text || "").toLowerCase();
+  const keys = Object.keys(WORD_HEX).sort(function (a, b) { return b.length - a.length; });
+  for (let i = 0; i < keys.length; i++) {
+    if (raw.indexOf(keys[i]) >= 0) return WORD_HEX[keys[i]];
+  }
+  return "";
+}
+
+function englishOnly(text) {
+  return String(text || "")
+    .replace(/\s*\(([^)]*)\)/g, function (_, inner) {
+      if (/[^\x00-\x7F]/.test(inner)) return "";
+      if (/\b(the|a|an|of|in|and|not|with|from|this|day|holding)\b/i.test(inner)) return " (" + inner + ")";
+      return "";
+    })
+    .replace(/\s+/g, " ")
+    .replace(/\s+([,.;])/g, "$1")
+    .trim();
+}
+
+function putString(key, text) {
+  STRINGS.en[key] = text;
+}
+
+function deityColour(deity) {
+  if (deity.body_colour_hex && deity.body_colour_hex.value) return deity.body_colour_hex.value;
+  const outside = deity.outside_source && deity.outside_source.body_colour;
+  if (outside) {
+    const hex = hexFromWords(outside);
+    if (hex) return hex;
+  }
+  if (deity.body_colour_source) {
+    const hex = hexFromWords(deity.body_colour_source);
+    if (hex) return hex;
+  }
+  return UNSTATED;
+}
+
+function uncertainOf(deity) {
+  const bits = [];
+  const outside = deity.outside_source && (deity.outside_source.body_colour || deity.outside_source.consort_colour);
+  if (!deity.body_colour_source && outside) {
+    bits.push("the source does not state the body colour; the paint follows the checked table’s outside note (" + englishOnly(outside) + ")");
+  } else if (!deity.body_colour_source && !deity._carried) {
+    bits.push("the source does not state the body colour");
+  }
+  if (deity.faces > 1 && !deity.face_colours) bits.push("the face colours are not given");
+  return bits.join(". ");
+}
+
+function familyWord(name) {
+  const n = String(name || "").toLowerCase();
+  if (n.indexOf("vairocana") >= 0) return "white";
+  if (n.indexOf("vajrasattva") >= 0 || n.indexOf("akshobhya") >= 0) return "blue";
+  if (n.indexOf("ratnasambhava") >= 0) return "yellow";
+  if (n.indexOf("amit") >= 0) return "red";
+  if (n.indexOf("amoghasiddhi") >= 0) return "green";
+  return "";
+}
+
+function expandDeities(entry) {
+  const out = [];
+  (entry.deities || []).forEach(function (deity) {
+    if (!deity.name_en) return;
+    if (deity.role === "main_couple") {
+      const buddha = deity.name_en.split(",")[0];
+      const word = familyWord(buddha);
+      out.push(Object.assign({}, deity, {
+        name_en: buddha,
+        body_colour_source: word,
+        body_colour_hex: null,
+        _carried: true,
+        note: "Attributes are not itemised again on this day. The colour is the one the root text gives this Buddha on the earlier day. " + (deity.note || "")
+      }));
+      const cons = deity.outside_source || {};
+      out.push({
+        role: "consort",
+        name_en: cons.consort_sanskrit || (buddha + ", consort"),
+        outside_source: cons.consort_colour ? { body_colour: cons.consort_colour } : null,
+        note: "Her colour is not stated on this day.",
+        items: []
+      });
+      return;
+    }
+    out.push(deity);
+  });
+  return out;
+}
+
+function figureOf(deity, book, index) {
+  const items = (deity.items || []).map(function (item) { return englishOnly(item.item_en); }).filter(Boolean);
+  const five = /five colour|five-colour|all five/i.test(deity.body_colour_source || "");
+  const unsure = uncertainOf(deity);
+  const mount = deity.mount_or_throne && deity.mount_or_throne.en ? englishOnly(deity.mount_or_throne.en) : "";
+  const parts = [englishOnly(deity.name_en || "A figure")];
+  if (deity._carried && deity.body_colour_source) parts.push(deity.body_colour_source + ", carried from the earlier day");
+  else if (deity.body_colour_source) parts.push(englishOnly(deity.body_colour_source));
+  if (items.length) parts.push("Emblem: " + items.join(", "));
+  if (mount) parts.push(mount);
+  if (deity.note) parts.push(englishOnly(deity.note));
+  if (unsure) parts.push("Uncertain: " + unsure);
+  parts.push(JUNG_NOTE);
+  const line = "p" + book + "f" + index;
+  const detail = line + "d";
+  putString(line, englishOnly(deity.name_en || "Figure"));
+  putString(detail, parts.join(". ").replace(/\.\.+/g, "."));
+  return {
+    name: deity.name_en || "Figure",
+    colour: five ? "#C4A24A" : deityColour(deity),
+    rainbow: five,
+    line: line,
+    detail: detail,
+    items: items,
+    mount: mount,
+    role: deity.role || ""
+  };
+}
+
+function lightOf(entry, book, index) {
+  const src = englishOnly(entry.colour_source || "");
+  const withheld = entry.kind === "wisdom_withheld" || /does not appear|withheld/i.test(entry.colour_source || "") || /withheld/i.test(entry.name_en || "");
+  const dull = entry.kind === "dull_realm" || (!entry.name_en && !!entry.realm_en);
+  let name = englishOnly(entry.name_en || "");
+  if (!name && entry.realm_en) name = src + ", " + englishOnly(entry.realm_en);
+  if (!name) name = src || "Light";
+  const parts = [name];
+  if (src && parts[0].indexOf(src) < 0) parts.push(src);
+  if (entry.from) parts.push("From " + englishOnly(entry.from));
+  if (entry.note) {
+    englishOnly(entry.note).split(/(?<=\.)\s+/).forEach(function (sentence) {
+      if (/^Proposed link/i.test(sentence)) return;
+      if (sentence) parts.push(sentence);
+    });
+  }
+  if (/does not use the word hell|does not say hell|day 2 does not/i.test(entry.note || "")) {
+    parts.push("Uncertain as a name: this day does not say hell");
+  }
+  if (/bluish/.test(entry.colour_source || "") && /dull yellow/i.test(entry.note || "")) {
+    parts.push("Uncertain: this day says bluish-yellow; a later day says dull yellow");
+  }
+  parts.push(JUNG_NOTE);
+  const line = "p" + book + "l" + index;
+  const detail = line + "d";
+  putString(line, name);
+  putString(detail, parts.join(". ").replace(/\.\.+/g, "."));
+  const rainbow = /five-colour|five colour/i.test(entry.colour_source || "");
+  const hex = entry.colour_hex && entry.colour_hex.value;
+  return {
+    name: name,
+    colour: hex || hexFromWords(entry.colour_source) || "#C4A24A",
+    rainbow: rainbow,
+    withheld: withheld,
+    dull: dull,
+    line: line,
+    detail: detail
+  };
+}
+
+function peaceSpec(entry) {
+  const book = entry.chonyid_day;
+  const deities = expandDeities(entry);
+  const figures = deities.map(function (deity, index) { return figureOf(deity, book, index); });
+  const lights = (entry.lights || []).map(function (light, index) { return lightOf(light, book, index); });
+  const emblems = [];
+  figures.forEach(function (fig, index) {
+    fig.items.forEach(function (item) {
+      const n = emblems.length;
+      const line = "p" + book + "e" + n;
+      const detail = line + "d";
+      putString(line, item);
+      putString(detail, fig.name + " — " + item + ". " + JUNG_NOTE);
+      emblems.push({ name: item, colour: "#E0C36A", line: line, detail: detail, owner: index });
+    });
+    if (fig.mount) {
+      const n = emblems.length;
+      const line = "p" + book + "e" + n;
+      const detail = line + "d";
+      putString(line, fig.mount);
+      putString(detail, fig.name + " — " + fig.mount + ". " + JUNG_NOTE);
+      emblems.push({ name: fig.mount, colour: "#C4A24A", line: line, detail: detail, owner: index });
+    }
+  });
+  const jung = 19 - book;
+  const layout = book === 6 ? "grid" : book === 7 ? "mandala" : "seat";
+  let blurb = englishOnly(entry.title_en || "").replace(/^Step \d+ — /, "");
+  if (entry.direction && String(entry.direction).length < 40) blurb += " (" + entry.direction + ")";
+  if (lights.some(function (light) { return light.withheld; })) {
+    blurb += ". The green all-accomplishing path is withheld.";
+  }
+  const blurbKey = "p" + book + "blurb";
+  putString(blurbKey, blurb);
+  return {
+    id: "p" + book,
+    code: "J" + (jung < 10 ? "0" : "") + jung + "-B0" + book,
+    cal: entry.calendar_day,
+    book: book,
+    peace: true,
+    blurb: blurbKey,
+    layout: layout,
+    figures: figures,
+    lights: lights,
+    emblems: emblems
+  };
+}
+
+function applyWrathful(table) {
+  const byDay = { 8: "w08", 9: "w09", 10: "w10", 11: "w11", 12: "w12", 13: "w13", 14: "w14" };
+  (table.entries || []).forEach(function (entry) {
+    const id = byDay[entry.chonyid_day];
+    if (!id || !SCREEN[id]) return;
+    const deities = entry.deities || [];
+    if (entry.chonyid_day >= 13) {
+      const picked = entry.chonyid_day === 14
+        ? deities.filter(function (d) { return d.role === "female_door_keeper"; })
+        : [deities[0]].concat(deities.filter(function (d) { return d.role === "htamenma"; }).slice(0, 4));
+      picked.forEach(function (deity, index) {
+        const fig = SCREEN[id].figures[index];
+        if (!fig || !deity) return;
+        fig.colour = deityColour(deity);
+      });
+      return;
+    }
+    const heruka = deities.filter(function (d) { return d.role === "heruka"; })[0];
+    const consort = deities.filter(function (d) { return d.role === "consort"; })[0];
+    if (!heruka) return;
+    let body = deityColour(heruka);
+    const faces = heruka.face_colours || {};
+    if (entry.chonyid_day === 8) body = MAROON;
+    SCREEN[id].body = body;
+    SCREEN[id].faces = [
+      hexFromWords(faces.right || "white") || "#E6E0D4",
+      entry.chonyid_day === 8 ? body : (hexFromWords(faces.middle || heruka.body_colour_source) || body),
+      hexFromWords(faces.left || "red") || "#8E3A3A"
+    ];
+    const fig = SCREEN[id].figures && SCREEN[id].figures[0];
+    if (entry.chonyid_day === 8 && fig) {
+      putString("tapBuddhaH", "Buddha Heruka, painted maroon, three faces, six hands.");
+      putString("detailBuddhaH", "Book day 8. The root text calls the Great Glorious Buddha Heruka dark brown, right face white, left face red, centre dark brown, and says he is Vairochana. The checked table records the Dudjom card’s central figure as maroon-red. This screen is painted maroon. Uncertain against the root text: the book says dark brown.");
+    } else if (fig && !heruka.face_colours) {
+      const key = fig.detail;
+      const text = STRINGS.en[key] || "";
+      if (!/face colour/i.test(text)) {
+        putString(key, text + " Uncertain: the three face colours are not given for this day.");
+      }
+    }
+    if (consort && SCREEN[id].figures[1] && !consort.body_colour_source) {
+      const key = SCREEN[id].figures[1].detail;
+      const text = STRINGS.en[key] || "";
+      if (!/body colour/i.test(text)) {
+        putString(key, text + " Uncertain: her body colour is not stated.");
+      }
+    }
+  });
+}
+
+async function loadIconography() {
+  if (window.__iconsReady) return;
+  const response = await fetch("data/iconography.json", { cache: "no-store" });
+  if (!response.ok) throw new Error("iconography " + response.status);
+  const table = await response.json();
+  applyWrathful(table);
+  [7, 6, 5, 4, 3, 2, 1].forEach(function (day) {
+    const entry = (table.entries || []).filter(function (item) {
+      return item.kind === "chonyid_day" && item.chonyid_day === day && item.phase === "peaceful";
+    })[0];
+    if (!entry) throw new Error("missing peaceful day " + day);
+    const spec = peaceSpec(entry);
+    if (spec.figures.length < 1) throw new Error("empty peaceful day " + day);
+    SCREEN[spec.id] = spec;
+    if (CLIMB.indexOf(spec.id) < 0) CLIMB.push(spec.id);
+  });
+  if (SCREEN.p6 && SCREEN.p6.figures.length !== 42) {
+    throw new Error("day 6 figures " + SCREEN.p6.figures.length);
+  }
+  window.__iconsReady = true;
+  window.__screenCodes = CLIMB.map(function (id) { return SCREEN[id].code; });
+}
 
 // Painted scenes. Everything is drawn in code inside a centred 3:4 stage
 // so a wide window letterboxes instead of stretching strokes to the edges.
@@ -1112,6 +1442,219 @@ function drawWrathful(ctx, w, h, spec) {
   addDisc(20, 1, kx, cy, 28);
 }
 
+function drawMark(ctx, x, y, colour, rainbow, scale) {
+  const s = scale || 1;
+  if (rainbow) {
+    ["#E6E0D4", "#C4A24A", "#8E3A3A", "#3A6B48", "#2C4A6E"].forEach(function (band, i) {
+      ctx.fillStyle = band;
+      ctx.fillRect(x - 12 * s, y - 16 * s + i * 6 * s, 24 * s, 6 * s);
+    });
+    return;
+  }
+  ctx.fillStyle = colour;
+  ctx.beginPath();
+  ctx.ellipse(x, y + 6 * s, 12 * s, 16 * s, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(x, y - 14 * s, 9 * s, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "rgba(247, 244, 234, 0.35)";
+  ctx.beginPath();
+  ctx.arc(x - 3 * s, y - 16 * s, 2 * s, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawBeam(ctx, x, y, light, tall) {
+  const h = tall || 36;
+  ctx.globalAlpha = light.withheld ? 0.45 : light.dull ? 0.75 : 0.95;
+  if (light.rainbow) {
+    ["#E6E0D4", "#C4A24A", "#8E3A3A", "#3A6B48", "#2C4A6E"].forEach(function (band, i) {
+      ctx.fillStyle = band;
+      ctx.fillRect(x - 10 + i * 4, y, 4, h);
+    });
+  } else {
+    ctx.fillStyle = light.colour;
+    ctx.fillRect(x - 7, y, 14, h);
+  }
+  if (light.withheld) {
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = "#E0C36A";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x - 9, y, 18, h);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawEmblem(ctx, x, y, name, colour) {
+  const n = String(name || "").toLowerCase();
+  ctx.fillStyle = colour || "#E0C36A";
+  ctx.strokeStyle = "#F4F1E6";
+  ctx.lineWidth = 2;
+  if (/wheel/.test(n)) {
+    ctx.beginPath();
+    ctx.arc(x, y, 8, 0, Math.PI * 2);
+    ctx.stroke();
+    for (let i = 0; i < 8; i++) {
+      const a = (Math.PI * 2 * i) / 8;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + Math.cos(a) * 8, y + Math.sin(a) * 8);
+      ctx.stroke();
+    }
+  } else if (/vajra/.test(n)) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - 9);
+    ctx.lineTo(x - 4, y);
+    ctx.lineTo(x, y + 9);
+    ctx.lineTo(x + 4, y);
+    ctx.closePath();
+    ctx.fill();
+  } else if (/jewel/.test(n)) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - 8);
+    ctx.lineTo(x + 7, y);
+    ctx.lineTo(x, y + 8);
+    ctx.lineTo(x - 7, y);
+    ctx.closePath();
+    ctx.fill();
+  } else if (/lotus|flower/.test(n)) {
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI * 2 * i) / 6;
+      ctx.beginPath();
+      ctx.ellipse(x + Math.cos(a) * 4, y + Math.sin(a) * 4, 3, 5, a, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (/lion|elephant|horse|peacock|garuda|throne/.test(n)) {
+    ctx.beginPath();
+    ctx.ellipse(x, y + 2, 10, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + 8, y - 2, 4, 0, Math.PI * 2);
+    ctx.fill();
+  } else {
+    ctx.fillRect(x - 6, y - 6, 12, 12);
+  }
+}
+
+function drawPeace(ctx, w, h, spec) {
+  ctx.fillStyle = "#12140f";
+  ctx.fillRect(0, 0, w, h);
+  const glow = ctx.createRadialGradient(w / 2, h * 0.46, 10, w / 2, h * 0.46, Math.max(w, h) * 0.55);
+  glow.addColorStop(0, "#2c2818");
+  glow.addColorStop(1, "#12140f");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, w, h);
+  const lights = spec.lights || [];
+  const wisdom = [];
+  const dull = [];
+  lights.forEach(function (light, i) {
+    (light.dull ? dull : wisdom).push(i);
+  });
+  function placeRow(indexes, y, tall) {
+    indexes.forEach(function (index, n) {
+      const x = indexes.length === 1 ? w * 0.5 : w * (0.12 + (0.76 * n) / (indexes.length - 1));
+      const light = lights[index];
+      drawBeam(ctx, x, y, light, tall);
+      addDisc(22, index, x, y + tall / 2, Math.max(16, tall / 2));
+    });
+  }
+  if (wisdom.length <= 1 && dull.length <= 1) {
+    wisdom.forEach(function (index) {
+      drawBeam(ctx, w * 0.32, 16, lights[index], Math.min(110, h * 0.16));
+      addDisc(22, index, w * 0.32, 16 + h * 0.06, 24);
+    });
+    dull.forEach(function (index) {
+      drawBeam(ctx, w * 0.68, 16, lights[index], Math.min(110, h * 0.16));
+      addDisc(22, index, w * 0.68, 16 + h * 0.06, 24);
+    });
+  } else {
+    placeRow(wisdom, 8, 26);
+    placeRow(dull, 40, 22);
+  }
+  const figures = spec.figures || [];
+  const foot = h - 86;
+  const emblemCount = (spec.emblems || []).length;
+  const emblemPer = emblemCount > 8 && emblemCount <= 10 ? emblemCount : 8;
+  const emblemRows = Math.max(1, Math.ceil(emblemCount / emblemPer));
+  const emblemTop = foot - (emblemRows - 1) * 26;
+  const bandBot = emblemTop - 34;
+  const bandTop = Math.min(Math.max(120, h * 0.24), bandBot - 70);
+  function bandY(frac) {
+    return bandTop + (bandBot - bandTop) * frac;
+  }
+  if (spec.layout === "grid") {
+    const cols = 7;
+    const rows = Math.ceil(figures.length / cols);
+    const top = 86;
+    const bottom = foot - 28;
+    figures.forEach(function (fig, i) {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = w * (0.1 + (0.8 * col) / (cols - 1));
+      const y = top + ((bottom - top) * row) / Math.max(1, rows - 1);
+      drawMark(ctx, x, y, fig.colour, fig.rainbow, 0.72);
+      addDisc(21, i, x, y, 14);
+    });
+  } else if (spec.layout === "mandala") {
+    const pairAt = [
+      [0.42, 0.42, 0.58, 0.46],
+      [0.42, 0.08, 0.58, 0.08],
+      [0.78, 0.42, 0.78, 0.62],
+      [0.42, 0.78, 0.58, 0.78],
+      [0.22, 0.42, 0.22, 0.62]
+    ];
+    for (let p = 0; p < 5; p++) {
+      const spot = pairAt[p];
+      const a = p * 2;
+      const b = a + 1;
+      if (figures[a]) {
+        drawMark(ctx, w * spot[0], bandY(spot[1]), figures[a].colour, figures[a].rainbow, p === 0 ? 1.7 : 1.15);
+        addDisc(21, a, w * spot[0], bandY(spot[1]), p === 0 ? 28 : 20);
+      }
+      if (figures[b]) {
+        drawMark(ctx, w * spot[2], bandY(spot[3]), figures[b].colour, figures[b].rainbow, 0.95);
+        addDisc(21, b, w * spot[2], bandY(spot[3]), 16);
+      }
+    }
+    if (figures[10]) {
+      drawMark(ctx, w * 0.5, bandY(0.98), figures[10].colour, figures[10].rainbow, 0.8);
+      addDisc(21, 10, w * 0.5, bandY(0.98), 16);
+    }
+  } else {
+    const cx = w * 0.4;
+    const cy = h * 0.46;
+    if (figures[0]) {
+      drawMark(ctx, cx, cy, figures[0].colour, figures[0].rainbow, 2.1);
+      addDisc(21, 0, cx, cy, 36);
+    }
+    if (figures[1]) {
+      drawMark(ctx, w * 0.64, cy + 10, figures[1].colour, figures[1].rainbow, 1.45);
+      addDisc(21, 1, w * 0.64, cy + 10, 24);
+    }
+    for (let i = 2; i < figures.length; i++) {
+      const x = w * (0.16 + ((i - 2) % 4) * 0.22);
+      const y = h * 0.68;
+      drawMark(ctx, x, y, figures[i].colour, figures[i].rainbow, 0.95);
+      addDisc(21, i, x, y, 16);
+    }
+  }
+  const emblems = spec.emblems || [];
+  const per = emblemPer;
+  emblems.forEach(function (emblem, i) {
+    const row = Math.floor(i / per);
+    const col = i % per;
+    const n = Math.min(per, emblems.length - row * per);
+    const x = n === 1 ? w * 0.5 : w * (0.12 + (0.76 * col) / (n - 1));
+    const y = foot - row * 26;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(1.7, 1.7);
+    drawEmblem(ctx, 0, 0, emblem.name, emblem.colour);
+    ctx.restore();
+    addDisc(23, i, x, y, 16);
+  });
+}
+
 function drawWishBody(ctx, w, h, model) {
   const colours = ["#f4f1e6", "#1c1c1c", "#a33b32"];
   const yA = h * 0.72;
@@ -1199,6 +1742,8 @@ function paintAll(time, model) {
     drawRealmLight(ctx, box.w, box.h, model.screen);
   } else if (model.wrath) {
     drawWrathful(ctx, box.w, box.h, model.wrath);
+  } else if (model.peace) {
+    drawPeace(ctx, box.w, box.h, model.peace);
   } else if (model.scene === 0) {
     paintAxesLocal(ctx, box.w, box.h, model);
   } else if (model.scene === 1) {
@@ -1274,7 +1819,7 @@ function hitContains(region, x, y) {
   return ang >= start && ang <= region.a1;
 }
 
-const STAMP = "v0.8 b20261123-1619 c581e23";
+const STAMP = "v0.9 b20261123-1648 aa2b3f1";
 const RAW_VERSION = "https://raw.githubusercontent.com/RobertBoettcherSF/bardo-visualization/main/version.txt";
 const REPO_API = "https://api.github.com/repos/RobertBoettcherSF/bardo-visualization/commits/main";
 const REALM_COLOUR = ["#C9C3B5", "#4A5E48", "#A89A55", "#3A4A62", "#7A4548", "#5C5550"];
@@ -1307,6 +1852,7 @@ const STEP_CAP = 4000;
 const DIARY_KEY = "bardo-auto-diary";
 let lineKey = "";
 let detailKey = "";
+let forcedArrival = "";
 let arrivalKey = "";
 let selectedKey = "";
 let lives = [];
@@ -1516,8 +2062,9 @@ function sceneCopy(code) {
 }
 
 function currentInfo(scene) {
-  if (lineKey) return t(lineKey);
-  if (arrivalKey) return t(arrivalKey);
+  if (lineKey) return lineKey.indexOf(" ") >= 0 ? lineKey : t(lineKey);
+  if (arrivalKey) return arrivalKey.indexOf(" ") >= 0 ? arrivalKey : t(arrivalKey);
+  if (SCREEN[screenId] && SCREEN[screenId].blurb) return t(SCREEN[screenId].blurb);
   return t(infoKey(scene));
 }
 
@@ -1667,7 +2214,8 @@ function modelNow() {
     x: side[8],
     y: side[9],
     curves: curves,
-    wrath: SCREEN[screenId] && SCREEN[screenId].figures ? SCREEN[screenId] : null
+    wrath: SCREEN[screenId] && SCREEN[screenId].kind ? SCREEN[screenId] : null,
+    peace: SCREEN[screenId] && SCREEN[screenId].peace ? SCREEN[screenId] : null
   };
 }
 
@@ -1761,8 +2309,9 @@ function showScreen(id, button, extra) {
   detailKey = "";
   arrivalKey = "";
   if (button === "dont") {
-    arrivalKey = REALMS.indexOf(id) >= 0 ? pullKey() : (ARRIVE[id] || "");
+    arrivalKey = forcedArrival || (REALMS.indexOf(id) >= 0 ? pullKey() : (ARRIVE[id] || ""));
   }
+  forcedArrival = "";
   document.getElementById("more").hidden = true;
   if (id === "opening") {
     viewMode = "opening";
@@ -1842,13 +2391,22 @@ function choose(follow, via) {
   karma = follow
     ? ada.exports.bardo_karma_lighten(karma)
     : ada.exports.bardo_karma_heavy(karma);
-  if (follow && from === "w08") {
-    lineKey = "infoPeaceOnward";
-    detailKey = "infoPeaceOnward";
+  if (follow && from === "p1") {
+    lineKey = "infoClearOnward";
+    detailKey = "infoClearOnward";
     arrivalKey = "";
-    remember("follow", { onward: "peaceful" });
-    if (via === "auto") noteStep("follow", from, from, { karmaBefore: karmaBefore, onward: "peaceful" });
+    remember("follow", { onward: "clear light" });
+    if (via === "auto") noteStep("follow", from, from, { karmaBefore: karmaBefore, onward: "clear light" });
     render();
+    return;
+  }
+  if (!follow && SCREEN[from] && SCREEN[from].peace) {
+    const code = ada.exports.bardo_dull_realm(SCREEN[from].book);
+    const realmCode = code < 0 ? ada.exports.bardo_karma_realm(karma) : code;
+    destination = realmCode;
+    forcedArrival = code < 0 ? "" : ("arrivePeace" + SCREEN[from].book);
+    showScreen(REALMS[realmCode], "dont");
+    if (via === "auto") noteStep("dont", from, screenId, { karmaBefore: karmaBefore });
     return;
   }
   const next = follow ? CLIMB[at + 1] : (at === 0 ? rebirthId() : CLIMB[at - 1]);
@@ -1857,6 +2415,11 @@ function choose(follow, via) {
 }
 
 function explainOf(action, arg) {
+  if ((action === 21 || action === 22 || action === 23) && SCREEN[screenId]) {
+    const group = action === 21 ? "figures" : action === 22 ? "lights" : "emblems";
+    const item = (SCREEN[screenId][group] || [])[arg];
+    if (item) return { line: item.line, detail: item.detail };
+  }
   if (action === 20 && SCREEN[screenId] && SCREEN[screenId].figures && SCREEN[screenId].figures[arg]) {
     const fig = SCREEN[screenId].figures[arg];
     return { line: fig.line, detail: fig.detail };
@@ -2087,7 +2650,9 @@ function clearDiary() {
   publishCoverage();
 }
 
-const LIFE_SCREENS = CLIMB.concat(["good"]).concat(REALMS);
+function lifeScreens() {
+  return CLIMB.concat(["good"]).concat(REALMS);
+}
 
 function actionsFor(screen) {
   if (screen === "wish") {
@@ -2128,6 +2693,17 @@ function actionsFor(screen) {
   if (screen === "good" || REALMS.indexOf(screen) >= 0) {
     return [{ id: "again", kind: "again" }];
   }
+  if (SCREEN[screen] && SCREEN[screen].peace) {
+    const spec = SCREEN[screen];
+    const list = [
+      { id: "follow", kind: "follow" },
+      { id: "dont", kind: "dont" }
+    ];
+    (spec.figures || []).forEach(function (_, i) { list.push({ id: "fig-" + i, kind: "peace", group: "figures", arg: i }); });
+    (spec.lights || []).forEach(function (_, i) { list.push({ id: "beam-" + i, kind: "peace", group: "lights", arg: i }); });
+    (spec.emblems || []).forEach(function (_, i) { list.push({ id: "emblem-" + i, kind: "peace", group: "emblems", arg: i }); });
+    return list;
+  }
   if (SCREEN[screen] && SCREEN[screen].figures) {
     const list = [
       { id: "follow", kind: "follow" },
@@ -2143,20 +2719,20 @@ function actionsFor(screen) {
 
 function requiredLinks() {
   const links = [];
-  LIFE_SCREENS.forEach(function (screen) {
+  lifeScreens().forEach(function (screen) {
     actionsFor(screen).forEach(function (action) {
       links.push({ from: screen, button: action.id });
     });
   });
   links.push({ from: "womb", button: "petals" });
   return links.filter(function (link) {
-    return !(link.from === "w08" && link.button === "follow");
+    return !(link.from === "p1" && link.button === "follow");
   });
 }
 
 function unreachedNow() {
   return {
-    screens: LIFE_SCREENS.filter(function (id) { return !seenScreens[id]; }),
+    screens: lifeScreens().filter(function (id) { return !seenScreens[id]; }),
     links: requiredLinks().filter(function (link) {
       return !seenLinks[link.from + ">" + link.button];
     })
@@ -2165,7 +2741,7 @@ function unreachedNow() {
 
 function coverageNow() {
   const gaps = unreachedNow();
-  const screens = (LIFE_SCREENS.length - gaps.screens.length) + "/" + LIFE_SCREENS.length;
+  const screens = (lifeScreens().length - gaps.screens.length) + "/" + lifeScreens().length;
   const linkCount = requiredLinks().length;
   const links = (linkCount - gaps.links.length) + "/" + linkCount;
   return {
@@ -2224,10 +2800,10 @@ function runFile() {
     totals: totals,
     unreached: unreachedNow(),
     deadEnds: [{
-      from: "J11-B08",
+      from: "J18-B01",
       button: "follow",
-      onward: "peaceful",
-      note: "Following here would open the peaceful days, which are not in this part of the tour. It is not required for coverage."
+      onward: "clear light",
+      note: "Following here would open the Clear Light, which is not in this part of the tour. It is not required for coverage."
     }]
   };
 }
@@ -2375,6 +2951,11 @@ function actionHelps(action) {
   if (action.kind === "dont" && screenId === "wish" && !seenScreens.judge) return true;
   if (action.kind === "dont" && screenId === "judge" && !seenScreens.lights) return true;
   if (action.kind === "dont" && screenId === "lights" && !seenScreens.womb) return true;
+  if (action.kind === "dont" && SCREEN[screenId] && SCREEN[screenId].peace) {
+    const code = ada.exports.bardo_dull_realm(SCREEN[screenId].book);
+    const realm = code < 0 ? REALMS[ada.exports.bardo_karma_realm(karma)] : REALMS[code];
+    if (!seenScreens[realm]) return true;
+  }
   return false;
 }
 
@@ -2414,6 +2995,15 @@ function autoApply(action) {
   }
   if (action.kind === "again") {
     beginAgain("auto");
+    return;
+  }
+  if (action.kind === "peace") {
+    const item = SCREEN[from][action.group][action.arg];
+    lineKey = item.line;
+    detailKey = item.detail;
+    arrivalKey = "";
+    noteStep(action.id, from, from, { karmaBefore: karmaBefore });
+    render();
     return;
   }
   if (action.kind === "figure") {
@@ -2630,6 +3220,7 @@ async function boot() {
       return { speed: out[9], alpha: out[10], stride: out[11] || 1 };
     }
   });
+  await loadIconography();
   loadDiary();
   remember("load");
   render();
