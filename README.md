@@ -2,7 +2,7 @@
 
 An interactive tour of the Bardo states. The clock, the curves and the mantra syllables are Plain Ada, compiled to WebAssembly. The page draws, and nothing else.
 
-The tour is in UK English. Other languages can be overlaid later. Jung’s reverse order is the default. Lives start in Sidpa and can Follow through the wrathful days and the peaceful days to the Clear Light. Remaining in the primary light is the end of the tour.
+The tour is in UK English. Other languages can be overlaid later. Jung’s reverse order is the default. The opening is followed by his frame, then the clock, then the six bardos. A life starts at the womb and can Follow through the Chonyid to the Clear Light. Remaining in the primary light is the end of the tour. A coda follows the endings.
 
 ## Screen IDs
 
@@ -10,10 +10,14 @@ Every life-wheel screen is `J##-B##`: Jung’s tour position, then the book day.
 
 | ID | Screen |
 | --- | --- |
+| J00-F1 | Jung’s frame, after the opening |
+| J00-F2 | The three stretches on one clock |
+| J00-F3 | The six bardos |
 | J01-B49 | Womb door |
 | J02-B42 | Six realm lights |
 | J03-B35 | Mirror of karma |
 | J04-B28 | Wish-body |
+| J04-B15 | Entering the Chonyid. Later screens are not renumbered |
 | J05-B14 … J11-B08 | Wrathful days 14 down to 8 |
 | J12-B07 … J18-B01 | Peaceful days 7 down to 1 |
 | J19-B00 | Secondary Clear Light |
@@ -21,7 +25,7 @@ Every life-wheel screen is `J##-B##`: Jung’s tour position, then the book day.
 
 `B` for a Sidpa screen is the last day of that stretch, the day the reverse walk enters it. `B` for a wrathful screen is the book’s own day (8–14), not the calendar day the model uses (11–17). `B` for a peaceful screen is the book’s own day (1–7); the model calendar days are 4–10. Colours come from `data/iconography.json`. Where that table marks a colour or a name uncertain, the detail panel says so. Buddha Heruka is painted maroon: the root text says dark brown, and the table’s outside note says maroon-red.
 
-Endings hang off the womb with a suffix: `J01-B49/good` and `J01-B49/deva`, `asura`, `human`, `animal`, `preta`, `hell`. Remaining in the primary Clear Light is `J20-B00/liberation`. The opening is `OPEN`. The clock before day 22 is `CLOCK`. `B00` is the Clear Light, before book day 1. The primary light is the first hours of the model clock. The secondary light is still calendar day 0, just after those hours.
+Endings hang off the womb with a suffix: `J01-B49/good` and `J01-B49/deva`, `asura`, `human`, `animal`, `preta`, `hell`. An unclosed womb continues through `J01-B49/visions`, `J01-B49/shelter`, and `J01-B49/choice`, then `J01-B49/amitabha`, `J01-B49/tushita`, or `J01-B49/jambu`. Remaining in the primary Clear Light is `J20-B00/liberation`. The coda is `J00-C1`. The opening is `OPEN`. The clock before day 22 is `CLOCK`. `B00` is the Clear Light, before book day 1. The primary light is the first hours of the model clock. The secondary light is still calendar day 0, just after those hours. `J04-B15` sits between the wish-body and the first wrathful day. The J-numbers after it are unchanged.
 
 ## Build
 

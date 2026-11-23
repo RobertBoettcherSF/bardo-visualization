@@ -320,6 +320,17 @@ procedure Smoke is
       pragma Assert (Bardo.Sidpa.Clear_Step (20, 2) = -1);
       pragma Assert (Bardo.API.Clear_Step_Host (20, 1) = 21);
       pragma Assert (Bardo.API.Dissolve_Stage_Host (400) = 1);
+      pragma Assert (Bardo.Sidpa.Womb_Path (0, 0, -1, 500) = 1);
+      pragma Assert (Bardo.Sidpa.Womb_Path (1, 0, -1, 500) = 2);
+      pragma Assert (Bardo.Sidpa.Womb_Path (1, 9, -1, 500) = 0);
+      pragma Assert (Bardo.Sidpa.Womb_Path (2, 0, -1, 500) = 3);
+      pragma Assert (Bardo.Sidpa.Womb_Path (3, 1, -1, 500) = 10);
+      pragma Assert (Bardo.Sidpa.Womb_Path (3, 2, -1, 500) = 11);
+      pragma Assert (Bardo.Sidpa.Womb_Path (3, 3, -1, 500) = 12);
+      pragma Assert (Bardo.Sidpa.Womb_Path (3, 4, -1, 500) = 22);
+      pragma Assert (Bardo.Sidpa.Womb_Path (3, 4, -1, 950) = 25);
+      pragma Assert (Bardo.Sidpa.Womb_Path (3, 4, 0, 950) = 20);
+      pragma Assert (Bardo.API.Womb_Path_Host (3, 3, -1, 500) = 12);
       pragma Assert (Bardo.Sidpa.Wind_Force (0) = 0);
       pragma Assert (Bardo.Sidpa.Wind_Force (22_000) = 640);
       pragma Assert (Bardo.Sidpa.Wind_Force (49_000) > Bardo.Sidpa.Wind_Force (22_000));

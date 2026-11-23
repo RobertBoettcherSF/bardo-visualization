@@ -292,8 +292,21 @@ function drawMirror(ctx, w, h) {
   ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
   ctx.fill();
   addDisc(5, 0, cx, cy, Math.min(rx, ry) * 0.85);
-  addDisc(8, 0, cx - rx - 22, cy, 28);
-  addDisc(9, 0, cx + rx + 22, cy, 28);
+  ctx.fillStyle = "#d9d3c4";
+  ctx.beginPath();
+  ctx.ellipse(cx - rx - 36, cy + 16, 12, 22, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#2a2a2a";
+  ctx.beginPath();
+  ctx.ellipse(cx + rx + 36, cy + 16, 12, 22, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#5c4030";
+  ctx.beginPath();
+  ctx.ellipse(cx, cy - ry - 28, 16, 22, 0, 0, Math.PI * 2);
+  ctx.fill();
+  addDisc(10, 0, cx, cy - ry - 28, 24);
+  addDisc(8, 0, cx - rx - 36, cy, 28);
+  addDisc(9, 0, cx + rx + 36, cy, 28);
   for (let i = 0; i < 5; i++) {
     ctx.beginPath();
     ctx.arc(cx - rx - 22, cy - 24 + i * 14, 7, 0, Math.PI * 2);
@@ -689,6 +702,135 @@ function drawClear(ctx, w, h, model, time) {
   }
 }
 
+function drawCanon(ctx, w, h, model) {
+  ctx.fillStyle = "#14160f";
+  ctx.fillRect(0, 0, w, h);
+  const kind = model.canon;
+  if (kind === "frame" || kind === "coda") {
+    const n = kind === "frame" ? 3 : 5;
+    for (let i = 0; i < n; i++) {
+      const y = h * (0.22 + i * (0.56 / Math.max(1, n - 1)));
+      ctx.fillStyle = i === n - 1 ? "#e0c36a" : "#3a4038";
+      ctx.fillRect(w * 0.18, y, w * 0.64, 18);
+      addDisc(24, i, w * 0.5, y + 9, 22);
+    }
+    return;
+  }
+  if (kind === "interval") {
+    const bands = ["#f7f4ea", "#c4a24a", "#7a4548"];
+    bands.forEach(function (colour, i) {
+      const x = w * (0.2 + i * 0.28);
+      ctx.fillStyle = colour;
+      ctx.globalAlpha = 0.85;
+      ctx.fillRect(x - 28, h * 0.16, 56, 22);
+      ctx.globalAlpha = 1;
+      addDisc(24, i, x, h * 0.16 + 11, 24);
+    });
+    const series = [
+      [model.curves.clarity, "#f7f4ea", 3],
+      [model.curves.intensity, "#e0c36a", 4],
+      [model.curves.complexity, "#8e3a3a", 5]
+    ];
+    series.forEach(function (seriesItem) {
+      const data = seriesItem[0];
+      ctx.strokeStyle = seriesItem[1];
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let day = 0; day <= 49; day++) {
+        const x = w * (0.12 + 0.76 * day / 49);
+        const y = h * (0.78 - 0.4 * (data[day] || 0) / 1000);
+        if (day === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      addDisc(24, seriesItem[2], w * 0.5, h * (0.42 + seriesItem[2] * 0.06), 18);
+    });
+    return;
+  }
+  if (kind === "bardos") {
+    for (let i = 0; i < 6; i++) {
+      const col = i % 3;
+      const row = Math.floor(i / 3);
+      const x = w * (0.25 + col * 0.25);
+      const y = h * (0.32 + row * 0.28);
+      ctx.fillStyle = i >= 3 ? "#e0c36a" : "#3a4038";
+      ctx.beginPath();
+      ctx.arc(x, y, 22, 0, Math.PI * 2);
+      ctx.fill();
+      addDisc(24, i, x, y, 26);
+    }
+    return;
+  }
+  if (kind === "visions") {
+    const colours = ["#7f91a3", "#c4a24a", "#a33b32", "#3f5348", "#c9c3b5", "#4a5e48", "#a89a55", "#3a4a62", "#7a4548", "#5c5550"];
+    for (let i = 0; i < 10; i++) {
+      const col = i % 5;
+      const row = Math.floor(i / 5);
+      const x = w * (0.14 + col * 0.18);
+      const y = h * (0.32 + row * 0.28);
+      ctx.fillStyle = colours[i];
+      ctx.fillRect(x - 16, y - 22, 32, 44);
+      addDisc(24, i, x, y, 24);
+    }
+    return;
+  }
+  if (kind === "shelter") {
+    ctx.fillStyle = "#2a2418";
+    ctx.fillRect(w * 0.28, h * 0.34, w * 0.44, h * 0.28);
+    ctx.fillStyle = "#5c5348";
+    for (let i = 0; i < 4; i++) {
+      const x = i < 2 ? w * 0.16 : w * 0.84;
+      const y = h * (0.4 + (i % 2) * 0.16);
+      ctx.beginPath();
+      ctx.arc(x, y, 12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    addDisc(24, 0, w * 0.5, h * 0.48, 40);
+    return;
+  }
+  if (kind === "choice") {
+    const colours = ["#8e3a3a", "#e0c36a", "#c4a24a", "#5c5550"];
+    for (let i = 0; i < 4; i++) {
+      const x = w * (0.2 + (i % 2) * 0.4);
+      const y = h * (0.32 + Math.floor(i / 2) * 0.28);
+      ctx.fillStyle = colours[i];
+      ctx.beginPath();
+      ctx.arc(x, y, 28, 0, Math.PI * 2);
+      ctx.fill();
+      addDisc(24, i, x, y, 32);
+    }
+    return;
+  }
+  if (kind === "chonyid") {
+    ctx.strokeStyle = "#e0c36a";
+    ctx.globalAlpha = 0.7;
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 8; i++) {
+      const a = (Math.PI * 2 * i) / 8;
+      ctx.beginPath();
+      ctx.moveTo(w * 0.5, h * 0.42);
+      ctx.lineTo(w * 0.5 + Math.cos(a) * w * 0.42, h * 0.42 + Math.sin(a) * h * 0.28);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    addDisc(24, 0, w * 0.5, h * 0.18, 20);
+    const family = ["#E6E0D4", "#2C4A6E", "#C4A24A", "#8E3A3A", "#3A6B48"];
+    const spots = [[0.5, 0.42], [0.5, 0.28], [0.68, 0.48], [0.5, 0.58], [0.32, 0.48]];
+    family.forEach(function (colour, i) {
+      ctx.fillStyle = colour;
+      ctx.beginPath();
+      ctx.arc(w * spots[i][0], h * spots[i][1], i === 0 ? 18 : 14, 0, Math.PI * 2);
+      ctx.fill();
+      addDisc(24, i + 2, w * spots[i][0], h * spots[i][1], 20);
+    });
+    ctx.strokeStyle = "#f7f4ea";
+    ctx.setLineDash([3, 4]);
+    ctx.strokeRect(w * 0.72, h * 0.7, 18, 36);
+    ctx.setLineDash([]);
+    addDisc(24, 1, w * 0.76, h * 0.74, 22);
+  }
+}
+
 function drawWishBody(ctx, w, h, model) {
   const colours = ["#f4f1e6", "#1c1c1c", "#a33b32"];
   const yA = h * 0.72;
@@ -774,6 +916,8 @@ function paintAll(time, model) {
     drawPetals(ctx, box.w / 2, box.h * 0.42, radius, 5, t);
   } else if (REALM_WASH[model.screen]) {
     drawRealmLight(ctx, box.w, box.h, model.screen);
+  } else if (model.canon) {
+    drawCanon(ctx, box.w, box.h, model);
   } else if (model.clearKind) {
     drawClear(ctx, box.w, box.h, model, t);
   } else if (model.wrath) {

@@ -98,7 +98,9 @@ button[aria-pressed="true"] { background: #e7e2d4; color: #111; }
 #enter:focus, #enter:focus-visible { outline: none; background: transparent; color: #f7f4ea; }
 #go, #again { margin-top: 6px; }
 body:not(.is-opening) #go { display: none; }
-body:not(.is-ending) #again, body:not(.is-ending) #quote { display: none; }
+body:not(.has-again) #again, body:not(.is-ending) #quote { display: none; }
+#coda { display: none; margin-top: 6px; }
+body.is-ending #coda { display: inline-block; }
 .quote {
   width: min(36rem, calc(100vw - 1.5rem));
   margin: 4px auto 0; padding: 0 12px;
@@ -221,6 +223,7 @@ body.has-choice #choices { display: flex; }
   <p id="quote" class="quote"></p>
   <button type="button" id="go" data-k="enter"></button>
   <button type="button" id="again" data-k="again"></button>
+  <button type="button" id="coda" data-k="coda"></button>
 </div>
 <div id="dissolve" hidden>
   <button type="button" id="dissolve-label" data-k="dissolveLabel"></button>

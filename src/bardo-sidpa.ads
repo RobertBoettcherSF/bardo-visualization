@@ -107,6 +107,16 @@ package Bardo.Sidpa is
    function Clear_Step (Screen : Integer; Follow : Integer) return Integer with
      Post => Clear_Step'Result in -1 .. 21;
 
+   --  Unclosed womb. From 0 is the failed door, 1 the warning visions,
+   --  2 the shelter, 3 the choice. Choice 0 continues, 9 steps back,
+   --  1 Amitabha, 2 Tushita, 3 Jambu, 4 the karmic realm.
+   --  Results: 0 door, 1 visions, 2 shelter, 3 choice, 10 Amitabha,
+   --  11 Tushita, 12 Jambu, 20..25 the six realms.
+   function Womb_Path
+     (From : Integer; Choice : Integer; Brightest : Integer; Weight : Integer)
+     return Integer with
+     Post => Womb_Path'Result in -1 .. 25;
+
    function Wind_Force (Time : Milli_Time) return Thousandth;
 
    function Wander_X (Tick : Natural) return Thousandth;

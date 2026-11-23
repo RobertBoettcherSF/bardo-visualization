@@ -106,5 +106,10 @@ package Bardo.API is
    function Clear_Step_Host (Screen : Integer; Follow : Integer) return Integer with
      Export, Convention => C, External_Name => "bardo_clear_step",
      Post => Clear_Step_Host'Result in -1 .. 21;
+   function Womb_Path_Host
+     (From : Integer; Choice : Integer; Brightest : Integer; Weight : Integer)
+     return Integer with
+     Export, Convention => C, External_Name => "bardo_womb_path",
+     Post => Womb_Path_Host'Result in -1 .. 25;
 
 end Bardo.API;

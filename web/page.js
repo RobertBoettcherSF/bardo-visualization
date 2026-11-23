@@ -118,14 +118,44 @@ function compute() {
 const SCENE_ID = { 1: "womb", 2: "lights", 3: "judge", 4: "wish" };
 const SCENE_CODE = { womb: 1, lights: 2, judge: 3, wish: 4 };
 const ANCHOR = { womb: 49, lights: 42, judge: 35, wish: 28 };
-const CLIMB = ["womb", "lights", "judge", "wish", "w14", "w13", "w12", "w11", "w10", "w09", "w08"];
+const CLIMB = ["f1", "f2", "f3", "womb", "lights", "judge", "wish", "chonyid", "w14", "w13", "w12", "w11", "w10", "w09", "w08"];
 const SCREEN = {
   opening: { code: "OPEN" },
   clock: { code: "CLOCK" },
+  f1: { code: "J00-F1", tour: true, frame: true, canon: "frame", blurb: "blurbF1", hits: [
+    { line: "tapPsyche", detail: "detailPsyche" },
+    { line: "tapPsychotic", detail: "detailPsychotic" },
+    { line: "tapCaveat", detail: "detailCaveat" }
+  ]},
+  f2: { code: "J00-F2", tour: true, frame: true, canon: "interval", blurb: "blurbF2", hits: [
+    { line: "tapSecChikhai", detail: "detailSecChikhai" },
+    { line: "tapSecChonyid", detail: "detailSecChonyid" },
+    { line: "tapSecSidpa", detail: "detailSecSidpa" },
+    { line: "tapCurveC", detail: "detailCurveC" },
+    { line: "tapCurveI", detail: "detailCurveI" },
+    { line: "tapCurveX", detail: "detailCurveX" }
+  ]},
+  f3: { code: "J00-F3", tour: true, frame: true, canon: "bardos", blurb: "blurbF3", hits: [
+    { line: "tapBardo0", detail: "detailBardo0" },
+    { line: "tapBardo1", detail: "detailBardo1" },
+    { line: "tapBardo2", detail: "detailBardo2" },
+    { line: "tapBardo3", detail: "detailBardo3" },
+    { line: "tapBardo4", detail: "detailBardo4" },
+    { line: "tapBardo5", detail: "detailBardo5" }
+  ]},
   womb: { code: "J01-B49" },
   lights: { code: "J02-B42" },
   judge: { code: "J03-B35" },
   wish: { code: "J04-B28" },
+  chonyid: { code: "J04-B15", cal: 18, entry: true, canon: "chonyid", blurb: "blurbEntry", hits: [
+    { line: "tapRays", detail: "detailRays" },
+    { line: "tapBodySafe", detail: "detailBodySafe" },
+    { line: "tapFamily0", detail: "detailFamily0" },
+    { line: "tapFamily1", detail: "detailFamily1" },
+    { line: "tapFamily2", detail: "detailFamily2" },
+    { line: "tapFamily3", detail: "detailFamily3" },
+    { line: "tapFamily4", detail: "detailFamily4" }
+  ]},
   w14: { code: "J05-B14", cal: 17, info: "infoW14", kind: "row", flame: "#e0c36a", figures: [
     { key: "door-tiger", line: "tapDoorTiger", detail: "detailDoor", colour: "#f4f1e6" },
     { key: "door-sow", line: "tapDoorSow", detail: "detailDoor", colour: "#c4a24a" },
@@ -177,6 +207,37 @@ const SCREEN = {
     ]
   },
   liberation: { code: "J20-B00/liberation", clearKind: "liberation" },
+  visions: { code: "J01-B49/visions", cal: 49, branch: 1, canon: "visions", blurb: "blurbVisions", hits: [
+    { line: "tapEast", detail: "detailEast" },
+    { line: "tapSouth", detail: "detailSouth" },
+    { line: "tapWestC", detail: "detailWestC" },
+    { line: "tapNorthC", detail: "detailNorthC" },
+    { line: "tapSignDeva", detail: "detailSignDeva" },
+    { line: "tapSignAsura", detail: "detailSignAsura" },
+    { line: "tapSignHuman", detail: "detailSignHuman" },
+    { line: "tapSignAnimal", detail: "detailSignAnimal" },
+    { line: "tapSignPreta", detail: "detailSignPreta" },
+    { line: "tapSignHell", detail: "detailSignHell" }
+  ]},
+  shelter: { code: "J01-B49/shelter", cal: 49, branch: 2, canon: "shelter", blurb: "blurbShelter", hits: [
+    { line: "tapFuries", detail: "detailFuries" }
+  ]},
+  choice: { code: "J01-B49/choice", cal: 49, branch: 3, canon: "choice", blurb: "blurbChoice", hits: [
+    { line: "takeAmitabha", detail: "detailTakeA" },
+    { line: "takeTushita", detail: "detailTakeT" },
+    { line: "takeJambu", detail: "detailTakeJ" },
+    { line: "takeKarma", detail: "detailTakeK" }
+  ]},
+  amitabha: { code: "J01-B49/amitabha" },
+  tushita: { code: "J01-B49/tushita" },
+  jambu: { code: "J01-B49/jambu" },
+  coda: { code: "J00-C1", tour: true, frame: true, canon: "coda", blurb: "blurbCoda", hits: [
+    { line: "tapPurpose", detail: "detailPurpose" },
+    { line: "tapCaveat2", detail: "detailCaveat2" },
+    { line: "tapSources", detail: "detailSources" },
+    { line: "tapComputed", detail: "detailComputed" },
+    { line: "tapVerses", detail: "detailVerses" }
+  ]},
   good: { code: "J01-B49/good" },
   deva: { code: "J01-B49/deva" },
   asura: { code: "J01-B49/asura" },
@@ -191,6 +252,19 @@ function codeOf(id) {
 }
 const REALMS = ["deva", "asura", "human", "animal", "preta", "hell"];
 const CLEAR_ID = { 18: "p1", 19: "c19", 20: "c20", 21: "liberation" };
+const WOMB_ID = {
+  0: "womb", 1: "visions", 2: "shelter", 3: "choice",
+  10: "amitabha", 11: "tushita", 12: "jambu",
+  20: "deva", 21: "asura", 22: "human", 23: "animal", 24: "preta", 25: "hell"
+};
+const ENDINGS = ["good", "liberation", "amitabha", "tushita", "jambu"].concat(
+  ["deva", "asura", "human", "animal", "preta", "hell"]
+);
+function holdsScreen(id) {
+  if (ANCHOR[id]) return true;
+  const spec = SCREEN[id];
+  return !!(spec && (spec.tour || spec.cal || Object.prototype.hasOwnProperty.call(spec, "milli")));
+}
 let dissolve = 0;
 let dissolveStage = 0;
 const REALM_INFO = {
@@ -273,6 +347,9 @@ function infoKey(scene) {
   if (viewMode === "opening" || screenId === "opening") return "title";
   if (screenId === "good") return "infoGood";
   if (screenId === "liberation") return "infoLiberation";
+  if (screenId === "amitabha") return "infoAmitabha";
+  if (screenId === "tushita") return "infoTushita";
+  if (screenId === "jambu") return "infoJambu";
   if (REALM_INFO[screenId]) return REALM_INFO[screenId];
   if (SCREEN[screenId] && SCREEN[screenId].info) return SCREEN[screenId].info;
   if (screenId === "wish" && turned) return "infoWishTurn";
@@ -294,7 +371,7 @@ function updateChrome(out) {
   state.dataset.intensity = String(out[5]);
   state.dataset.complexity = String(out[6]);
   state.dataset.mantra = String(out[8]);
-  if (viewMode !== "opening" && !endingLocked && !(SCREEN[screenId] && (SCREEN[screenId].cal || Object.prototype.hasOwnProperty.call(SCREEN[screenId], "milli")))) {
+  if (viewMode !== "opening" && !endingLocked && !holdsScreen(screenId)) {
     screenId = screenFromScene(side[0]);
   }
   state.dataset.scene = String(side[0]);
@@ -327,10 +404,11 @@ function updateChrome(out) {
   const sound = document.getElementById("sound");
   sound.textContent = soundEnabled() ? t("soundOn") : t("soundOff");
   sound.setAttribute("aria-pressed", String(soundEnabled()));
-  const teaching = CLIMB.indexOf(screenId) >= 0;
+  const teaching = CLIMB.indexOf(screenId) >= 0 || !!(SCREEN[screenId] && SCREEN[screenId].branch);
   const ending = viewMode === "ending";
   document.body.classList.toggle("is-opening", viewMode === "opening");
   document.body.classList.toggle("is-ending", ending);
+  document.body.classList.toggle("has-again", ending || screenId === "coda");
   document.body.classList.toggle("has-choice", teaching);
   const followButton = document.getElementById("follow");
   const dontButton = document.getElementById("dont");
@@ -353,8 +431,11 @@ function updateChrome(out) {
   document.getElementById("enter").textContent = currentInfo(side[0]);
   const quote = document.getElementById("quote");
   if (ending) {
-    const quoteKey = screenId === "good" ? "quoteGood" : screenId === "liberation" ? "quoteLiberation" : REALM_QUOTE[screenId];
-    quote.textContent = t(quoteKey);
+    const quoteKey = {
+      good: "quoteGood", liberation: "quoteLiberation",
+      amitabha: "quoteAmitabha", tushita: "quoteTushita", jambu: "quoteJambu"
+    }[screenId] || REALM_QUOTE[screenId];
+    quote.textContent = quoteKey ? t(quoteKey) : "";
   }
   const names = sceneCopy(viewMode === "opening" ? -1 : side[0]);
   const moreBody = detailKey
@@ -438,6 +519,7 @@ function modelNow() {
     wrath: SCREEN[screenId] && SCREEN[screenId].kind ? SCREEN[screenId] : null,
     peace: SCREEN[screenId] && SCREEN[screenId].peace ? SCREEN[screenId] : null,
     clearKind: (SCREEN[screenId] && SCREEN[screenId].clearKind) || "",
+    canon: (SCREEN[screenId] && SCREEN[screenId].canon) || "",
     dissolve: dissolveStage
   };
 }
@@ -547,13 +629,15 @@ function showScreen(id, button, extra) {
     viewMode = "opening";
     endingLocked = false;
     turned = false;
-  } else if (ANCHOR[id] || (SCREEN[id] && (SCREEN[id].cal || Object.prototype.hasOwnProperty.call(SCREEN[id], "milli")))) {
+  } else if (holdsScreen(id)) {
     viewMode = "tour";
     endingLocked = false;
     if (id !== "wish") turned = false;
-    milli = Object.prototype.hasOwnProperty.call(SCREEN[id] || {}, "milli")
-      ? SCREEN[id].milli
-      : ada.exports.bardo_milli_of_day(ANCHOR[id] || SCREEN[id].cal);
+    if (SCREEN[id] && Object.prototype.hasOwnProperty.call(SCREEN[id], "milli")) {
+      milli = SCREEN[id].milli;
+    } else if (ANCHOR[id] || (SCREEN[id] && SCREEN[id].cal)) {
+      milli = ada.exports.bardo_milli_of_day(ANCHOR[id] || SCREEN[id].cal);
+    }
     if (id === "c20") applyDissolve(0);
   } else {
     viewMode = "ending";
@@ -607,7 +691,7 @@ function goNext() {
   const list = tourList();
   const index = list.indexOf(screenId);
   if (screenId === "opening" || index < 0) {
-    showScreen(firstId(), "next");
+    showScreen(direction === 0 ? "f1" : firstId(), "next");
     return;
   }
   if (index >= list.length - 1) return;
@@ -629,11 +713,34 @@ function choose(follow, via) {
   if (via !== "auto") playClick();
   const from = screenId;
   const at = CLIMB.indexOf(from);
-  if (at < 0) return;
   const karmaBefore = karma;
   karma = follow
     ? ada.exports.bardo_karma_lighten(karma)
     : ada.exports.bardo_karma_heavy(karma);
+  if (SCREEN[from] && SCREEN[from].branch) {
+    let pick = follow ? 0 : 9;
+    if (SCREEN[from].branch === 3) pick = follow ? 3 : 4;
+    const code = ada.exports.bardo_womb_path(SCREEN[from].branch, pick, destination, karma);
+    const next = WOMB_ID[code];
+    if (!next) return;
+    if (code >= 20) destination = code - 20;
+    showScreen(next, follow ? "follow" : "dont");
+    if (via === "auto") noteStep(follow ? "follow" : "dont", from, screenId, { karmaBefore: karmaBefore });
+    return;
+  }
+  if (at < 0) return;
+  if (SCREEN[from] && SCREEN[from].frame && from !== "coda") {
+    const next = follow ? CLIMB[at + 1] : (at > 0 ? CLIMB[at - 1] : from);
+    showScreen(next, follow ? "follow" : "dont");
+    if (via === "auto") noteStep(follow ? "follow" : "dont", from, screenId, { karmaBefore: karmaBefore });
+    return;
+  }
+  if (!follow && from === "womb") {
+    const code = ada.exports.bardo_womb_path(0, 0, destination, karma);
+    showScreen(WOMB_ID[code] || "visions", "dont");
+    if (via === "auto") noteStep("dont", from, screenId, { karmaBefore: karmaBefore });
+    return;
+  }
   if (SCREEN[from] && SCREEN[from].clear) {
     const nextCode = ada.exports.bardo_clear_step(SCREEN[from].clear, follow ? 1 : 0);
     const next = CLEAR_ID[nextCode];
@@ -701,6 +808,7 @@ function explainOf(action, arg) {
   }
   if (action === 8) return { line: "tapPebbleW", detail: "detailPebbleW" };
   if (action === 9) return { line: "tapPebbleB", detail: "detailPebbleB" };
+  if (action === 10) return { line: "tapLord", detail: "detailLord" };
   return null;
 }
 
@@ -714,6 +822,10 @@ function onHit(region, via) {
   const spec = explainOf(region.action, region.arg);
   if (!spec) return;
   const key = region.action + ":" + region.arg;
+  if (region.action === 24 && screenId === "choice" && selectedKey === key && region.arg <= 3) {
+    takePath([1, 2, 3, 4][region.arg], via, ["amitabha", "tushita", "jambu", "karma"][region.arg]);
+    return;
+  }
   const acts = region.action >= 1 && region.action <= 7;
   if (selectedKey === key && acts) {
     const from = screenId;
@@ -724,11 +836,9 @@ function onHit(region, via) {
       const natural = roll < chance;
       const ok = via === "auto" ? true : natural;
       if (!ok) {
-        lineKey = pullKey();
-        detailKey = "detailFail";
-        arrivalKey = "";
-        if (via !== "auto") playClick();
-        render();
+        const code = ada.exports.bardo_womb_path(0, 0, destination, karma);
+        showScreen(WOMB_ID[code] || "visions", "fail");
+        if (via === "auto") noteStep("fail", from, screenId, {});
         return;
       }
     }
@@ -743,7 +853,11 @@ function onHit(region, via) {
     const outcome = sidpa()[1];
     if (outcome === 8) lineKey = "outOrder";
     else if (region.action === 1 && methodsDone > before) lineKey = "tapClosed";
-    else if (outcome === 6) lineKey = "outFree";
+    else if (outcome === 6) {
+      showScreen("liberation", "recognise");
+      if (via === "auto") noteStep("recognise", from, "liberation", {});
+      return;
+    }
     else if (outcome === 7) lineKey = "outStay";
     else if (outcome === 4) lineKey = "outAllow";
     else if (outcome === 5) lineKey = "outRefuse";
@@ -789,12 +903,13 @@ function noteStep(action, from, led, extra) {
   life.karma = karma;
   touchDiary(from, action, led);
   trimSteps();
-  if (led === "good" || led === "liberation" || REALMS.indexOf(led) >= 0) {
+  if (led === "good" || led === "liberation" || led === "amitabha" || led === "tushita" || led === "jambu" || REALMS.indexOf(led) >= 0) {
     life.ended = led;
     if (lifeTotals) {
       lifeTotals.lives += 1;
       if (led === "good") lifeTotals.good += 1;
       else if (led === "liberation") lifeTotals.liberation += 1;
+      else if (led === "amitabha" || led === "tushita" || led === "jambu") lifeTotals.chosen += 1;
       else if (lifeTotals.rebirths[led] !== undefined) lifeTotals.rebirths[led] += 1;
     }
     lives.push(life);
@@ -805,7 +920,7 @@ function noteStep(action, from, led, extra) {
 }
 
 function freshTotals() {
-  const totals = { lives: 0, good: 0, liberation: 0, incomplete: 0, rebirths: {} };
+  const totals = { lives: 0, good: 0, liberation: 0, chosen: 0, incomplete: 0, rebirths: {} };
   REALMS.forEach(function (name) { totals.rebirths[name] = 0; });
   return totals;
 }
@@ -907,7 +1022,7 @@ function clearDiary() {
 }
 
 function lifeScreens() {
-  return CLIMB.concat(["good", "liberation"]).concat(REALMS);
+  return CLIMB.concat(["visions", "shelter", "choice", "good", "liberation", "amitabha", "tushita", "jambu", "coda"]).concat(REALMS);
 }
 
 function actionsFor(screen) {
@@ -927,7 +1042,8 @@ function actionsFor(screen) {
       { id: "mirror", kind: "hit", action: 5, arg: 0 },
       { id: "pass", kind: "hit", action: 6, arg: 0 },
       { id: "pebble-w", kind: "hit", action: 8, arg: 0 },
-      { id: "pebble-b", kind: "hit", action: 9, arg: 0 }
+      { id: "pebble-b", kind: "hit", action: 9, arg: 0 },
+      { id: "lord", kind: "hit", action: 10, arg: 0 }
     ];
   }
   if (screen === "lights") {
@@ -946,8 +1062,30 @@ function actionsFor(screen) {
     for (let i = 1; i <= 5; i++) list.push({ id: "petal-" + i, kind: "petal", arg: i });
     return list;
   }
-  if (screen === "good" || screen === "liberation" || REALMS.indexOf(screen) >= 0) {
-    return [{ id: "again", kind: "again" }];
+  if (ENDINGS.indexOf(screen) >= 0) {
+    return [
+      { id: "again", kind: "again" },
+      { id: "coda", kind: "coda" }
+    ];
+  }
+  if (screen === "coda" || (SCREEN[screen] && (SCREEN[screen].frame || SCREEN[screen].entry || SCREEN[screen].branch))) {
+    const list = screen === "coda"
+      ? [{ id: "again", kind: "again" }]
+      : screen === "f1"
+        ? [{ id: "follow", kind: "follow" }]
+        : [
+          { id: "follow", kind: "follow" },
+          { id: "dont", kind: "dont" }
+        ];
+    if (screen === "choice") {
+      list.push({ id: "amitabha", kind: "path", choice: 1 });
+      list.push({ id: "tushita", kind: "path", choice: 2 });
+    }
+    (SCREEN[screen].hits || []).forEach(function (hit, i) {
+      if (!hit) return;
+      list.push({ id: "hit-" + i, kind: "clear", arg: i });
+    });
+    return list;
   }
   if (SCREEN[screen] && SCREEN[screen].clear) {
     const list = [
@@ -1190,7 +1328,32 @@ function beginAgain(via) {
   if (via === "auto") noteStep("again", from, "womb", { karmaBefore: karmaBefore });
 }
 
+function takePath(pick, via, actionId) {
+  const from = screenId;
+  const karmaBefore = karma;
+  if (pick === 1 || pick === 2 || pick === 3) karma = ada.exports.bardo_karma_lighten(karma);
+  const code = ada.exports.bardo_womb_path(3, pick, destination, karma);
+  if (code >= 20) destination = code - 20;
+  const next = WOMB_ID[code];
+  if (!next) return;
+  showScreen(next, actionId || "path");
+  if (via === "auto") noteStep(actionId || "path", from, screenId, { karmaBefore: karmaBefore });
+}
+
 function actionHelps(action) {
+  if (action.kind === "follow" || action.kind === "dont" || action.kind === "again" || action.kind === "path" || action.kind === "coda") {
+    const pending = actionsFor(screenId).some(function (other) {
+      return other.kind !== "follow" && other.kind !== "dont" && other.kind !== "again"
+        && other.kind !== "path" && other.kind !== "coda"
+        && !seenLinks[screenId + ">" + other.id];
+    });
+    if (pending) return false;
+  }
+  if (action.kind === "follow") {
+    const at = CLIMB.indexOf(screenId);
+    const nxt = at >= 0 ? CLIMB[at + 1] : "";
+    if (nxt && (!seenScreens[nxt] || actionsFor(nxt).some(function (other) { return !seenLinks[nxt + ">" + other.id]; }))) return true;
+  }
   const link = screenId + ">" + action.id;
   if (!seenLinks[link]) return true;
   if (action.kind === "light" && !seenScreens[REALMS[action.arg]]) return true;
@@ -1236,8 +1399,12 @@ function pickAction() {
     }
   });
   const helpful = pool.filter(actionHelps);
-  const choice = (helpful.length ? helpful : pool);
-  return choice[Math.floor(Math.random() * choice.length)];
+  const choice = helpful.length ? helpful : pool;
+  const unseen = choice.filter(function (action) { return !tries[screenId + ">" + action.id]; });
+  const ready = unseen.length ? unseen : choice;
+  const back = ready.filter(function (action) { return action.kind === "dont"; });
+  const use = back.length && ready.some(function (action) { return action.kind === "follow"; }) ? back : ready;
+  return use[Math.floor(Math.random() * use.length)];
 }
 
 function autoApply(action) {
@@ -1255,6 +1422,15 @@ function autoApply(action) {
   }
   if (action.kind === "again") {
     beginAgain("auto");
+    return;
+  }
+  if (action.kind === "coda") {
+    showScreen("coda", "coda");
+    noteStep("coda", from, "coda", { karmaBefore: karmaBefore });
+    return;
+  }
+  if (action.kind === "path") {
+    takePath(action.choice, "auto", action.id);
     return;
   }
   if (action.kind === "clear") {
@@ -1312,6 +1488,11 @@ function autoApply(action) {
     return;
   }
   if (action.action >= 1 && action.action <= 7) applyAction(action.action, action.arg);
+  if (action.action === 5 && sidpa()[1] === 6) {
+    showScreen("liberation", "recognise");
+    noteStep(action.id, from, "liberation", { karmaBefore: karmaBefore });
+    return;
+  }
   const spec = explainOf(action.action, action.arg);
   if (spec) {
     lineKey = spec.line;
@@ -1325,7 +1506,7 @@ function autoApply(action) {
 function performAutoAction() {
   if (!actionsFor(screenId).length) {
     const from = screenId;
-    showScreen("wish", "auto");
+    showScreen(direction === 0 ? "f1" : "wish", "auto");
     noteStep("start", from, screenId, { karmaBefore: karma });
     return;
   }
@@ -1348,7 +1529,7 @@ function startAuto() {
   lifeTotals = freshTotals();
   window.__autoLives = 0;
   applyDiary();
-  if (screenId === "opening" || screenId === "clock") showScreen("womb", "auto");
+  if (screenId === "opening" || screenId === "clock") showScreen(direction === 0 ? "f1" : "wish", "auto");
   seenScreens[screenId] = true;
   publishCoverage();
   if (!autoKeepGoing && coverageComplete()) {
@@ -1557,7 +1738,7 @@ document.getElementById("day").addEventListener("input", function (event) {
   render();
 });
 document.getElementById("go").addEventListener("click", function () {
-  if (viewMode === "opening") showScreen(firstId(), "enter");
+  if (viewMode === "opening") showScreen(direction === 0 ? "f1" : firstId(), "enter");
 });
 document.getElementById("dissolve-range").addEventListener("input", function (event) {
   applyDissolve(Number(event.target.value));
@@ -1578,6 +1759,7 @@ document.getElementById("dissolve-label").addEventListener("click", function () 
 document.getElementById("follow").addEventListener("click", function () { choose(true); });
 document.getElementById("dont").addEventListener("click", function () { choose(false); });
 document.getElementById("again").addEventListener("click", function () { beginAgain(); });
+document.getElementById("coda").addEventListener("click", function () { showScreen("coda", "coda"); });
 document.getElementById("auto").addEventListener("click", function () {
   if (autoRunning || autoPrompt) requestStop();
   else startAuto();

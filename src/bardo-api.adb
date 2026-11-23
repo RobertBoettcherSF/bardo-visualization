@@ -172,5 +172,9 @@ package body Bardo.API is
      (Bardo.Sidpa.Dissolve_Stage (Level));
    function Clear_Step_Host (Screen : Integer; Follow : Integer) return Integer is
      (Bardo.Sidpa.Clear_Step (Screen, Follow));
+   function Womb_Path_Host
+     (From : Integer; Choice : Integer; Brightest : Integer; Weight : Integer)
+     return Integer is
+     (Bardo.Sidpa.Womb_Path (From, Choice, Brightest, Weight));
 
 end Bardo.API;

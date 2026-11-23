@@ -185,6 +185,38 @@ package body Bardo.Sidpa is
       end if;
    end Dissolve_Stage;
 
+   function Womb_Path
+     (From : Integer; Choice : Integer; Brightest : Integer; Weight : Integer)
+     return Integer
+   is
+      Realm : Integer;
+   begin
+      if From = 0 and then Choice = 0 then
+         return 1;
+      elsif From = 1 and then Choice = 0 then
+         return 2;
+      elsif From = 1 and then Choice = 9 then
+         return 0;
+      elsif From = 2 and then Choice = 0 then
+         return 3;
+      elsif From = 2 and then Choice = 9 then
+         return 1;
+      elsif From = 3 and then Choice = 1 then
+         return 10;
+      elsif From = 3 and then Choice = 2 then
+         return 11;
+      elsif From = 3 and then Choice = 3 then
+         return 12;
+      elsif From = 3 and then Choice = 4 then
+         Realm := Rebirth_Realm (Brightest, Weight);
+         return 20 + Realm;
+      elsif From = 3 and then Choice = 9 then
+         return 2;
+      else
+         return -1;
+      end if;
+   end Womb_Path;
+
    function Clear_Step (Screen : Integer; Follow : Integer) return Integer is
    begin
       if Follow not in 0 .. 1 then

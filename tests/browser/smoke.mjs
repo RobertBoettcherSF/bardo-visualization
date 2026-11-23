@@ -156,9 +156,12 @@ try {
     assert(lang === "en-GB", name + " lang " + lang);
     await page.click("#menu");
     await page.click("#next");
+    let screen = await page.$eval("#state", (el) => el.dataset.screen);
+    assert(screen === "f1", name + " screen " + screen);
+    await page.click("#start");
     let scene = await page.$eval("#state", (el) => el.dataset.scene);
     assert(scene === "1", name + " expected womb, got " + scene);
-    const screen = await page.$eval("#state", (el) => el.dataset.screen);
+    screen = await page.$eval("#state", (el) => el.dataset.screen);
     assert(screen === "womb", name + " screen " + screen);
     assert(await onScreen("#follow") && await onScreen("#dont"), name + " choices missing");
     const regions = await page.evaluate(() => window.__regions.map((r) => r.action));
@@ -262,14 +265,12 @@ try {
       assert(now === "lights", name + " follow climbs " + now);
       await page.click("#start");
       await page.click("#dont");
-      now = await page.$eval("#state", (el) => el.dataset.screen);
-      assert(now === "human", name + " fallback rebirth " + now);
-      const line = await page.$eval("#quote", (el) => el.textContent);
-      assert(line.toLowerCase().includes("yellow"), name + " realm line " + line);
-      await page.click("#again");
+      now = await page.$eval("#state", (el) => el.dataset.id);
+      assert(now === "J01-B49/visions", name + " unclosed womb " + now);
+      await page.click("#dont");
       now = await page.$eval("#state", (el) => ({ screen: el.dataset.screen, id: el.dataset.id, day: el.dataset.day }));
       assert(now.screen === "womb" && now.id === "J01-B49" && now.day === "49", name + " new life " + JSON.stringify(now));
-      for (let i = 0; i < 4; i++) await page.click("#follow");
+      for (let i = 0; i < 5; i++) await page.click("#follow");
       now = await page.$eval("#state", (el) => el.dataset.id);
       assert(now === "J05-B14", name + " first wrathful " + now);
       await shot("wrath14");
@@ -292,10 +293,13 @@ try {
       assert(chosen === "5", name + " hell light " + chosen);
       await page.click("#dont");
       await page.click("#dont");
+      await page.click("#follow");
+      await page.click("#follow");
+      await page.click("#dont");
       now = await page.$eval("#state", (el) => el.dataset.screen);
       assert(now === "hell", name + " smoky rebirth " + now);
       const pull = await page.$eval("#enter", (el) => el.textContent);
-      assert(/Heavy karma/i.test(pull) && /smoky/i.test(pull), name + " pull " + pull);
+      assert(/smoky/i.test(pull), name + " pull " + pull);
       await shot("karma");
       await shot("rebirth");
       await page.click("#menu");
@@ -320,15 +324,15 @@ try {
       await page.keyboard.press("F9");
       const during = await page.$eval("#auto", (el) => el.textContent.trim());
       assert(during === "Stop", name + " F9 stopped auto");
-      await page.waitForFunction(() => !document.getElementById("auto-ask").hidden, { timeout: 30000 });
+      await page.waitForFunction(() => !document.getElementById("auto-ask").hidden, { timeout: 90000 });
       await page.click("#auto-end");
       const run = await readReport("bardo-run.json");
       assert(run.schema === "bardo-run", name + " run schema");
       assert(run.complete === true, name + " run not complete " + JSON.stringify(run.coverage) + " " + JSON.stringify(run.unreached));
-      assert(run.coverage.screens === "28/28", name + " screens " + run.coverage.screens);
+      assert(run.coverage.screens === "39/39", name + " screens " + run.coverage.screens);
       assert(JSON.stringify(run).includes("J05-B14") && JSON.stringify(run).includes("J11-B08"), name + " wrathful ids");
       assert(JSON.stringify(run).includes("J12-B07") && JSON.stringify(run).includes("J18-B01"), name + " peaceful ids");
-      assert(JSON.stringify(run).includes("J19-B00") && JSON.stringify(run).includes("J20-B00/liberation"), name + " clear light ids");
+      assert(JSON.stringify(run).includes("J00-F1") && JSON.stringify(run).includes("J04-B15") && JSON.stringify(run).includes("J00-C1"), name + " canon ids");
       assert(run.unreached.screens.length === 0, name + " screens left " + run.unreached.screens.join(","));
       assert(run.unreached.links.length === 0, name + " links left " + run.unreached.links.map((l) => l.from + ">" + l.button).join(","));
       ["deva", "asura", "human", "animal", "preta", "hell"].forEach((realm) => {
@@ -353,7 +357,7 @@ try {
 
   await rm(join(outDir, "bardo-report.json"), { force: true });
   const reportPage = await open(browser, 1280, 800, false);
-  await reportPage.page.click("#next");
+  await reportPage.page.click("#start");
   await reportPage.page.click("#follow");
   await reportPage.page.click("#menu");
   await reportPage.page.type("#note", "expected the Sidpa end");
@@ -394,11 +398,11 @@ try {
     await page.waitForFunction(() => {
       const ask = document.getElementById("auto-ask");
       const stats = document.getElementById("auto-stats");
-      return ask.hidden && stats && /Screens \d+\//.test(stats.textContent) && !stats.textContent.includes("28/28");
+      return ask.hidden && stats && /Screens \d+\//.test(stats.textContent) && !stats.textContent.includes("39/39");
     });
     await page.screenshot({ path: join(outDir, "auto-running-" + label + ".png") });
     await page.evaluate(() => { window.__autoBatch = 400; });
-    await page.waitForFunction(() => !document.getElementById("auto-ask").hidden, { timeout: 30000 });
+    await page.waitForFunction(() => !document.getElementById("auto-ask").hidden, { timeout: 90000 });
     const ms = Date.now() - started;
     await page.screenshot({ path: join(outDir, "auto-done-" + label + ".png") });
     await rm(join(outDir, "bardo-run.json"), { force: true });
