@@ -7,7 +7,7 @@
 <style>
 @font-face {
   font-family: "Rain Devanagari";
-  src: url("assets/devanagari-subset.woff2?v=b8a9b4d") format("woff2");
+  src: url("assets/devanagari-subset.woff2?v=96deed4") format("woff2");
   font-display: swap;
 }
 * { box-sizing: border-box; }
@@ -98,7 +98,9 @@ button[aria-pressed="true"] { background: #e7e2d4; color: #111; }
 #enter:focus, #enter:focus-visible { outline: none; background: transparent; color: #f7f4ea; }
 #go, #again { margin-top: 6px; }
 body:not(.is-opening) #go { display: none; }
-body:not(.is-ending) #again, body:not(.is-ending) #quote { display: none; }
+body:not(.has-again) #again, body:not(.is-ending) #quote { display: none; }
+#coda { display: none; margin-top: 6px; }
+body.is-ending #coda { display: inline-block; }
 .quote {
   width: min(36rem, calc(100vw - 1.5rem));
   margin: 4px auto 0; padding: 0 12px;
@@ -179,7 +181,7 @@ body.has-choice #choices { display: flex; }
 <body>
 <canvas id="rain" aria-hidden="true"></canvas>
 <canvas id="viz"></canvas>
-<p id="stamp" class="stamp" data-dbg>v0.10 b20261123-1707 b8a9b4d</p>
+<p id="stamp" class="stamp" data-dbg>v0.11 b20261123-1734 96deed4</p>
 <p id="sid" class="sid"></p>
 <button type="button" id="menu" aria-expanded="false" aria-controls="menu-panel"></button>
 <div id="menu-panel" hidden>
@@ -221,6 +223,7 @@ body.has-choice #choices { display: flex; }
   <p id="quote" class="quote"></p>
   <button type="button" id="go" data-k="enter"></button>
   <button type="button" id="again" data-k="again"></button>
+  <button type="button" id="coda" data-k="coda"></button>
 </div>
 <div id="dissolve" hidden>
   <button type="button" id="dissolve-label" data-k="dissolveLabel"></button>
@@ -245,7 +248,7 @@ body.has-choice #choices { display: flex; }
 </div>
 <noscript><p>This page needs JavaScript.</p></noscript>
 <script>
-const WASM_BASE64 = "AGFzbQEAAAABOglgAAF/YAAAYAJ/fwBgAX8Bf2ACf38Bf2ADf39/AX9gBX9/f39/AX9gA39/fwBgCX9/f39/f39/fwADNjUAAAAAAQECAwMEAwMEAAMDAwMDAwQDAwMEBAQEBAUEBAQEBAYHBAUEBAQEBAQFBAQEBQgEBQUEAQCAAgYJAX8BQeCMwAALB8IDGgZtZW1vcnkCAAtiYXJkb19pbnB1dAAADGJhcmRvX291dHB1dAABC2JhcmRvX2dseXBoAAILYmFyZG9fc2lkcGEAAw1iYXJkb19jb21wdXRlAAQKYmFyZG9fdGljawAFEmJhcmRvX21hbnRyYV9nbHlwaAAGC2JhcmRvX3N0YXJ0AAcSYmFyZG9fbWlsbGlfb2ZfZGF5AAgKYmFyZG9fd2FsawAJDGJhcmRvX2FuY2hvcgAKC2JhcmRvX2ZpcnN0AAsLYmFyZG9fcmVhbG0ADBFiYXJkb19rYXJtYV9zdGFydAANE2JhcmRvX2thcm1hX2xpZ2h0ZW4ADhFiYXJkb19rYXJtYV9oZWF2eQAPEWJhcmRvX2thcm1hX2NhcnJ5ABAQYmFyZG9fa2FybWFfYmFuZAAREmJhcmRvX2thcm1hX2NoYW5jZQASEWJhcmRvX2thcm1hX3JlYWxtABMNYmFyZG9fcmViaXJ0aAAUEGJhcmRvX2R1bGxfcmVhbG0AFRRiYXJkb19kaXNzb2x2ZV9jbGFtcAAWFGJhcmRvX2Rpc3NvbHZlX3N0YWdlABcQYmFyZG9fY2xlYXJfc3RlcAAYCroiNQgAQZyLgIAACwgAQbyLgIAACwgAQfyLgIAACwgAQZyMgIAAC7sFAQd/I4CAgIAAQdAAayIAJICAgIAAQQAoApyLgIAAIQFBACgCoIuAgAAhAgJAAkAgAUHo/gJNDQBBAEEBNgK8i4CAAAwBCwJAIAJBAkkNAEEAQQI2AryLgIAADAELAkBBACgCpIuAgABBCE8NAEEAKAKsi4CAAEEGTw0AQQAoArSLgIAAQQBIDQAgACABIAAQpICAgABBAEEANgK8i4CAACAAKAIMIQMgACgCCCEEIAAoAgQhBSAALAAAIQZBACABIAAQmYCAgABB/wFxNgLAi4CAAEEAIAEgABCbgICAADYCxIuAgABBACABIAAQmoCAgAA2AsiLgIAAQQAgASAAEJ6AgIAANgLMi4CAAEEAIAEgABCfgICAADYC0IuAgABBACABIAAQoICAgAA2AtSLgIAAQQAgAjYC2IuAgABBACAGNgLci4CAAEEAIAU2AuCLgIAAQQAgBDYC5IuAgABBACADNgLoi4CAAEEAIAJBAEciAiAAEJyAgIAANgL4i4CAACABIAJBACgCpIuAgABBACgCqIuAgABBACgCrIuAgABBACgCsIuAgABBACgCtIuAgAAgAEEQaiAAELKAgIAAQQAgAC0AEDYCnIyAgABBACAAKAIUNgKgjICAAEEAIAAoAhg2AqSMgIAAQQAgACgCHDYCqIyAgABBACAAKAIgNgKsjICAAEEAIAAoAiQ2ArCMgIAAQQAgACgCKDYCtIyAgABBACAAKAIsNgK4jICAAEEAIAAoAjA2AryMgIAAQQAgACgCNDYCwIyAgABBACAAKAI4NgLEjICAAEEAIAAoAjw2AsiMgIAAQQAgACgCQDYCzIyAgABBACAAKAJENgLQjICAAEEAIAAoAkg2AtSMgIAAQQAgACgCTDYC2IyAgAAMAQtBAEEFNgK8i4CAAAsgAEHQAGokgICAgAALPgECf0H/////ByEAAkBBACgC3IyAgAAiAUH/////B0YNAEEAIAFBAWoiADYC3IyAgAALQQAgADYC9IuAgAALgAEAAkACQAJAIABBf2pBA0kNAEEAQQM2AryLgIAADAELAkAgAUF/TA0AIAAgABCigICAACABTA0AQQAgACABQfyLgIAAQYCIgIAAIAAQo4CAgAA2AuyLgIAAQbyLgIAAIQAMAgtBAEEENgK8i4CAAAtB7IuAgAAhAAsgAEEANgIACyMBAX9BfyEBAkAgAEECTw0AIABBAEcgABCcgICAACEBCyABCyABAX9BfyEBAkAgAEEyTw0AIAAgABCzgICAACEBCyABCy4BAX9BfyECAkAgAEHo/gJLDQAgAUECTw0AIAAgAUEARyAAEJ2AgIAAIQILIAILIAEBf0F/IQECQCAAQQVPDQAgACAAEKWAgIAAIQELIAELEQBBBEF/IABBAUYbQQEgABsLDgAgACABIAEQpoCAgAALBQBB9AMLDAAgACAAEKeAgIAACwwAIAAgABCogICAAAsMACAAIAAQqYCAgAALDAAgACAAEKqAgIAACwwAIAAgABCrgICAAAsMACAAIAAQrICAgAALDgAgACAB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";
+const WASM_BASE64 = "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IAAQrICAgAALDAAgACAAEK2AgIAACw4AIAAgASABEK6AgIAACwwAIAAgABCvgICAAAsMACAAIAAQsICAgAALDAAgACAAELGAgIAACw4AIAAgASABELOAgIAACxIAIAAgASACIAMgAxCygICAAAtJAQF/QQAhAgJAIABB+QFMDQBBASECIABBoB9JDQBBAiECIABB+NUASQ0AQQMhAiAAQdCMAUkNAEEEQQUgAEHwqwFJGyECCyACC0wBAX8CQCAAQeBgaiICQdg2Tw0AIAJB//8DcUHoB25BAWoPC0EAIQICQCAAQYiqf2oiAEHXNksNACAAQf//A3FB6AduQQhqIQILIAILCAAgAEHoB20LDwBBAEHo/gIgAEH/AXEbCyoAQegHQZh4IAFB/wFxGyAAaiIBQej+AiABQej+AkgbIgFBACABQQBKGwsLACAAQU9tQegHagt2AQN/IAAgABCagICAACECQTwhAyAAIAAQm4CAgAAhBAJAAkACQAJAAkACQCACQf8BcUF/ag4FAAECAwUECyAAQYwBbEHI7n1qQaYdbUHkAGoPCyAEQSRsQYgCag8LIARBMGxB7AFqDwtB1AIhAwsgAw8LQcQEC2YBAn8gACAAEJqAgIAAIQJBKCEDIAAgABCbgICAACEAAkACQAJAAkACQAJAIAJB/wFxQX9qDgUAAQIDBQQLQdoADwsgAEEobEGMAWoPCyAAQS5sQZACag8LQaABIQMLIAMPC0HcAQsKACAAQQZJQQF0CxAAQQxBBiAAQf8BcUEDRhsLwAIBA38CQAJAAkACQCAAQf8BcUF+ag4CAQIACyABQQN0IgBBtImAgABqIQUgAEGwiYCAAGohBgwCCyABQQN0IgBB5ImAgABqIQUgAEHgiYCAAGohBgwBCyABQQN0IgBBlIqAgABqIQUgAEGQioCAAGohBgtBACEAIAJBAEEAIAMoAAQiASADKAAAIgNrQQFqQf////8BcSABIANIGxC2gICAACEDAkAgBSgCACIHQQFIDQAgBigCACEGIAdBA3EhAgJAIAdBBEkNACAGQZCIgIAAaiEBIAdBfHEhBUEAIQADQCADIABqIAEgAGooAAA2AAAgBSAAQQRqIgBHDQALCyACRQ0AIAMgAGohAyAAIAZqQZCIgIAAaiEAA0AgAyAALQAAOgAAIABBAWohACADQQFqIQMg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";
 const STRINGS = {
   en: {
     title: "The Bardo states",
@@ -500,6 +503,111 @@ const STRINGS = {
     dissolveLabel: "Dissolution",
     arrivePass19: "The moment passes. Book day 1 is here again.",
     arrivePass20: "The moment passes. The secondary Clear Light returns.",
+    coda: "Coda",
+    blurbF1: "Jung’s frame. This is his commentary, not the root text.",
+    blurbF2: "One book, three stretches, on a single 49-day clock.",
+    blurbF3: "Six bardos. This tour follows the last three.",
+    blurbVisions: "The door stayed open. The warning signs appear.",
+    blurbShelter: "Shelter from the furies that pursue an open womb.",
+    blurbChoice: "A pure realm, a careful human birth, or the pull of karma.",
+    blurbEntry: "The Chonyid opens: sounds, lights, and rays.",
+    blurbCoda: "Why the book is read aloud, and how this page computes.",
+    infoAmitabha: "A transfer to Amitābha’s western realm. This birth is not taken.",
+    infoTushita: "A transfer to Maitreya in Tuṣita. This birth is not taken.",
+    infoJambu: "A human womb in Jambudvipa, where the teaching can be heard.",
+    quoteAmitabha: "Lines 1104–1164. Aim the wish at Amitābha’s realm rather than at a womb.",
+    quoteTushita: "Lines 1104–1164. Tuṣita is the pure realm named for that waiting with Maitreya.",
+    quoteJambu: "Line 1112. If a womb must be entered, the southern continent is where the teaching is current.",
+    tapPsyche: "Jung: deities and lights are projections of the psyche.",
+    detailPsyche: "Jung’s commentary, kept apart from the root text. He reads the deities and the lights as projections of the psyche, thought-forms that present themselves as if they were real. He relates them to archetypes and the collective unconscious.",
+    tapPsychotic: "Jung compares the Chonyid to an induced psychotic state.",
+    detailPsychotic: "Jung, not the Bardo Thodol. He compares the Chonyid visions to a psychotic state that has been induced, and he treats Sidpa as the drive toward rebirth. The comparison is his.",
+    tapCaveat: "Reading backwards is Jung’s aid, not the book’s intent.",
+    detailCaveat: "Jung, lines 127 and 214–222, paraphrased. He lists the days in reverse as an aid for Western readers. He says that order is not the Bardo Thodol’s own intent. This tour follows his order and keeps that caveat in view.",
+    tapSecChikhai: "First stretch: the Clear Light.",
+    detailSecChikhai: "Lines 24–39 and 70. The book falls into three stretches. On this clock the Clear Light is the opening, through the first days. Clarity is highest here.",
+    tapSecChonyid: "Second stretch: experiencing reality.",
+    detailSecChonyid: "Lines 24–39 and 70. The middle stretch is the Chonyid, the deities of the peaceful and wrathful days. Intensity and complexity rise as the visions thicken.",
+    tapSecSidpa: "Third stretch: the drive toward birth.",
+    detailSecSidpa: "Lines 24–39 and 70. Sidpa is the last stretch, the judgement, the lights, and the womb. The clock runs on to day 49. Clarity has fallen.",
+    tapCurveC: "Clarity falls across the 49 days.",
+    detailCurveC: "The clarity curve is an integer thousandth from Ada, Bardo.Curves. It starts high at the Clear Light and falls toward day 49. The book does not print this graph.",
+    tapCurveI: "Intensity rises through the deity days.",
+    detailCurveI: "Intensity is an integer thousandth from Ada. It is quiet in the Clear Light, rises through the Chonyid, and eases in Sidpa. The shape is the model’s, not a figure from the text.",
+    tapCurveX: "Complexity rises as the visions multiply.",
+    detailCurveX: "Complexity is an integer thousandth from Ada. It grows as the mandalas accumulate, then drops once Sidpa begins. Tap a section to see which stretch you are in.",
+    tapBardo0: "The bardo of the womb.",
+    tapBardo1: "The bardo of the dream.",
+    tapBardo2: "The bardo of meditation.",
+    tapBardo3: "The bardo of the moment of death.",
+    tapBardo4: "The bardo of experiencing reality.",
+    tapBardo5: "The bardo of becoming.",
+    detailBardo0: "Line 488. Six intermediate states are named. The first is the womb, from conception to birth. This tour does not walk it.",
+    detailBardo1: "Line 488. The dream bardo lies between sleeping and waking. This tour does not walk it.",
+    detailBardo2: "Line 488. The meditation bardo is the interval in a session of practice. This tour does not walk it.",
+    detailBardo3: "Line 488. The bardo of the moment of death is the Clear Light. This tour enters it at the far end, as J19-B00 and J20-B00.",
+    detailBardo4: "Line 488. Experiencing reality is the Chonyid, the peaceful and wrathful days. This tour walks those days.",
+    detailBardo5: "Line 488. Becoming is Sidpa, the drive toward a new birth. This tour starts there.",
+    tapFuries: "The furies that pursue an unclosed womb.",
+    detailFuries: "Lines 1104–1164. When the womb door is not closed, pursuing furies appear. The counsel is to take shelter, then choose with care rather than flee into the nearest sign.",
+    tapEast: "East, Lüpah: a lake with swans. Do not go.",
+    tapSouth: "South, Jambu: dwellings. The teaching is here.",
+    tapWestC: "West, Balang-Tschöd: a lake with horses. Do not go.",
+    tapNorthC: "North, Daminyan: cattle and trees. Do not go.",
+    detailEast: "Line 1111. The eastern continent appears as a lake adorned with swans. The teaching is not spread there. Do not go.",
+    detailSouth: "Line 1112. The southern continent, Jambu, appears as great and appealing dwellings. If a womb must be entered, enter there.",
+    detailWestC: "Line 1113. The western continent appears as a lake with horses. There is wealth, and the teaching does not prevail. Do not go.",
+    detailNorthC: "Line 1114. The northern continent appears as cattle, or a lake surrounded by trees. Life there is long, and the teaching is not heard. Do not go.",
+    tapSignDeva: "Gods: temples of precious materials. Entry is allowed.",
+    tapSignAsura: "Demigods: a fair forest, or fires circling. Do not enter.",
+    tapSignHuman: "Humans: the dwellings of Jambu.",
+    tapSignAnimal: "Animals: caves, chasms, or fog. Do not enter.",
+    tapSignPreta: "Hungry ghosts: bare plains and thickets. Do not enter.",
+    tapSignHell: "Hells: dark roads and a feeling of being drawn. Do not enter.",
+    detailSignDeva: "Line 1116. A god’s sign is a splendid temple. The text allows that entry. Line 1164 also names the white light of the gods if a path must be taken.",
+    detailSignAsura: "Line 1117. An asura’s sign is a fair forest, or fires that circle in opposite directions. Do not enter.",
+    detailSignHuman: "Lines 1112 and 1164. The human sign is the southern dwellings, or the yellow light. Enter the halls and the gardens if a womb is taken.",
+    detailSignAnimal: "Line 1118. An animal’s sign is a rock cave, a deep chasm, or fog. Do not enter.",
+    detailSignPreta: "Line 1119. A hungry ghost’s sign is a bare plain, a shallow cave, or a dense thicket. Do not enter.",
+    detailSignHell: "Line 1120. A hell’s sign is wailing, dark ground, black and white houses, black fissures, and dark roads. Do not enter.",
+    takeAmitabha: "Transfer to Amitābha’s western realm.",
+    takeTushita: "Transfer to Maitreya in Tuṣita.",
+    takeJambu: "Enter a human womb in Jambu.",
+    takeKarma: "Let karma choose the realm.",
+    detailTakeA: "Lines 1104–1164. A supernormal transfer aims the wish at Amitābha’s western realm instead of a womb. The outcome is computed in Ada.",
+    detailTakeT: "Lines 1104–1164. The other transfer named here is Maitreya’s Tuṣita. The outcome is computed in Ada.",
+    detailTakeJ: "Line 1112. The careful human birth is Jambu, where the teaching is found. The outcome is computed in Ada.",
+    detailTakeK: "Lines 1104–1164. If no deliberate path is taken, the realm follows the light already chosen, or the karma weight. Ada computes which of the six.",
+    tapRays: "Sounds, lights, and rays. They terrify, and they do not harm.",
+    detailRays: "Lines 478–522. At the opening of the Chonyid, sounds, lights, and rays break out and terrify. The thought-body cannot be harmed by them. Recognise every appearance as your own mind.",
+    tapBodySafe: "The thought-body cannot be harmed.",
+    detailBodySafe: "Lines 478–522. The body you have here is a thought-body. The rays do not wound it. Fear is the mistake, not an injury.",
+    tapFamily0: "Vairocana, white, the centre.",
+    tapFamily1: "Vajrasattva, blue, the east.",
+    tapFamily2: "Ratnasambhava, yellow, the south.",
+    tapFamily3: "Amitābha, red, the west.",
+    tapFamily4: "Amoghasiddhi, green, the north.",
+    detailFamily0: "The first five-family mandala of this tour. Vairocana is white, in the centre, as on book day 1. The colour is the root text’s.",
+    detailFamily1: "Vajrasattva is blue, in the east, as on book day 2. Jung’s commentary calls him white. The mandala follows the root text.",
+    detailFamily2: "Ratnasambhava is yellow, in the south, as on book day 3.",
+    detailFamily3: "Amitābha is red, in the west, as on book day 4.",
+    detailFamily4: "Amoghasiddhi is green, in the north, as on book day 5.",
+    tapPurpose: "The book is heard so that attention can hold.",
+    detailPurpose: "The root text is read beside the dying, and to the dead, so that hearing it steadies attention at each vision. This page keeps that use and does not add a rite.",
+    tapCaveat2: "Jung’s caveat, stated again on its own.",
+    detailCaveat2: "Jung, lines 127 and 214–222, separately from the root text. Reverse order is his help for Western readers. It is not what the Bardo Thodol itself intends.",
+    tapSources: "Sources, without a copyright note.",
+    detailSources: "The root text followed here is Evans-Wentz, cited by line. Jung is quoted only as commentary and always named. Colours come from the checked iconography table. No copyright line is shown.",
+    tapComputed: "How this page computes.",
+    detailComputed: "The clock, the curves, the karma weight, the rebirth, the Clear Light step, and the womb path are Plain Ada integers. A thousandth is the unit. Follow lightens the weight by 160. Don’t follow makes it heavier by 160. The next life carries half the distance back toward the middle.",
+    tapVerses: "The appendix verses are pointed to, not printed.",
+    detailVerses: "The book’s closing verses sit in an appendix. This page points at them and does not reproduce them.",
+    tapLord: "The Lord of Death, consulting the mirror.",
+    detailLord: "Lines 956–972. The Lord of Death looks into the mirror of karma, where the deeds appear. The text says he, the court, and the punishment are one’s own mind. The body is said to be torn and to compose itself again. That is told here and not drawn.",
+    detailMirror: "Lines 956–972. The mirror shows every deed. Recognising that the court is one’s own mind, which cannot die, is liberation. A second tap takes that recognition. Ada reports the outcome.",
+    detailPebbleW: "Lines 956–972. The good genius, born with you, counts what was done well with white pebbles. The count is the mind’s image, not a score kept by this page.",
+    detailPebbleB: "Lines 956–972. The evil genius counts what was done ill with black pebbles. Neither genius is a power outside the mind.",
+    bodyJudge: "Lines 956–972. The good genius counts with white pebbles and the evil genius with black. The Lord of Death consults the mirror of karma. The text says the body is torn and composes itself again. That violence is not drawn. All of it is one’s own mind, which cannot die. Recognising that is liberation.",
     tapBuddhaH: "Buddha Heruka, painted maroon, three faces, six hands.",
     tapBuddhaK: "Buddha Krotishaurima, embracing him, offering a red shell.",
     detailBuddhaH: "Book day 8. The root text calls the Great Glorious Buddha Heruka dark brown, right face white, left face red, centre dark brown, and says he is Vairochana. The checked table records the Dudjom card’s central figure as maroon-red. This screen is painted maroon. Uncertain against the root text: the book says dark brown.",
@@ -1386,8 +1494,21 @@ function drawMirror(ctx, w, h) {
   ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
   ctx.fill();
   addDisc(5, 0, cx, cy, Math.min(rx, ry) * 0.85);
-  addDisc(8, 0, cx - rx - 22, cy, 28);
-  addDisc(9, 0, cx + rx + 22, cy, 28);
+  ctx.fillStyle = "#d9d3c4";
+  ctx.beginPath();
+  ctx.ellipse(cx - rx - 36, cy + 16, 12, 22, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#2a2a2a";
+  ctx.beginPath();
+  ctx.ellipse(cx + rx + 36, cy + 16, 12, 22, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#5c4030";
+  ctx.beginPath();
+  ctx.ellipse(cx, cy - ry - 28, 16, 22, 0, 0, Math.PI * 2);
+  ctx.fill();
+  addDisc(10, 0, cx, cy - ry - 28, 24);
+  addDisc(8, 0, cx - rx - 36, cy, 28);
+  addDisc(9, 0, cx + rx + 36, cy, 28);
   for (let i = 0; i < 5; i++) {
     ctx.beginPath();
     ctx.arc(cx - rx - 22, cy - 24 + i * 14, 7, 0, Math.PI * 2);
@@ -1783,6 +1904,135 @@ function drawClear(ctx, w, h, model, time) {
   }
 }
 
+function drawCanon(ctx, w, h, model) {
+  ctx.fillStyle = "#14160f";
+  ctx.fillRect(0, 0, w, h);
+  const kind = model.canon;
+  if (kind === "frame" || kind === "coda") {
+    const n = kind === "frame" ? 3 : 5;
+    for (let i = 0; i < n; i++) {
+      const y = h * (0.22 + i * (0.56 / Math.max(1, n - 1)));
+      ctx.fillStyle = i === n - 1 ? "#e0c36a" : "#3a4038";
+      ctx.fillRect(w * 0.18, y, w * 0.64, 18);
+      addDisc(24, i, w * 0.5, y + 9, 22);
+    }
+    return;
+  }
+  if (kind === "interval") {
+    const bands = ["#f7f4ea", "#c4a24a", "#7a4548"];
+    bands.forEach(function (colour, i) {
+      const x = w * (0.2 + i * 0.28);
+      ctx.fillStyle = colour;
+      ctx.globalAlpha = 0.85;
+      ctx.fillRect(x - 28, h * 0.16, 56, 22);
+      ctx.globalAlpha = 1;
+      addDisc(24, i, x, h * 0.16 + 11, 24);
+    });
+    const series = [
+      [model.curves.clarity, "#f7f4ea", 3],
+      [model.curves.intensity, "#e0c36a", 4],
+      [model.curves.complexity, "#8e3a3a", 5]
+    ];
+    series.forEach(function (seriesItem) {
+      const data = seriesItem[0];
+      ctx.strokeStyle = seriesItem[1];
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let day = 0; day <= 49; day++) {
+        const x = w * (0.12 + 0.76 * day / 49);
+        const y = h * (0.78 - 0.4 * (data[day] || 0) / 1000);
+        if (day === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      addDisc(24, seriesItem[2], w * 0.5, h * (0.42 + seriesItem[2] * 0.06), 18);
+    });
+    return;
+  }
+  if (kind === "bardos") {
+    for (let i = 0; i < 6; i++) {
+      const col = i % 3;
+      const row = Math.floor(i / 3);
+      const x = w * (0.25 + col * 0.25);
+      const y = h * (0.32 + row * 0.28);
+      ctx.fillStyle = i >= 3 ? "#e0c36a" : "#3a4038";
+      ctx.beginPath();
+      ctx.arc(x, y, 22, 0, Math.PI * 2);
+      ctx.fill();
+      addDisc(24, i, x, y, 26);
+    }
+    return;
+  }
+  if (kind === "visions") {
+    const colours = ["#7f91a3", "#c4a24a", "#a33b32", "#3f5348", "#c9c3b5", "#4a5e48", "#a89a55", "#3a4a62", "#7a4548", "#5c5550"];
+    for (let i = 0; i < 10; i++) {
+      const col = i % 5;
+      const row = Math.floor(i / 5);
+      const x = w * (0.14 + col * 0.18);
+      const y = h * (0.32 + row * 0.28);
+      ctx.fillStyle = colours[i];
+      ctx.fillRect(x - 16, y - 22, 32, 44);
+      addDisc(24, i, x, y, 24);
+    }
+    return;
+  }
+  if (kind === "shelter") {
+    ctx.fillStyle = "#2a2418";
+    ctx.fillRect(w * 0.28, h * 0.34, w * 0.44, h * 0.28);
+    ctx.fillStyle = "#5c5348";
+    for (let i = 0; i < 4; i++) {
+      const x = i < 2 ? w * 0.16 : w * 0.84;
+      const y = h * (0.4 + (i % 2) * 0.16);
+      ctx.beginPath();
+      ctx.arc(x, y, 12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    addDisc(24, 0, w * 0.5, h * 0.48, 40);
+    return;
+  }
+  if (kind === "choice") {
+    const colours = ["#8e3a3a", "#e0c36a", "#c4a24a", "#5c5550"];
+    for (let i = 0; i < 4; i++) {
+      const x = w * (0.2 + (i % 2) * 0.4);
+      const y = h * (0.32 + Math.floor(i / 2) * 0.28);
+      ctx.fillStyle = colours[i];
+      ctx.beginPath();
+      ctx.arc(x, y, 28, 0, Math.PI * 2);
+      ctx.fill();
+      addDisc(24, i, x, y, 32);
+    }
+    return;
+  }
+  if (kind === "chonyid") {
+    ctx.strokeStyle = "#e0c36a";
+    ctx.globalAlpha = 0.7;
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 8; i++) {
+      const a = (Math.PI * 2 * i) / 8;
+      ctx.beginPath();
+      ctx.moveTo(w * 0.5, h * 0.42);
+      ctx.lineTo(w * 0.5 + Math.cos(a) * w * 0.42, h * 0.42 + Math.sin(a) * h * 0.28);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    addDisc(24, 0, w * 0.5, h * 0.18, 20);
+    const family = ["#E6E0D4", "#2C4A6E", "#C4A24A", "#8E3A3A", "#3A6B48"];
+    const spots = [[0.5, 0.42], [0.5, 0.28], [0.68, 0.48], [0.5, 0.58], [0.32, 0.48]];
+    family.forEach(function (colour, i) {
+      ctx.fillStyle = colour;
+      ctx.beginPath();
+      ctx.arc(w * spots[i][0], h * spots[i][1], i === 0 ? 18 : 14, 0, Math.PI * 2);
+      ctx.fill();
+      addDisc(24, i + 2, w * spots[i][0], h * spots[i][1], 20);
+    });
+    ctx.strokeStyle = "#f7f4ea";
+    ctx.setLineDash([3, 4]);
+    ctx.strokeRect(w * 0.72, h * 0.7, 18, 36);
+    ctx.setLineDash([]);
+    addDisc(24, 1, w * 0.76, h * 0.74, 22);
+  }
+}
+
 function drawWishBody(ctx, w, h, model) {
   const colours = ["#f4f1e6", "#1c1c1c", "#a33b32"];
   const yA = h * 0.72;
@@ -1868,6 +2118,8 @@ function paintAll(time, model) {
     drawPetals(ctx, box.w / 2, box.h * 0.42, radius, 5, t);
   } else if (REALM_WASH[model.screen]) {
     drawRealmLight(ctx, box.w, box.h, model.screen);
+  } else if (model.canon) {
+    drawCanon(ctx, box.w, box.h, model);
   } else if (model.clearKind) {
     drawClear(ctx, box.w, box.h, model, t);
   } else if (model.wrath) {
@@ -1949,7 +2201,7 @@ function hitContains(region, x, y) {
   return ang >= start && ang <= region.a1;
 }
 
-const STAMP = "v0.10 b20261123-1707 b8a9b4d";
+const STAMP = "v0.11 b20261123-1734 96deed4";
 const RAW_VERSION = "https://raw.githubusercontent.com/RobertBoettcherSF/bardo-visualization/main/version.txt";
 const REPO_API = "https://api.github.com/repos/RobertBoettcherSF/bardo-visualization/commits/main";
 const REALM_COLOUR = ["#C9C3B5", "#4A5E48", "#A89A55", "#3A4A62", "#7A4548", "#5C5550"];
@@ -2069,14 +2321,44 @@ function compute() {
 const SCENE_ID = { 1: "womb", 2: "lights", 3: "judge", 4: "wish" };
 const SCENE_CODE = { womb: 1, lights: 2, judge: 3, wish: 4 };
 const ANCHOR = { womb: 49, lights: 42, judge: 35, wish: 28 };
-const CLIMB = ["womb", "lights", "judge", "wish", "w14", "w13", "w12", "w11", "w10", "w09", "w08"];
+const CLIMB = ["f1", "f2", "f3", "womb", "lights", "judge", "wish", "chonyid", "w14", "w13", "w12", "w11", "w10", "w09", "w08"];
 const SCREEN = {
   opening: { code: "OPEN" },
   clock: { code: "CLOCK" },
+  f1: { code: "J00-F1", tour: true, frame: true, canon: "frame", blurb: "blurbF1", hits: [
+    { line: "tapPsyche", detail: "detailPsyche" },
+    { line: "tapPsychotic", detail: "detailPsychotic" },
+    { line: "tapCaveat", detail: "detailCaveat" }
+  ]},
+  f2: { code: "J00-F2", tour: true, frame: true, canon: "interval", blurb: "blurbF2", hits: [
+    { line: "tapSecChikhai", detail: "detailSecChikhai" },
+    { line: "tapSecChonyid", detail: "detailSecChonyid" },
+    { line: "tapSecSidpa", detail: "detailSecSidpa" },
+    { line: "tapCurveC", detail: "detailCurveC" },
+    { line: "tapCurveI", detail: "detailCurveI" },
+    { line: "tapCurveX", detail: "detailCurveX" }
+  ]},
+  f3: { code: "J00-F3", tour: true, frame: true, canon: "bardos", blurb: "blurbF3", hits: [
+    { line: "tapBardo0", detail: "detailBardo0" },
+    { line: "tapBardo1", detail: "detailBardo1" },
+    { line: "tapBardo2", detail: "detailBardo2" },
+    { line: "tapBardo3", detail: "detailBardo3" },
+    { line: "tapBardo4", detail: "detailBardo4" },
+    { line: "tapBardo5", detail: "detailBardo5" }
+  ]},
   womb: { code: "J01-B49" },
   lights: { code: "J02-B42" },
   judge: { code: "J03-B35" },
   wish: { code: "J04-B28" },
+  chonyid: { code: "J04-B15", cal: 18, entry: true, canon: "chonyid", blurb: "blurbEntry", hits: [
+    { line: "tapRays", detail: "detailRays" },
+    { line: "tapBodySafe", detail: "detailBodySafe" },
+    { line: "tapFamily0", detail: "detailFamily0" },
+    { line: "tapFamily1", detail: "detailFamily1" },
+    { line: "tapFamily2", detail: "detailFamily2" },
+    { line: "tapFamily3", detail: "detailFamily3" },
+    { line: "tapFamily4", detail: "detailFamily4" }
+  ]},
   w14: { code: "J05-B14", cal: 17, info: "infoW14", kind: "row", flame: "#e0c36a", figures: [
     { key: "door-tiger", line: "tapDoorTiger", detail: "detailDoor", colour: "#f4f1e6" },
     { key: "door-sow", line: "tapDoorSow", detail: "detailDoor", colour: "#c4a24a" },
@@ -2128,6 +2410,37 @@ const SCREEN = {
     ]
   },
   liberation: { code: "J20-B00/liberation", clearKind: "liberation" },
+  visions: { code: "J01-B49/visions", cal: 49, branch: 1, canon: "visions", blurb: "blurbVisions", hits: [
+    { line: "tapEast", detail: "detailEast" },
+    { line: "tapSouth", detail: "detailSouth" },
+    { line: "tapWestC", detail: "detailWestC" },
+    { line: "tapNorthC", detail: "detailNorthC" },
+    { line: "tapSignDeva", detail: "detailSignDeva" },
+    { line: "tapSignAsura", detail: "detailSignAsura" },
+    { line: "tapSignHuman", detail: "detailSignHuman" },
+    { line: "tapSignAnimal", detail: "detailSignAnimal" },
+    { line: "tapSignPreta", detail: "detailSignPreta" },
+    { line: "tapSignHell", detail: "detailSignHell" }
+  ]},
+  shelter: { code: "J01-B49/shelter", cal: 49, branch: 2, canon: "shelter", blurb: "blurbShelter", hits: [
+    { line: "tapFuries", detail: "detailFuries" }
+  ]},
+  choice: { code: "J01-B49/choice", cal: 49, branch: 3, canon: "choice", blurb: "blurbChoice", hits: [
+    { line: "takeAmitabha", detail: "detailTakeA" },
+    { line: "takeTushita", detail: "detailTakeT" },
+    { line: "takeJambu", detail: "detailTakeJ" },
+    { line: "takeKarma", detail: "detailTakeK" }
+  ]},
+  amitabha: { code: "J01-B49/amitabha" },
+  tushita: { code: "J01-B49/tushita" },
+  jambu: { code: "J01-B49/jambu" },
+  coda: { code: "J00-C1", tour: true, frame: true, canon: "coda", blurb: "blurbCoda", hits: [
+    { line: "tapPurpose", detail: "detailPurpose" },
+    { line: "tapCaveat2", detail: "detailCaveat2" },
+    { line: "tapSources", detail: "detailSources" },
+    { line: "tapComputed", detail: "detailComputed" },
+    { line: "tapVerses", detail: "detailVerses" }
+  ]},
   good: { code: "J01-B49/good" },
   deva: { code: "J01-B49/deva" },
   asura: { code: "J01-B49/asura" },
@@ -2142,6 +2455,19 @@ function codeOf(id) {
 }
 const REALMS = ["deva", "asura", "human", "animal", "preta", "hell"];
 const CLEAR_ID = { 18: "p1", 19: "c19", 20: "c20", 21: "liberation" };
+const WOMB_ID = {
+  0: "womb", 1: "visions", 2: "shelter", 3: "choice",
+  10: "amitabha", 11: "tushita", 12: "jambu",
+  20: "deva", 21: "asura", 22: "human", 23: "animal", 24: "preta", 25: "hell"
+};
+const ENDINGS = ["good", "liberation", "amitabha", "tushita", "jambu"].concat(
+  ["deva", "asura", "human", "animal", "preta", "hell"]
+);
+function holdsScreen(id) {
+  if (ANCHOR[id]) return true;
+  const spec = SCREEN[id];
+  return !!(spec && (spec.tour || spec.cal || Object.prototype.hasOwnProperty.call(spec, "milli")));
+}
 let dissolve = 0;
 let dissolveStage = 0;
 const REALM_INFO = {
@@ -2224,6 +2550,9 @@ function infoKey(scene) {
   if (viewMode === "opening" || screenId === "opening") return "title";
   if (screenId === "good") return "infoGood";
   if (screenId === "liberation") return "infoLiberation";
+  if (screenId === "amitabha") return "infoAmitabha";
+  if (screenId === "tushita") return "infoTushita";
+  if (screenId === "jambu") return "infoJambu";
   if (REALM_INFO[screenId]) return REALM_INFO[screenId];
   if (SCREEN[screenId] && SCREEN[screenId].info) return SCREEN[screenId].info;
   if (screenId === "wish" && turned) return "infoWishTurn";
@@ -2245,7 +2574,7 @@ function updateChrome(out) {
   state.dataset.intensity = String(out[5]);
   state.dataset.complexity = String(out[6]);
   state.dataset.mantra = String(out[8]);
-  if (viewMode !== "opening" && !endingLocked && !(SCREEN[screenId] && (SCREEN[screenId].cal || Object.prototype.hasOwnProperty.call(SCREEN[screenId], "milli")))) {
+  if (viewMode !== "opening" && !endingLocked && !holdsScreen(screenId)) {
     screenId = screenFromScene(side[0]);
   }
   state.dataset.scene = String(side[0]);
@@ -2278,10 +2607,11 @@ function updateChrome(out) {
   const sound = document.getElementById("sound");
   sound.textContent = soundEnabled() ? t("soundOn") : t("soundOff");
   sound.setAttribute("aria-pressed", String(soundEnabled()));
-  const teaching = CLIMB.indexOf(screenId) >= 0;
+  const teaching = CLIMB.indexOf(screenId) >= 0 || !!(SCREEN[screenId] && SCREEN[screenId].branch);
   const ending = viewMode === "ending";
   document.body.classList.toggle("is-opening", viewMode === "opening");
   document.body.classList.toggle("is-ending", ending);
+  document.body.classList.toggle("has-again", ending || screenId === "coda");
   document.body.classList.toggle("has-choice", teaching);
   const followButton = document.getElementById("follow");
   const dontButton = document.getElementById("dont");
@@ -2304,8 +2634,11 @@ function updateChrome(out) {
   document.getElementById("enter").textContent = currentInfo(side[0]);
   const quote = document.getElementById("quote");
   if (ending) {
-    const quoteKey = screenId === "good" ? "quoteGood" : screenId === "liberation" ? "quoteLiberation" : REALM_QUOTE[screenId];
-    quote.textContent = t(quoteKey);
+    const quoteKey = {
+      good: "quoteGood", liberation: "quoteLiberation",
+      amitabha: "quoteAmitabha", tushita: "quoteTushita", jambu: "quoteJambu"
+    }[screenId] || REALM_QUOTE[screenId];
+    quote.textContent = quoteKey ? t(quoteKey) : "";
   }
   const names = sceneCopy(viewMode === "opening" ? -1 : side[0]);
   const moreBody = detailKey
@@ -2389,6 +2722,7 @@ function modelNow() {
     wrath: SCREEN[screenId] && SCREEN[screenId].kind ? SCREEN[screenId] : null,
     peace: SCREEN[screenId] && SCREEN[screenId].peace ? SCREEN[screenId] : null,
     clearKind: (SCREEN[screenId] && SCREEN[screenId].clearKind) || "",
+    canon: (SCREEN[screenId] && SCREEN[screenId].canon) || "",
     dissolve: dissolveStage
   };
 }
@@ -2498,13 +2832,15 @@ function showScreen(id, button, extra) {
     viewMode = "opening";
     endingLocked = false;
     turned = false;
-  } else if (ANCHOR[id] || (SCREEN[id] && (SCREEN[id].cal || Object.prototype.hasOwnProperty.call(SCREEN[id], "milli")))) {
+  } else if (holdsScreen(id)) {
     viewMode = "tour";
     endingLocked = false;
     if (id !== "wish") turned = false;
-    milli = Object.prototype.hasOwnProperty.call(SCREEN[id] || {}, "milli")
-      ? SCREEN[id].milli
-      : ada.exports.bardo_milli_of_day(ANCHOR[id] || SCREEN[id].cal);
+    if (SCREEN[id] && Object.prototype.hasOwnProperty.call(SCREEN[id], "milli")) {
+      milli = SCREEN[id].milli;
+    } else if (ANCHOR[id] || (SCREEN[id] && SCREEN[id].cal)) {
+      milli = ada.exports.bardo_milli_of_day(ANCHOR[id] || SCREEN[id].cal);
+    }
     if (id === "c20") applyDissolve(0);
   } else {
     viewMode = "ending";
@@ -2558,7 +2894,7 @@ function goNext() {
   const list = tourList();
   const index = list.indexOf(screenId);
   if (screenId === "opening" || index < 0) {
-    showScreen(firstId(), "next");
+    showScreen(direction === 0 ? "f1" : firstId(), "next");
     return;
   }
   if (index >= list.length - 1) return;
@@ -2580,11 +2916,34 @@ function choose(follow, via) {
   if (via !== "auto") playClick();
   const from = screenId;
   const at = CLIMB.indexOf(from);
-  if (at < 0) return;
   const karmaBefore = karma;
   karma = follow
     ? ada.exports.bardo_karma_lighten(karma)
     : ada.exports.bardo_karma_heavy(karma);
+  if (SCREEN[from] && SCREEN[from].branch) {
+    let pick = follow ? 0 : 9;
+    if (SCREEN[from].branch === 3) pick = follow ? 3 : 4;
+    const code = ada.exports.bardo_womb_path(SCREEN[from].branch, pick, destination, karma);
+    const next = WOMB_ID[code];
+    if (!next) return;
+    if (code >= 20) destination = code - 20;
+    showScreen(next, follow ? "follow" : "dont");
+    if (via === "auto") noteStep(follow ? "follow" : "dont", from, screenId, { karmaBefore: karmaBefore });
+    return;
+  }
+  if (at < 0) return;
+  if (SCREEN[from] && SCREEN[from].frame && from !== "coda") {
+    const next = follow ? CLIMB[at + 1] : (at > 0 ? CLIMB[at - 1] : from);
+    showScreen(next, follow ? "follow" : "dont");
+    if (via === "auto") noteStep(follow ? "follow" : "dont", from, screenId, { karmaBefore: karmaBefore });
+    return;
+  }
+  if (!follow && from === "womb") {
+    const code = ada.exports.bardo_womb_path(0, 0, destination, karma);
+    showScreen(WOMB_ID[code] || "visions", "dont");
+    if (via === "auto") noteStep("dont", from, screenId, { karmaBefore: karmaBefore });
+    return;
+  }
   if (SCREEN[from] && SCREEN[from].clear) {
     const nextCode = ada.exports.bardo_clear_step(SCREEN[from].clear, follow ? 1 : 0);
     const next = CLEAR_ID[nextCode];
@@ -2652,6 +3011,7 @@ function explainOf(action, arg) {
   }
   if (action === 8) return { line: "tapPebbleW", detail: "detailPebbleW" };
   if (action === 9) return { line: "tapPebbleB", detail: "detailPebbleB" };
+  if (action === 10) return { line: "tapLord", detail: "detailLord" };
   return null;
 }
 
@@ -2665,6 +3025,10 @@ function onHit(region, via) {
   const spec = explainOf(region.action, region.arg);
   if (!spec) return;
   const key = region.action + ":" + region.arg;
+  if (region.action === 24 && screenId === "choice" && selectedKey === key && region.arg <= 3) {
+    takePath([1, 2, 3, 4][region.arg], via, ["amitabha", "tushita", "jambu", "karma"][region.arg]);
+    return;
+  }
   const acts = region.action >= 1 && region.action <= 7;
   if (selectedKey === key && acts) {
     const from = screenId;
@@ -2675,11 +3039,9 @@ function onHit(region, via) {
       const natural = roll < chance;
       const ok = via === "auto" ? true : natural;
       if (!ok) {
-        lineKey = pullKey();
-        detailKey = "detailFail";
-        arrivalKey = "";
-        if (via !== "auto") playClick();
-        render();
+        const code = ada.exports.bardo_womb_path(0, 0, destination, karma);
+        showScreen(WOMB_ID[code] || "visions", "fail");
+        if (via === "auto") noteStep("fail", from, screenId, {});
         return;
       }
     }
@@ -2694,7 +3056,11 @@ function onHit(region, via) {
     const outcome = sidpa()[1];
     if (outcome === 8) lineKey = "outOrder";
     else if (region.action === 1 && methodsDone > before) lineKey = "tapClosed";
-    else if (outcome === 6) lineKey = "outFree";
+    else if (outcome === 6) {
+      showScreen("liberation", "recognise");
+      if (via === "auto") noteStep("recognise", from, "liberation", {});
+      return;
+    }
     else if (outcome === 7) lineKey = "outStay";
     else if (outcome === 4) lineKey = "outAllow";
     else if (outcome === 5) lineKey = "outRefuse";
@@ -2740,12 +3106,13 @@ function noteStep(action, from, led, extra) {
   life.karma = karma;
   touchDiary(from, action, led);
   trimSteps();
-  if (led === "good" || led === "liberation" || REALMS.indexOf(led) >= 0) {
+  if (led === "good" || led === "liberation" || led === "amitabha" || led === "tushita" || led === "jambu" || REALMS.indexOf(led) >= 0) {
     life.ended = led;
     if (lifeTotals) {
       lifeTotals.lives += 1;
       if (led === "good") lifeTotals.good += 1;
       else if (led === "liberation") lifeTotals.liberation += 1;
+      else if (led === "amitabha" || led === "tushita" || led === "jambu") lifeTotals.chosen += 1;
       else if (lifeTotals.rebirths[led] !== undefined) lifeTotals.rebirths[led] += 1;
     }
     lives.push(life);
@@ -2756,7 +3123,7 @@ function noteStep(action, from, led, extra) {
 }
 
 function freshTotals() {
-  const totals = { lives: 0, good: 0, liberation: 0, incomplete: 0, rebirths: {} };
+  const totals = { lives: 0, good: 0, liberation: 0, chosen: 0, incomplete: 0, rebirths: {} };
   REALMS.forEach(function (name) { totals.rebirths[name] = 0; });
   return totals;
 }
@@ -2858,7 +3225,7 @@ function clearDiary() {
 }
 
 function lifeScreens() {
-  return CLIMB.concat(["good", "liberation"]).concat(REALMS);
+  return CLIMB.concat(["visions", "shelter", "choice", "good", "liberation", "amitabha", "tushita", "jambu", "coda"]).concat(REALMS);
 }
 
 function actionsFor(screen) {
@@ -2878,7 +3245,8 @@ function actionsFor(screen) {
       { id: "mirror", kind: "hit", action: 5, arg: 0 },
       { id: "pass", kind: "hit", action: 6, arg: 0 },
       { id: "pebble-w", kind: "hit", action: 8, arg: 0 },
-      { id: "pebble-b", kind: "hit", action: 9, arg: 0 }
+      { id: "pebble-b", kind: "hit", action: 9, arg: 0 },
+      { id: "lord", kind: "hit", action: 10, arg: 0 }
     ];
   }
   if (screen === "lights") {
@@ -2897,8 +3265,30 @@ function actionsFor(screen) {
     for (let i = 1; i <= 5; i++) list.push({ id: "petal-" + i, kind: "petal", arg: i });
     return list;
   }
-  if (screen === "good" || screen === "liberation" || REALMS.indexOf(screen) >= 0) {
-    return [{ id: "again", kind: "again" }];
+  if (ENDINGS.indexOf(screen) >= 0) {
+    return [
+      { id: "again", kind: "again" },
+      { id: "coda", kind: "coda" }
+    ];
+  }
+  if (screen === "coda" || (SCREEN[screen] && (SCREEN[screen].frame || SCREEN[screen].entry || SCREEN[screen].branch))) {
+    const list = screen === "coda"
+      ? [{ id: "again", kind: "again" }]
+      : screen === "f1"
+        ? [{ id: "follow", kind: "follow" }]
+        : [
+          { id: "follow", kind: "follow" },
+          { id: "dont", kind: "dont" }
+        ];
+    if (screen === "choice") {
+      list.push({ id: "amitabha", kind: "path", choice: 1 });
+      list.push({ id: "tushita", kind: "path", choice: 2 });
+    }
+    (SCREEN[screen].hits || []).forEach(function (hit, i) {
+      if (!hit) return;
+      list.push({ id: "hit-" + i, kind: "clear", arg: i });
+    });
+    return list;
   }
   if (SCREEN[screen] && SCREEN[screen].clear) {
     const list = [
@@ -3141,7 +3531,32 @@ function beginAgain(via) {
   if (via === "auto") noteStep("again", from, "womb", { karmaBefore: karmaBefore });
 }
 
+function takePath(pick, via, actionId) {
+  const from = screenId;
+  const karmaBefore = karma;
+  if (pick === 1 || pick === 2 || pick === 3) karma = ada.exports.bardo_karma_lighten(karma);
+  const code = ada.exports.bardo_womb_path(3, pick, destination, karma);
+  if (code >= 20) destination = code - 20;
+  const next = WOMB_ID[code];
+  if (!next) return;
+  showScreen(next, actionId || "path");
+  if (via === "auto") noteStep(actionId || "path", from, screenId, { karmaBefore: karmaBefore });
+}
+
 function actionHelps(action) {
+  if (action.kind === "follow" || action.kind === "dont" || action.kind === "again" || action.kind === "path" || action.kind === "coda") {
+    const pending = actionsFor(screenId).some(function (other) {
+      return other.kind !== "follow" && other.kind !== "dont" && other.kind !== "again"
+        && other.kind !== "path" && other.kind !== "coda"
+        && !seenLinks[screenId + ">" + other.id];
+    });
+    if (pending) return false;
+  }
+  if (action.kind === "follow") {
+    const at = CLIMB.indexOf(screenId);
+    const nxt = at >= 0 ? CLIMB[at + 1] : "";
+    if (nxt && (!seenScreens[nxt] || actionsFor(nxt).some(function (other) { return !seenLinks[nxt + ">" + other.id]; }))) return true;
+  }
   const link = screenId + ">" + action.id;
   if (!seenLinks[link]) return true;
   if (action.kind === "light" && !seenScreens[REALMS[action.arg]]) return true;
@@ -3187,8 +3602,12 @@ function pickAction() {
     }
   });
   const helpful = pool.filter(actionHelps);
-  const choice = (helpful.length ? helpful : pool);
-  return choice[Math.floor(Math.random() * choice.length)];
+  const choice = helpful.length ? helpful : pool;
+  const unseen = choice.filter(function (action) { return !tries[screenId + ">" + action.id]; });
+  const ready = unseen.length ? unseen : choice;
+  const back = ready.filter(function (action) { return action.kind === "dont"; });
+  const use = back.length && ready.some(function (action) { return action.kind === "follow"; }) ? back : ready;
+  return use[Math.floor(Math.random() * use.length)];
 }
 
 function autoApply(action) {
@@ -3206,6 +3625,15 @@ function autoApply(action) {
   }
   if (action.kind === "again") {
     beginAgain("auto");
+    return;
+  }
+  if (action.kind === "coda") {
+    showScreen("coda", "coda");
+    noteStep("coda", from, "coda", { karmaBefore: karmaBefore });
+    return;
+  }
+  if (action.kind === "path") {
+    takePath(action.choice, "auto", action.id);
     return;
   }
   if (action.kind === "clear") {
@@ -3263,6 +3691,11 @@ function autoApply(action) {
     return;
   }
   if (action.action >= 1 && action.action <= 7) applyAction(action.action, action.arg);
+  if (action.action === 5 && sidpa()[1] === 6) {
+    showScreen("liberation", "recognise");
+    noteStep(action.id, from, "liberation", { karmaBefore: karmaBefore });
+    return;
+  }
   const spec = explainOf(action.action, action.arg);
   if (spec) {
     lineKey = spec.line;
@@ -3276,7 +3709,7 @@ function autoApply(action) {
 function performAutoAction() {
   if (!actionsFor(screenId).length) {
     const from = screenId;
-    showScreen("wish", "auto");
+    showScreen(direction === 0 ? "f1" : "wish", "auto");
     noteStep("start", from, screenId, { karmaBefore: karma });
     return;
   }
@@ -3299,7 +3732,7 @@ function startAuto() {
   lifeTotals = freshTotals();
   window.__autoLives = 0;
   applyDiary();
-  if (screenId === "opening" || screenId === "clock") showScreen("womb", "auto");
+  if (screenId === "opening" || screenId === "clock") showScreen(direction === 0 ? "f1" : "wish", "auto");
   seenScreens[screenId] = true;
   publishCoverage();
   if (!autoKeepGoing && coverageComplete()) {
@@ -3508,7 +3941,7 @@ document.getElementById("day").addEventListener("input", function (event) {
   render();
 });
 document.getElementById("go").addEventListener("click", function () {
-  if (viewMode === "opening") showScreen(firstId(), "enter");
+  if (viewMode === "opening") showScreen(direction === 0 ? "f1" : firstId(), "enter");
 });
 document.getElementById("dissolve-range").addEventListener("input", function (event) {
   applyDissolve(Number(event.target.value));
@@ -3529,6 +3962,7 @@ document.getElementById("dissolve-label").addEventListener("click", function () 
 document.getElementById("follow").addEventListener("click", function () { choose(true); });
 document.getElementById("dont").addEventListener("click", function () { choose(false); });
 document.getElementById("again").addEventListener("click", function () { beginAgain(); });
+document.getElementById("coda").addEventListener("click", function () { showScreen("coda", "coda"); });
 document.getElementById("auto").addEventListener("click", function () {
   if (autoRunning || autoPrompt) requestStop();
   else startAuto();
