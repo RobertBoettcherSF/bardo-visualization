@@ -11,6 +11,12 @@ let fps = 0;
 let frameCount = 0;
 let frameStamp = 0;
 let viewMode = "opening";
+let screenId = "opening";
+let endingLocked = false;
+let turned = false;
+let poisonSeen = -1;
+let autoTimer = 0;
+const pathLog = [];
 let methodsDone = 0;
 let destination = -1;
 let wanderTick = 0;
@@ -80,7 +86,45 @@ function compute() {
   const side = sidpa();
   if (side[2] >= 0) methodsDone = side[2];
   if (side[3] >= 0) destination = side[3];
+  if (side[6] >= 0) poisonSeen = side[6];
   return output();
+}
+
+const SCENE_ID = { 1: "womb", 2: "lights", 3: "judge", 4: "wish" };
+const SCENE_CODE = { womb: 1, lights: 2, judge: 3, wish: 4 };
+const ANCHOR = { womb: 49, lights: 39, judge: 32, wish: 22 };
+const REALMS = ["deva", "asura", "human", "animal", "preta", "hell"];
+const REALM_INFO = {
+  deva: "infoDeva", asura: "infoAsura", human: "infoHuman",
+  animal: "infoAnimal", preta: "infoPreta", hell: "infoHell"
+};
+const REALM_QUOTE = {
+  deva: "quoteDeva", asura: "quoteAsura", human: "quoteHuman",
+  animal: "quoteAnimal", preta: "quotePreta", hell: "quoteHell"
+};
+
+function tourList() {
+  const teach = direction === 0
+    ? ["womb", "lights", "judge", "wish"]
+    : ["wish", "judge", "lights", "womb"];
+  return teach.concat(["good"]).concat(REALMS);
+}
+
+function firstId() {
+  return direction === 0 ? "womb" : "wish";
+}
+
+function screenFromScene(scene) {
+  return SCENE_ID[scene] || "clock";
+}
+
+function remember(button, extra) {
+  const entry = { screen: screenId, button: button, t: Date.now() };
+  if (extra) {
+    Object.keys(extra).forEach(function (key) { entry[key] = extra[key]; });
+  }
+  pathLog.push(entry);
+  if (pathLog.length > 80) pathLog.shift();
 }
 
 function outcomeText(code) {
@@ -101,11 +145,14 @@ function sceneCopy(code) {
 }
 
 function infoKey(scene) {
-  if (viewMode === "opening") return "title";
-  if (scene === 1) return "infoWomb";
-  if (scene === 2) return "infoLights";
-  if (scene === 3) return "infoJudge";
-  if (scene === 4) return "infoWish";
+  if (viewMode === "opening" || screenId === "opening") return "title";
+  if (screenId === "good") return "infoGood";
+  if (REALM_INFO[screenId]) return REALM_INFO[screenId];
+  if (screenId === "wish" && turned) return "infoWishTurn";
+  if (scene === 1 || screenId === "womb") return "infoWomb";
+  if (scene === 2 || screenId === "lights") return "infoLights";
+  if (scene === 3 || screenId === "judge") return "infoJudge";
+  if (scene === 4 || screenId === "wish") return "infoWish";
   return "infoClock";
 }
 
@@ -120,7 +167,9 @@ function updateChrome(out) {
   state.dataset.intensity = String(out[5]);
   state.dataset.complexity = String(out[6]);
   state.dataset.mantra = String(out[8]);
+  if (viewMode !== "opening" && !endingLocked) screenId = screenFromScene(side[0]);
   state.dataset.scene = String(side[0]);
+  state.dataset.screen = screenId;
   state.dataset.brightest = String(side[3]);
   state.dataset.outcome = String(side[1]);
   state.dataset.methods = String(side[2]);
@@ -137,21 +186,32 @@ function updateChrome(out) {
   book.setAttribute("aria-pressed", String(direction === 1));
   document.getElementById("prev").textContent = t("prev");
   document.getElementById("start").textContent = t("start");
+  document.getElementById("auto").textContent = t("auto");
   document.getElementById("next").textContent = t("next");
   document.getElementById("menu").textContent = t("menu");
   document.getElementById("debug").textContent = t("debug");
   const sound = document.getElementById("sound");
   sound.textContent = soundEnabled() ? t("soundOn") : t("soundOff");
   sound.setAttribute("aria-pressed", String(soundEnabled()));
+  const teaching = SCENE_CODE[screenId] !== undefined;
+  const ending = viewMode === "ending";
   document.body.classList.toggle("is-opening", viewMode === "opening");
+  document.body.classList.toggle("is-ending", ending);
+  document.body.classList.toggle("has-choice", teaching);
   document.getElementById("enter").textContent = t(infoKey(side[0]));
+  const quote = document.getElementById("quote");
+  if (ending) {
+    quote.textContent = t(screenId === "good" ? "quoteGood" : REALM_QUOTE[screenId]);
+  }
   const names = sceneCopy(viewMode === "opening" ? -1 : side[0]);
   const moreBody = viewMode === "opening" ? t("lead") + " " + t("moreEnter") : t(names[1]);
   document.getElementById("more-body").textContent = moreBody;
-  document.getElementById("outcome").textContent = viewMode === "opening" ? "" : outcomeText(side[1]);
+  document.getElementById("outcome").textContent = viewMode === "opening" || ending ? "" : outcomeText(side[1]);
+  const list = tourList();
+  const index = list.indexOf(screenId);
   document.getElementById("prev").disabled = viewMode === "opening";
-  document.getElementById("next").disabled = viewMode === "tour" && side[0] !== 0 && side[13] < 0;
-  const wantWind = viewMode === "tour" && side[0] !== 0;
+  document.getElementById("next").disabled = index === list.length - 1;
+  const wantWind = viewMode !== "opening";
   if (wantWind !== windWanted) {
     windWanted = wantWind;
     setWind(wantWind);
@@ -211,6 +271,8 @@ function modelNow() {
   const side = sidpa();
   return {
     opening: viewMode === "opening",
+    ending: viewMode === "ending",
+    screen: screenId,
     scene: side[0],
     methods: side[2],
     bright: side[3],
@@ -218,6 +280,17 @@ function modelNow() {
     y: side[9],
     curves: curves
   };
+}
+
+function noteFrame(now) {
+  frameCount += 1;
+  if (frameStamp === 0) frameStamp = now;
+  const span = now - frameStamp;
+  if (span >= 1000) {
+    fps = frameCount * 1000 / span;
+    frameCount = 0;
+    frameStamp = now;
+  }
 }
 
 function drawCanvas() {
@@ -229,19 +302,35 @@ function ensureLoop() {
   if (looping) return;
   looping = true;
   requestAnimationFrame(function tick(now) {
-    if (ada && viewMode === "tour" && sidpa()[0] === 4 && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (ada && screenId === "wish" && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       wanderTick = (wanderTick + 1) % 100000;
       compute();
     }
-    if (ada) paintAll(now, modelNow());
+    if (ada) {
+      paintAll(now, modelNow());
+      noteFrame(now);
+    }
     requestAnimationFrame(tick);
   });
+}
+
+function placeChoices() {
+  const stage = window.__stage;
+  const choices = document.getElementById("choices");
+  if (!stage || !choices) return;
+  const top = (stage.y + stage.h - 52) + "px";
+  const left = stage.x + "px";
+  const width = stage.w + "px";
+  if (choices.style.top !== top) choices.style.top = top;
+  if (choices.style.left !== left) choices.style.left = left;
+  if (choices.style.width !== width) choices.style.width = width;
 }
 
 function render() {
   const out = compute();
   updateChrome(out);
   drawCanvas();
+  placeChoices();
   ensureLoop();
   drawGraph(out[2]);
 }
@@ -261,50 +350,107 @@ function sampleCurves() {
   compute();
 }
 
-function showOpening() {
-  viewMode = "opening";
-  animating = false;
-  document.getElementById("more").hidden = true;
-  render();
+function stopAuto() {
+  if (autoTimer) clearInterval(autoTimer);
+  autoTimer = 0;
+  const button = document.getElementById("auto");
+  if (button) button.setAttribute("aria-pressed", "false");
 }
 
-function showTour() {
-  viewMode = "tour";
+function showScreen(id, button, extra) {
+  if (button !== "auto") stopAuto();
+  screenId = id;
+  remember(button, extra);
   document.getElementById("more").hidden = true;
-}
-
-function enterTour() {
-  showTour();
-  if (sidpa()[0] === 0) {
-    const first = ada.exports.bardo_first(direction);
-    milli = ada.exports.bardo_milli_of_day(ada.exports.bardo_anchor(first));
+  if (id === "opening") {
+    viewMode = "opening";
+    endingLocked = false;
+    turned = false;
+  } else if (ANCHOR[id]) {
+    viewMode = "tour";
+    endingLocked = false;
+    if (id !== "wish") turned = false;
+    milli = ada.exports.bardo_milli_of_day(ANCHOR[id]);
+  } else {
+    viewMode = "ending";
+    endingLocked = true;
+    turned = false;
   }
   cardsKey = "";
   render();
 }
 
-function goScene(code) {
-  milli = ada.exports.bardo_milli_of_day(ada.exports.bardo_anchor(code));
-  showTour();
-  cardsKey = "";
-  render();
+function showOpening() {
+  showScreen("opening", "prev");
+}
+
+function karmicId() {
+  const code = ada.exports.bardo_realm(destination, poisonSeen);
+  return REALMS[code] || "human";
+}
+
+function goStart() {
+  playClick();
+  methodsDone = 0;
+  destination = -1;
+  poisonSeen = -1;
+  wanderTick = 0;
+  pendingAction = 0;
+  showScreen(firstId(), "start");
 }
 
 function goNext() {
   playClick();
-  if (viewMode === "opening") { enterTour(); return; }
-  const side = sidpa();
-  if (side[0] === 0) { enterTour(); return; }
-  if (side[13] < 0) return;
-  goScene(side[13]);
+  const list = tourList();
+  const index = list.indexOf(screenId);
+  if (screenId === "opening" || index < 0) {
+    showScreen(firstId(), "next");
+    return;
+  }
+  if (index >= list.length - 1) return;
+  showScreen(list[index + 1], "next");
 }
 
 function goPrev() {
   playClick();
-  if (viewMode === "opening") return;
-  const side = sidpa();
-  if (side[0] === 0 || side[14] < 0) { showOpening(); return; }
-  goScene(side[14]);
+  if (screenId === "opening") return;
+  const index = tourList().indexOf(screenId);
+  if (index <= 0) {
+    showScreen("opening", "prev");
+    return;
+  }
+  showScreen(tourList()[index - 1], "prev");
+}
+
+function choose(follow) {
+  playClick();
+  if (!SCENE_CODE[screenId]) return;
+  if (follow && screenId === "wish") {
+    turned = true;
+    remember("follow", { onward: "chonyid" });
+    render();
+    return;
+  }
+  const next = follow
+    ? (screenId === "womb" ? "good" : screenId === "lights" ? "judge" : "wish")
+    : (screenId === "wish" ? "judge" : screenId === "judge" ? "lights" : screenId === "lights" ? "womb" : karmicId());
+  showScreen(next, follow ? "follow" : "dont");
+}
+
+function startAuto() {
+  stopAuto();
+  if (screenId === "opening" || tourList().indexOf(screenId) < 0) showScreen(firstId(), "auto");
+  const pace = window.__autoPace || 4500;
+  document.getElementById("auto").setAttribute("aria-pressed", "true");
+  autoTimer = setInterval(function () {
+    const list = tourList();
+    const index = list.indexOf(screenId);
+    if (index < 0 || index >= list.length - 1) {
+      stopAuto();
+      return;
+    }
+    showScreen(list[index + 1], "auto");
+  }, pace);
 }
 
 function act(action, arg) {
@@ -347,6 +493,11 @@ function report() {
       rainPaused: rain ? rain.isPaused() : true,
       reducedMotion: rain ? rain.prefersReduced() : matchMedia("(prefers-reduced-motion: reduce)").matches
     },
+    screen: screenId,
+    viewport: { width: window.innerWidth, height: window.innerHeight },
+    devicePixelRatio: window.devicePixelRatio || 1,
+    userAgent: navigator.userAgent,
+    path: pathLog.slice(),
     fps: Math.round(fps * 10) / 10,
     errors: errors.slice(),
     crash: { afterReload: crashNotice !== "", notice: crashNotice },
@@ -426,28 +577,24 @@ async function boot() {
     scales: function () {
       const out = output();
       return { speed: out[9], alpha: out[10], stride: out[11] || 1 };
-    },
-    onFrame: function () {
-      frameCount += 1;
-      const now = performance.now();
-      if (frameStamp === 0) frameStamp = now;
-      if (now - frameStamp >= 1000) {
-        fps = frameCount * 1000 / (now - frameStamp);
-        frameCount = 0;
-        frameStamp = now;
-      }
     }
   });
+  remember("load");
   render();
   window.__bardoReady = true;
 }
 
 function setDirection(next) {
+  stopAuto();
   direction = next;
   milli = ada.exports.bardo_start(direction);
   methodsDone = 0;
   destination = -1;
+  poisonSeen = -1;
+  endingLocked = false;
+  turned = false;
   cardsKey = "";
+  if (viewMode !== "opening") viewMode = "tour";
   render();
 }
 
@@ -486,12 +633,31 @@ document.getElementById("lang-de").addEventListener("click", function () {
 document.getElementById("dir-jung").addEventListener("click", function () { setDirection(0); playClick(); });
 document.getElementById("dir-book").addEventListener("click", function () { setDirection(1); playClick(); });
 document.getElementById("day").addEventListener("input", function (event) {
+  stopAuto();
+  endingLocked = false;
+  turned = false;
   milli = ada.exports.bardo_milli_of_day(Number(event.target.value));
+  if (viewMode === "opening") viewMode = "tour";
   cardsKey = "";
   render();
 });
 document.getElementById("go").addEventListener("click", function () {
-  if (viewMode === "opening") enterTour();
+  if (viewMode === "opening") showScreen(firstId(), "enter");
+});
+document.getElementById("follow").addEventListener("click", function () { choose(true); });
+document.getElementById("dont").addEventListener("click", function () { choose(false); });
+document.getElementById("again").addEventListener("click", goStart);
+document.getElementById("auto").addEventListener("click", function () {
+  if (autoTimer) stopAuto();
+  else startAuto();
+});
+document.addEventListener("pointerdown", function (event) {
+  if (!autoTimer) return;
+  if (event.target && event.target.closest && event.target.closest("#auto")) return;
+  stopAuto();
+}, true);
+document.addEventListener("keydown", function (event) {
+  if (autoTimer && event.key !== "F9") stopAuto();
 });
 document.getElementById("enter").addEventListener("click", function () {
   const more = document.getElementById("more");
@@ -501,7 +667,7 @@ document.getElementById("enter").addEventListener("click", function () {
     return;
   }
   more.hidden = true;
-  if (viewMode === "opening") enterTour();
+  if (viewMode === "opening") showScreen(firstId(), "enter");
 });
 document.getElementById("menu").addEventListener("click", function () {
   const panel = document.getElementById("menu-panel");
@@ -510,15 +676,7 @@ document.getElementById("menu").addEventListener("click", function () {
 });
 document.getElementById("next").addEventListener("click", goNext);
 document.getElementById("prev").addEventListener("click", goPrev);
-document.getElementById("start").addEventListener("click", function () {
-  playClick();
-  methodsDone = 0;
-  destination = -1;
-  wanderTick = 0;
-  milli = ada.exports.bardo_start(direction);
-  cardsKey = "";
-  showOpening();
-});
+document.getElementById("start").addEventListener("click", goStart);
 document.getElementById("sound").addEventListener("click", function () {
   setSound(!soundEnabled());
   if (soundEnabled()) playClick();
@@ -570,6 +728,7 @@ viz.addEventListener("pointerup", function (event) {
 addEventListener("resize", function () {
   if (!ada) return;
   drawCanvas();
+  placeChoices();
   drawGraph(Number(document.getElementById("state").dataset.day || "0"));
 });
 

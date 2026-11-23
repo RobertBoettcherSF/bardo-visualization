@@ -5,10 +5,20 @@ let originX = 0;
 let originY = 0;
 let bg = null;
 let bgKey = "";
+let regionKey = "";
 
-function stageBox(width, height, opening) {
+const REALM_WASH = {
+  deva: "#c9c3b5",
+  asura: "#4a5e48",
+  human: "#a89a55",
+  animal: "#3a4a62",
+  preta: "#7a4548",
+  hell: "#5c5550"
+};
+
+function stageBox(width, height, opening, ending) {
   const bar = 72;
-  const caption = opening ? 108 : 56;
+  const caption = opening ? 108 : ending ? 168 : 56;
   const top = 40;
   const availW = Math.max(40, width - 16);
   const availH = Math.max(40, height - bar - caption - top);
@@ -184,10 +194,10 @@ function drawPetals(ctx, cx, cy, radius, done, time) {
   for (let i = 0; i < 5; i++) {
     const sway = Math.sin(time / 800 + i) * 1.5;
     const angle = -Math.PI / 2 + i * (Math.PI * 2 / 5);
-    const px = cx + Math.cos(angle) * radius * 0.58 + sway;
+    const px = cx + Math.cos(angle) * radius * 0.58;
     const py = cy + Math.sin(angle) * radius * 0.58;
     ctx.save();
-    ctx.translate(px, py);
+    ctx.translate(px + sway, py);
     ctx.rotate(angle);
     ctx.beginPath();
     ctx.ellipse(0, 0, radius * 0.36, radius * 0.18, 0, 0, Math.PI * 2);
@@ -301,6 +311,28 @@ function drawMirror(ctx, w, h) {
   addDisc(6, 0, cx, py, 22);
 }
 
+function drawRealmLight(ctx, w, h, screen) {
+  const colour = REALM_WASH[screen] || "#a89a55";
+  const cx = w / 2;
+  const cy = h * 0.46;
+  const r = Math.min(w, h) * 0.28;
+  const glow = ctx.createRadialGradient(cx, cy, r * 0.2, cx, cy, r * 1.4);
+  glow.addColorStop(0, colour);
+  glow.addColorStop(1, "rgba(0, 0, 0, 0)");
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 1.4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = colour;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = "#e0c36a";
+  ctx.lineWidth = 6;
+  ctx.stroke();
+}
+
 function drawWishBody(ctx, w, h, model) {
   const colours = ["#f4f1e6", "#1c1c1c", "#a33b32"];
   const yA = h * 0.72;
@@ -360,7 +392,7 @@ function paintAll(time, model) {
   const ctx = canvas.getContext("2d");
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, width, height);
-  const box = stageBox(width, height, model.opening);
+  const box = stageBox(width, height, model.opening, model.ending);
   window.__stage = box;
   const kind = model.opening ? "open" : String(model.scene);
   const layer = ensureBg(kind, box, dpr);
@@ -375,12 +407,17 @@ function paintAll(time, model) {
   originY = box.y;
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const t = reduced ? 0 : time;
-  if (model.opening || model.scene === 0 && model.opening) {
+  if (model.opening) {
     const cx = box.w / 2;
     const cy = box.h * 0.52;
     const r = Math.min(box.w, box.h) * 0.42;
     drawHalo(ctx, cx, cy - box.h * 0.04, r, t);
     drawBuddha(ctx, cx, cy, Math.min(box.w, box.h) * 0.46);
+  } else if (model.screen === "good") {
+    const radius = Math.min(box.w, box.h) * 0.3;
+    drawPetals(ctx, box.w / 2, box.h * 0.42, radius, 5, t);
+  } else if (REALM_WASH[model.screen]) {
+    drawRealmLight(ctx, box.w, box.h, model.screen);
   } else if (model.scene === 0) {
     paintAxesLocal(ctx, box.w, box.h, model);
   } else if (model.scene === 1) {
@@ -395,12 +432,19 @@ function paintAll(time, model) {
     drawWishBody(ctx, box.w, box.h, model);
   }
   ctx.restore();
-  const rect = canvas.getBoundingClientRect();
-  window.__regions = regions.map(function (region) {
-    const x = region.kind === "disc" ? region.x : region.hitX;
-    const y = region.kind === "disc" ? region.y : region.hitY;
-    return { action: region.action, arg: region.arg, clientX: rect.left + x, clientY: rect.top + y };
-  });
+  const key = [
+    model.screen, model.methods, model.bright,
+    Math.round(box.x), Math.round(box.y), Math.round(box.w), Math.round(box.h)
+  ].join(":");
+  if (key !== regionKey) {
+    regionKey = key;
+    const rect = canvas.getBoundingClientRect();
+    window.__regions = regions.map(function (region) {
+      const x = region.kind === "disc" ? region.x : region.hitX;
+      const y = region.kind === "disc" ? region.y : region.hitY;
+      return { action: region.action, arg: region.arg, clientX: rect.left + x, clientY: rect.top + y };
+    });
+  }
 }
 
 function paintAxesLocal(ctx, w, h, model) {

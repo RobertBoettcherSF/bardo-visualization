@@ -144,4 +144,7 @@ package body Bardo.API is
       elsif Direction = 1 then 4
       else -1);
 
+   function Realm_Host (Brightest : Integer; Poison : Integer) return Integer is
+     (Bardo.Sidpa.Karmic_Realm (Brightest, Poison));
+
 end Bardo.API;

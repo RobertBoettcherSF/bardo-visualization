@@ -64,4 +64,8 @@ package Bardo.API is
      Post => First_Host'Result = -1
        or else First_Host'Result in 1 .. 4;
 
+   function Realm_Host (Brightest : Integer; Poison : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_realm",
+     Post => Realm_Host'Result in 0 .. 5;
+
 end Bardo.API;

@@ -89,6 +89,13 @@ package body Bardo.Sidpa is
    function Poison (Abyss : Natural) return Integer is
      (if Abyss <= 2 then Integer (Abyss) else -1);
 
+   function Karmic_Realm (Brightest : Integer; Poison : Integer) return Integer is
+     (if Brightest in 0 .. 5 then Brightest
+      elsif Poison = 0 then 5
+      elsif Poison = 1 then 4
+      elsif Poison = 2 then 3
+      else 2);
+
    function Wind_Force (Time : Milli_Time) return Thousandth is
       Day : constant Day_Number := Bardo.Calendar.Calendar_Day (Time);
    begin

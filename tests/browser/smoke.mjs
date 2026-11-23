@@ -139,7 +139,7 @@ try {
     };
     await shot("opening");
     assert(await onScreen("#menu"), name + " menu missing");
-    assert(await onScreen("#prev") && await onScreen("#start") && await onScreen("#next"), name + " nav missing");
+    assert(await onScreen("#prev") && await onScreen("#start") && await onScreen("#auto") && await onScreen("#next"), name + " nav missing");
     assert(await onScreen("#viz"), name + " drawing missing");
     assert(!(await onScreen("#sound")), name + " sound leaked onto the scene");
     assert(!(await onScreen("#day")), name + " scrubber leaked onto the scene");
@@ -158,6 +158,9 @@ try {
     await page.click("#next");
     let scene = await page.$eval("#state", (el) => el.dataset.scene);
     assert(scene === "1", name + " expected womb, got " + scene);
+    const screen = await page.$eval("#state", (el) => el.dataset.screen);
+    assert(screen === "womb", name + " screen " + screen);
+    assert(await onScreen("#follow") && await onScreen("#dont"), name + " choices missing");
     const regions = await page.evaluate(() => window.__regions.map((r) => r.action));
     assert(regions.includes(1) && !regions.includes(4), name + " lights leaked into the womb " + regions.join(","));
     await shot("sidpa-womb");
@@ -204,6 +207,46 @@ try {
     assert(paused === "true", name + " pause");
     const debugBg = await page.$eval("#debug", (el) => getComputedStyle(el).backgroundColor);
     assert(debugBg === "rgb(198, 40, 40)", name + " debug colour " + debugBg);
+    if (width === 390 || width === 1366) {
+      const menuOpen = await page.$eval("#menu-panel", (el) => !el.hidden);
+      if (menuOpen) await page.click("#menu");
+      await page.click("#start");
+      let now = await page.$eval("#state", (el) => el.dataset.screen);
+      assert(now === "womb", name + " start screen " + now);
+      await shot("choice");
+      await page.click("#follow");
+      now = await page.$eval("#state", (el) => el.dataset.screen);
+      assert(now === "good", name + " follow screen " + now);
+      const goodLine = await page.$eval("#enter", (el) => el.textContent);
+      assert(/closed|precious/i.test(goodLine), name + " good line " + goodLine);
+      assert(await onScreen("#again"), name + " begin again missing");
+      await shot("good");
+      await page.click("#start");
+      await page.click("#dont");
+      now = await page.$eval("#state", (el) => el.dataset.screen);
+      assert(now === "human", name + " rebirth " + now);
+      const line = await page.$eval("#quote", (el) => el.textContent);
+      assert(line.toLowerCase().includes("yellow"), name + " realm line " + line);
+      await shot("rebirth");
+      await page.click("#menu");
+      if (await page.$eval("#sound", (el) => el.getAttribute("aria-pressed")) === "true") await page.click("#sound");
+      if (await page.$eval("#rain-toggle", (el) => el.getAttribute("aria-pressed")) === "true") await page.click("#rain-toggle");
+      assert(await onScreen("#note"), name + " note box missing");
+      await shot("menu-note");
+      await page.click("#menu");
+    }
+    if (width === 1366) {
+      await page.evaluate(() => { window.__autoPace = 300; });
+      await page.click("#start");
+      await page.click("#auto");
+      await page.waitForFunction(() => document.getElementById("state").dataset.screen === "lights");
+      await page.click("#viz");
+      await new Promise((resolve) => setTimeout(resolve, 700));
+      const held = await page.$eval("#state", (el) => el.dataset.screen);
+      assert(held === "lights", name + " auto did not stop at " + held);
+      const pressedAuto = await page.$eval("#auto", (el) => el.getAttribute("aria-pressed"));
+      assert(pressedAuto === "false", name + " auto stayed on");
+    }
     assert(logs.length === 0, name + " console " + logs.join(" | "));
     await page.close();
   }
@@ -216,13 +259,21 @@ try {
   await reduced.page.close();
 
   const reportPage = await open(browser, 1280, 800, false);
+  await reportPage.page.click("#next");
+  await reportPage.page.click("#follow");
   await reportPage.page.click("#menu");
   await reportPage.page.type("#note", "expected the Sidpa end");
+  await new Promise((resolve) => setTimeout(resolve, 1200));
   await reportPage.page.click("#debug");
   const report = await readReport("bardo-report.json");
   assert(report.stamp === stamp, "report stamp");
   assert(report.note === "expected the Sidpa end", "report note");
-  assert(typeof report.fps === "number", "report fps");
+  assert(report.screen === "good", "report screen " + report.screen);
+  assert(Array.isArray(report.path) && report.path.some((step) => step.screen === "good" && step.button === "follow"), "report path");
+  assert(report.viewport && report.viewport.width === 1280 && report.viewport.height === 800, "report viewport");
+  assert(typeof report.devicePixelRatio === "number", "report dpr");
+  assert(typeof report.userAgent === "string" && report.userAgent.length > 8, "report agent");
+  assert(typeof report.fps === "number" && report.fps >= 30, "report fps " + report.fps);
   assert(Array.isArray(report.errors), "report errors");
   assert(report.crash && report.crash.afterReload === false, "report crash");
   await rm(join(outDir, "bardo-report.json"), { force: true });
@@ -232,7 +283,7 @@ try {
   assert(reportPage.logs.length === 0, "report console");
   await reportPage.page.close();
   await mkdir("/opt/cursor/artifacts", { recursive: true });
-  for (const name of ["opening-390.png", "opening-1366.png", "sidpa-womb-390.png", "sidpa-womb-1366.png", "sidpa-lights-390.png", "sidpa-lights-1366.png", "sidpa-judgement-390.png", "sidpa-judgement-1366.png", "sidpa-wish-390.png", "sidpa-wish-1366.png"]) {
+  for (const name of ["opening-390.png", "opening-1366.png", "choice-390.png", "choice-1366.png", "good-390.png", "good-1366.png", "rebirth-390.png", "rebirth-1366.png", "menu-note-390.png", "menu-note-1366.png"]) {
     await copyFile(join(outDir, name), join("/opt/cursor/artifacts", name));
   }
   console.log("browser smoke ok", stamp);

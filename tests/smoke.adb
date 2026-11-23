@@ -263,6 +263,13 @@ procedure Smoke is
       pragma Assert (Bardo.Sidpa.Poison (1) = 1);
       pragma Assert (Bardo.Sidpa.Poison (2) = 2);
       pragma Assert (Bardo.Sidpa.Poison (3) = -1);
+      pragma Assert (Bardo.Sidpa.Karmic_Realm (4, -1) = 4);
+      pragma Assert (Bardo.Sidpa.Karmic_Realm (-1, 0) = 5);
+      pragma Assert (Bardo.Sidpa.Karmic_Realm (-1, 1) = 4);
+      pragma Assert (Bardo.Sidpa.Karmic_Realm (-1, 2) = 3);
+      pragma Assert (Bardo.Sidpa.Karmic_Realm (-1, -1) = 2);
+      pragma Assert (Bardo.API.Realm_Host (1, 0) = 1);
+      pragma Assert (Bardo.API.Realm_Host (-1, 2) = 3);
       pragma Assert (Bardo.Sidpa.Wind_Force (0) = 0);
       pragma Assert (Bardo.Sidpa.Wind_Force (22_000) = 640);
       pragma Assert (Bardo.Sidpa.Wind_Force (49_000) > Bardo.Sidpa.Wind_Force (22_000));

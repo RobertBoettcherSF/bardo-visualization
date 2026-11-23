@@ -21,7 +21,7 @@ if [ -n "$(git status --porcelain)" ]; then
   DIRTY="+"
 fi
 WHEN=$(TZ=Europe/Berlin date +%Y%m%d-%H%M)
-STAMP="v0.3 b${WHEN} ${SHA}${DIRTY}"
+STAMP="v0.4 b${WHEN} ${SHA}${DIRTY}"
 python3 - "$STAMP" << 'PY'
 import pathlib, sys
 stamp = sys.argv[1]
@@ -49,7 +49,7 @@ mkdir -p obj/wasm
     --export=bardo_sidpa \
     --export=bardo_compute --export=bardo_tick --export=bardo_mantra_glyph \
     --export=bardo_start --export=bardo_milli_of_day --export=bardo_walk \
-    --export=bardo_anchor --export=bardo_first \
+    --export=bardo_anchor --export=bardo_first --export=bardo_realm \
     -z stack-size=1048576 --initial-memory=16777216 \
     -o bardo.wasm *.o
 )

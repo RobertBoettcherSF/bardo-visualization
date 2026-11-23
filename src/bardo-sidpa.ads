@@ -60,6 +60,13 @@ package Bardo.Sidpa is
        (if Abyss <= 2 then Poison'Result = Integer (Abyss)
         else Poison'Result = -1);
 
+   --  Realm of a karmic rebirth. A chosen light wins. Otherwise anger,
+   --  desire, and ignorance fall to hell, preta, and animal. With no
+   --  sign, the human light is the one the text says is easily entered.
+   --  This is not the precious human birth chosen at the womb door.
+   function Karmic_Realm (Brightest : Integer; Poison : Integer) return Integer with
+     Post => Karmic_Realm'Result in 0 .. 5;
+
    function Wind_Force (Time : Milli_Time) return Thousandth;
 
    function Wander_X (Tick : Natural) return Thousandth;
