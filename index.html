@@ -7,7 +7,7 @@
 <style>
 @font-face {
   font-family: "Rain Devanagari";
-  src: url("assets/devanagari-subset.woff2?v=96deed4") format("woff2");
+  src: url("assets/devanagari-subset.woff2?v=c754d01") format("woff2");
   font-display: swap;
 }
 * { box-sizing: border-box; }
@@ -63,7 +63,36 @@ button { min-height: 44px; min-width: 44px; }
 button { background: #1a1e1a; color: #e7e2d4; border: 1px solid #3c4038; padding: 0 10px; }
 button[aria-pressed="true"] { background: #e7e2d4; color: #111; }
 .debug { background: #c62828; color: #fff; border-color: #c62828; font-weight: 700; }
-#day, #note { width: 100%; min-height: 44px; }
+#note { width: 100%; min-height: 44px; }
+#curvebar {
+  position: fixed; z-index: 4;
+  top: calc(env(safe-area-inset-top) + 28px);
+  left: 50%; transform: translateX(-50%);
+  width: min(36rem, calc(100vw - 1.5rem));
+  text-align: center;
+}
+body:not(.has-scrub) #curvebar, body:not(.has-scrub) #scrub { display: none; }
+#curve-live { width: 100%; height: 64px; display: block; background: rgba(7, 8, 7, 0.78); }
+#curve-toggle { display: none; }
+#scrub {
+  position: fixed; z-index: 5;
+  left: 50%; transform: translateX(-50%);
+  width: min(36rem, calc(100vw - 1.5rem));
+  top: calc(env(safe-area-inset-top) + 108px);
+  text-align: center;
+}
+#scrub-read {
+  display: block; margin: 0;
+  color: #f7f4ea; font: 12px/1.3 ui-sans-serif, system-ui, sans-serif;
+  text-shadow: 0 1px 4px #000;
+}
+#day { width: 100%; accent-color: #e0c36a; }
+@media (max-width: 700px) {
+  #curve-toggle { display: inline-block; width: auto; min-height: 36px; margin-bottom: 4px; }
+  body.curves-folded #curve-live { display: none; }
+  body.curves-folded #scrub { top: calc(env(safe-area-inset-top) + 70px); }
+  body:not(.curves-folded) #scrub { top: calc(env(safe-area-inset-top) + 128px); }
+}
 #reload {
   position: fixed; z-index: 7;
   top: calc(env(safe-area-inset-top) + 52px);
@@ -181,7 +210,7 @@ body.has-choice #choices { display: flex; }
 <body>
 <canvas id="rain" aria-hidden="true"></canvas>
 <canvas id="viz"></canvas>
-<p id="stamp" class="stamp" data-dbg>v0.11 b20261123-1734 96deed4</p>
+<p id="stamp" class="stamp" data-dbg>v0.12 b20261123-1817 c754d01</p>
 <p id="sid" class="sid"></p>
 <button type="button" id="menu" aria-expanded="false" aria-controls="menu-panel"></button>
 <div id="menu-panel" hidden>
@@ -193,8 +222,6 @@ body.has-choice #choices { display: flex; }
     <button type="button" id="sound" aria-pressed="false"></button>
     <button type="button" id="rain-toggle" aria-pressed="false"></button>
   </div>
-  <label for="day" id="day-read"></label>
-  <input id="day" type="range" min="0" max="49" value="49">
   <p><label for="note" data-k="note"></label></p>
   <input id="note" maxlength="240" autocomplete="off">
   <p data-k="noteHint"></p>
@@ -218,6 +245,14 @@ body.has-choice #choices { display: flex; }
 <button type="button" id="reload" hidden></button>
 <p id="crash" hidden></p>
 <p id="errors" hidden></p>
+<div id="curvebar">
+  <button type="button" id="curve-toggle" data-k="curveShow"></button>
+  <canvas id="curve-live" width="640" height="64" aria-hidden="true"></canvas>
+</div>
+<div id="scrub">
+  <label for="day" id="scrub-read"></label>
+  <input id="day" type="range" min="0" max="49" value="49">
+</div>
 <div id="caption">
   <h1 id="enter" class="info"></h1>
   <p id="quote" class="quote"></p>
@@ -248,7 +283,7 @@ body.has-choice #choices { display: flex; }
 </div>
 <noscript><p>This page needs JavaScript.</p></noscript>
 <script>
-const WASM_BASE64 = "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IAAQrICAgAALDAAgACAAEK2AgIAACw4AIAAgASABEK6AgIAACwwAIAAgABCvgICAAAsMACAAIAAQsICAgAALDAAgACAAELGAgIAACw4AIAAgASABELOAgIAACxIAIAAgASACIAMgAxCygICAAAtJAQF/QQAhAgJAIABB+QFMDQBBASECIABBoB9JDQBBAiECIABB+NUASQ0AQQMhAiAAQdCMAUkNAEEEQQUgAEHwqwFJGyECCyACC0wBAX8CQCAAQeBgaiICQdg2Tw0AIAJB//8DcUHoB25BAWoPC0EAIQICQCAAQYiqf2oiAEHXNksNACAAQf//A3FB6AduQQhqIQILIAILCAAgAEHoB20LDwBBAEHo/gIgAEH/AXEbCyoAQegHQZh4IAFB/wFxGyAAaiIBQej+AiABQej+AkgbIgFBACABQQBKGwsLACAAQU9tQegHagt2AQN/IAAgABCagICAACECQTwhAyAAIAAQm4CAgAAhBAJAAkACQAJAAkACQCACQf8BcUF/ag4FAAECAwUECyAAQYwBbEHI7n1qQaYdbUHkAGoPCyAEQSRsQYgCag8LIARBMGxB7AFqDwtB1AIhAwsgAw8LQcQEC2YBAn8gACAAEJqAgIAAIQJBKCEDIAAgABCbgICAACEAAkACQAJAAkACQAJAIAJB/wFxQX9qDgUAAQIDBQQLQdoADwsgAEEobEGMAWoPCyAAQS5sQZACag8LQaABIQMLIAMPC0HcAQsKACAAQQZJQQF0CxAAQQxBBiAAQf8BcUEDRhsLwAIBA38CQAJAAkACQCAAQf8BcUF+ag4CAQIACyABQQN0IgBBtImAgABqIQUgAEGwiYCAAGohBgwCCyABQQN0IgBB5ImAgABqIQUgAEHgiYCAAGohBgwBCyABQQN0IgBBlIqAgABqIQUgAEGQioCAAGohBgtBACEAIAJBAEEAIAMoAAQiASADKAAAIgNrQQFqQf////8BcSABIANIGxC2gICAACEDAkAgBSgCACIHQQFIDQAgBigCACEGIAdBA3EhAgJAIAdBBEkNACAGQZCIgIAAaiEBIAdBfHEhBUEAIQADQCADIABqIAEgAGooAAA2AAAgBSAAQQRqIgBHDQALCyACRQ0AIAMgAGohAyAAIAZqQZCIgIAAaiEAA0AgAyAALQAAOgAAIABBAWohACADQQFqIQMg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";
+const WASM_BASE64 = "AGFzbQEAAAABTAtgAAF/YAAAYAJ/fwBgAX8Bf2ACf38Bf2AEf39/fwF/YAN/f38Bf2AFf39/f38Bf2ADf39/AGAGf39/f39/AX9gCX9/f39/f39/fwADREMAAAAAAQECAwMEAwMEAAMDAwMDAwQDAwMEBQMEBgcDAwQEBAQGBAQEBAQHCAQGBAQEBAQEBgQEBAcEBgUJBAQGCgQGBQQBAIACBgkBfwFB0JLAAAsHyAQhBm1lbW9yeQIAC2JhcmRvX2lucHV0AAAMYmFyZG9fb3V0cHV0AAELYmFyZG9fZ2x5cGgAAgtiYXJkb19zaWRwYQADDWJhcmRvX2NvbXB1dGUABApiYXJkb190aWNrAAUSYmFyZG9fbWFudHJhX2dseXBoAAYLYmFyZG9fc3RhcnQABxJiYXJkb19taWxsaV9vZl9kYXkACApiYXJkb193YWxrAAkMYmFyZG9fYW5jaG9yAAoLYmFyZG9fZmlyc3QACwtiYXJkb19yZWFsbQAMEWJhcmRvX2thcm1hX3N0YXJ0AA0TYmFyZG9fa2FybWFfbGlnaHRlbgAOEWJhcmRvX2thcm1hX2hlYXZ5AA8RYmFyZG9fa2FybWFfY2FycnkAEBBiYXJkb19rYXJtYV9iYW5kABESYmFyZG9fa2FybWFfY2hhbmNlABIRYmFyZG9fa2FybWFfcmVhbG0AEw1iYXJkb19yZWJpcnRoABQQYmFyZG9fZHVsbF9yZWFsbQAVFGJhcmRvX2Rpc3NvbHZlX2NsYW1wABYUYmFyZG9fZGlzc29sdmVfc3RhZ2UAFxBiYXJkb19jbGVhcl9zdGVwABgPYmFyZG9fd29tYl9wYXRoABkRYmFyZG9fdG91cl9sZW5ndGgAGhFiYXJkb190b3VyX3NjcmVlbgAbD2JhcmRvX3RvdXJfbW92ZQAcEWJhcmRvX2ZvbGxvd19tb3ZlAB0QYmFyZG9fZGF5X3NjcmVlbgAeEGJhcmRvX3NjcmVlbl9kYXkAHwq9L0MIAEGAkYCAAAsIAEGgkYCAAAsIAEHgkYCAAAsIAEGAkoCAAAu7BQEHfyOAgICAAEHQAGsiACSAgICAAEEAKAKAkYCAACEBQQAoAoSRgIAAIQICQAJAIAFB6P4CTQ0AQQBBATYCoJGAgAAMAQsCQCACQQJJDQBBAEECNgKgkYCAAAwBCwJAQQAo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AAAAhAAAAAwAAACQAAAACQAAAAEAAAACAAAAAwAAAAoAAAALAAAADAAAAA0AAAAOAAAAFQAAABYAAAAXAAAAGAAAABkAAAAaAAAAGwAAAB8AAAAgAAAAIQAAACIAAAAjAAAAJAAAACUAAAApAAAAKgAAADcAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAMAAAAqAAAAKQAAACUAAAAkAAAAIwAAACIAAAAhAAAAIAAAAB8AAAAbAAAAGgAAABkAAAAYAAAAFwAAABYAAAAVAAAADgAAAA0AAAAMAAAACwAAAAoAAAA8AAAAPQAAAD4AAAA3AAAACgAAAAsAAAAMAAAADQAAAA4AAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACkAAAAqAAAAMQAAACcAAAAgAAAAFgAAAAAAAAAFAAAAAgAAAAQAAAABAAAA/////wMAAAAAAAAAAQAAAAIAAAADAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAAAAAAAAAAAAAAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAAAAAAAAAAAAAAAAAEwAAABQAAAAAAAAAAAAAAAAAAAD///////////////////////////////8xAAAAKgAAACMAAAAcAAAAEgAAAP///////////////////////////////xEAAAAQAAAADwAAAA4AAAANAAAADAAAAAsAAAD///////////////8KAAAACQAAAAgAAAAHAAAABgAAAAUAAAAEAAAA////////////////AQAAAAAAAAD/////////////////////////////////////AAAAADEAAAAxAAAAMQAAADEAAAAAAAAA/////////////////////zEAAAAxAAAAMQAAAP////////////////////////////////////8xAAAAMQAAADEAAAAxAAAAMQAAADEAAAA=";
 const STRINGS = {
   en: {
     title: "The Bardo states",
@@ -510,7 +545,13 @@ const STRINGS = {
     blurbVisions: "The door stayed open. The warning signs appear.",
     blurbShelter: "Shelter from the furies that pursue an open womb.",
     blurbChoice: "A pure realm, a careful human birth, or the pull of karma.",
-    blurbEntry: "The Chonyid opens: sounds, lights, and rays.",
+    blurbEntry: "The Chonyid opens: sounds, lights, and rays. Model day 18. Scrubber days 18–21 are this entrance, the gap before Sidpa.",
+    arriveSkipJung: "The frame is set aside. Jung’s order enters at the womb.",
+    arriveSkipBook: "The frame is set aside. Book order enters at the primary Clear Light.",
+    toOpening: "The opening",
+    curveShow: "Show curves",
+    curveHide: "Hide curves",
+    scrubGap: "Day {day} · Chonyid entrance. Days 18–21 are the gap before Sidpa.",
     blurbCoda: "Why the book is read aloud, and how this page computes.",
     infoAmitabha: "A transfer to Amitābha’s western realm. This birth is not taken.",
     infoTushita: "A transfer to Maitreya in Tuṣita. This birth is not taken.",
@@ -1219,9 +1260,11 @@ const REALM_WASH = {
 };
 
 function stageBox(width, height, opening, ending) {
-  const bar = 72;
+  const bar = opening ? 72 : 128;
   const caption = opening ? 108 : ending ? 168 : 56;
-  const top = 40;
+  const wide = window.innerWidth > 700;
+  const folded = document.body.classList.contains("curves-folded");
+  const top = opening ? 40 : wide ? 176 : folded ? 120 : 188;
   const availW = Math.max(40, width - 16);
   const availH = Math.max(40, height - bar - caption - top);
   const aspect = 3 / 4;
@@ -2201,7 +2244,7 @@ function hitContains(region, x, y) {
   return ang >= start && ang <= region.a1;
 }
 
-const STAMP = "v0.11 b20261123-1734 96deed4";
+const STAMP = "v0.12 b20261123-1817 c754d01";
 const RAW_VERSION = "https://raw.githubusercontent.com/RobertBoettcherSF/bardo-visualization/main/version.txt";
 const REPO_API = "https://api.github.com/repos/RobertBoettcherSF/bardo-visualization/commits/main";
 const REALM_COLOUR = ["#C9C3B5", "#4A5E48", "#A89A55", "#3A4A62", "#7A4548", "#5C5550"];
@@ -2460,6 +2503,24 @@ const WOMB_ID = {
   10: "amitabha", 11: "tushita", 12: "jambu",
   20: "deva", 21: "asura", 22: "human", 23: "animal", 24: "preta", 25: "hell"
 };
+const ID_OF = {
+  0: "opening",
+  1: "f1", 2: "f2", 3: "f3",
+  10: "womb", 11: "lights", 12: "judge", 13: "wish", 14: "chonyid",
+  21: "w14", 22: "w13", 23: "w12", 24: "w11", 25: "w10", 26: "w09", 27: "w08",
+  31: "p7", 32: "p6", 33: "p5", 34: "p4", 35: "p3", 36: "p2", 37: "p1",
+  41: "c19", 42: "c20",
+  50: "liberation", 51: "good", 52: "amitabha", 53: "tushita", 54: "jambu", 55: "coda",
+  60: "visions", 61: "shelter", 62: "choice",
+  70: "deva", 71: "asura", 72: "human", 73: "animal", 74: "preta", 75: "hell"
+};
+const NUM_OF = {};
+Object.keys(ID_OF).forEach(function (code) { NUM_OF[ID_OF[code]] = Number(code); });
+let scrubDay = 49;
+let orderSnap = { 0: null, 1: null };
+let loopLog = [];
+let repeatKey = "";
+let repeatCount = 0;
 const ENDINGS = ["good", "liberation", "amitabha", "tushita", "jambu"].concat(
   ["deva", "asura", "human", "animal", "preta", "hell"]
 );
@@ -2587,7 +2648,6 @@ function updateChrome(out) {
   state.dataset.methods = String(side[2]);
   state.dataset.paused = rain && rain.isPaused() ? "true" : "false";
   document.getElementById("day").value = String(day);
-  document.getElementById("day-read").textContent = t("dayLabel") + " " + day + " " + t("of") + " 49";
   const jung = document.getElementById("dir-jung");
   const book = document.getElementById("dir-book");
   jung.textContent = t("jungShort");
@@ -2612,7 +2672,10 @@ function updateChrome(out) {
   document.body.classList.toggle("is-opening", viewMode === "opening");
   document.body.classList.toggle("is-ending", ending);
   document.body.classList.toggle("has-again", ending || screenId === "coda");
+  document.body.classList.toggle("has-scrub", viewMode !== "opening");
   document.body.classList.toggle("has-choice", teaching);
+  const againButton = document.getElementById("again");
+  if (againButton) againButton.textContent = screenId === "coda" ? t("toOpening") : t("again");
   const followButton = document.getElementById("follow");
   const dontButton = document.getElementById("dont");
   if (screenId === "c20") {
@@ -2647,10 +2710,22 @@ function updateChrome(out) {
   document.getElementById("more-body").textContent = moreBody;
   document.getElementById("curves").style.display = detailKey ? "none" : "block";
   document.getElementById("outcome").textContent = viewMode === "opening" || ending ? "" : outcomeText(side[1]);
-  const list = tourList();
-  const index = list.indexOf(screenId);
+  const here = NUM_OF[screenId];
   document.getElementById("prev").disabled = viewMode === "opening";
-  document.getElementById("next").disabled = index === list.length - 1;
+  document.getElementById("next").disabled = viewMode !== "opening" && (here === undefined || ada.exports.bardo_tour_move(direction, here, 1) < 0);
+  const scrub = document.getElementById("day");
+  const scrubRead = document.getElementById("scrub-read");
+  if (scrub && String(scrub.value) !== String(scrubDay)) scrub.value = String(scrubDay);
+  if (scrubRead) {
+    scrubRead.textContent = scrubDay >= 18 && scrubDay <= 21 && screenId === "chonyid"
+      ? t("scrubGap").replace("{day}", String(scrubDay))
+      : t("dayLabel") + " " + scrubDay + " " + t("of") + " 49";
+  }
+  const curveButton = document.getElementById("curve-toggle");
+  if (curveButton) {
+    const folded = document.body.classList.contains("curves-folded");
+    curveButton.textContent = folded ? t("curveShow") : t("curveHide");
+  }
   const wantWind = viewMode !== "opening";
   if (wantWind !== windWanted) {
     windWanted = wantWind;
@@ -2799,6 +2874,45 @@ function render() {
   placePanels();
   ensureLoop();
   drawGraph(out[2]);
+  drawLiveCurves();
+}
+
+function drawLiveCurves() {
+  const canvas = document.getElementById("curve-live");
+  if (!canvas || canvas.offsetParent === null) return;
+  const ctx = canvas.getContext("2d");
+  const dpr = Math.min(devicePixelRatio || 1, 1.5);
+  const width = canvas.clientWidth || 320;
+  const height = canvas.clientHeight || 64;
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+  const left = 8;
+  const plotW = width - 16;
+  const plotH = height - 10;
+  function stroke(series, colour) {
+    ctx.beginPath();
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = 2;
+    for (let day = 0; day <= 49; day++) {
+      const x = left + (day / 49) * plotW;
+      const y = 4 + plotH - ((series[day] || 0) / 1000) * plotH;
+      if (day === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+  stroke(curves.clarity, "#f7f4ea");
+  stroke(curves.intensity, "#e0c36a");
+  stroke(curves.complexity, "#8e3a3a");
+  const mark = left + (scrubDay / 49) * plotW;
+  ctx.strokeStyle = "#f5e642";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(mark, 2);
+  ctx.lineTo(mark, height - 2);
+  ctx.stroke();
 }
 
 function sampleCurves() {
@@ -2828,6 +2942,15 @@ function showScreen(id, button, extra) {
   }
   forcedArrival = "";
   document.getElementById("more").hidden = true;
+  if (id !== "opening" && NUM_OF[id] !== undefined) {
+    const marked = extra && typeof extra.day === "number"
+      ? extra.day
+      : ada.exports.bardo_screen_day(NUM_OF[id]);
+    if (marked >= 0) {
+      scrubDay = marked;
+      milli = ada.exports.bardo_milli_of_day(marked);
+    }
+  }
   if (id === "opening") {
     viewMode = "opening";
     endingLocked = false;
@@ -2836,11 +2959,6 @@ function showScreen(id, button, extra) {
     viewMode = "tour";
     endingLocked = false;
     if (id !== "wish") turned = false;
-    if (SCREEN[id] && Object.prototype.hasOwnProperty.call(SCREEN[id], "milli")) {
-      milli = SCREEN[id].milli;
-    } else if (ANCHOR[id] || (SCREEN[id] && SCREEN[id].cal)) {
-      milli = ada.exports.bardo_milli_of_day(ANCHOR[id] || SCREEN[id].cal);
-    }
     if (id === "c20") applyDissolve(0);
   } else {
     viewMode = "ending";
@@ -2891,86 +3009,44 @@ function goStart() {
 
 function goNext() {
   playClick();
-  const list = tourList();
-  const index = list.indexOf(screenId);
-  if (screenId === "opening" || index < 0) {
-    showScreen(direction === 0 ? "f1" : firstId(), "next");
+  if (screenId === "opening") {
+    showScreen("f1", "next");
     return;
   }
-  if (index >= list.length - 1) return;
-  showScreen(list[index + 1], "next");
+  const code = ada.exports.bardo_tour_move(direction, NUM_OF[screenId], 1);
+  if (code < 0 || !ID_OF[code]) return;
+  showScreen(ID_OF[code], "next");
 }
 
 function goPrev() {
   playClick();
   if (screenId === "opening") return;
-  const index = tourList().indexOf(screenId);
-  if (index <= 0) {
+  const code = ada.exports.bardo_tour_move(direction, NUM_OF[screenId], -1);
+  if (code < 0) {
     showScreen("opening", "prev");
     return;
   }
-  showScreen(tourList()[index - 1], "prev");
+  if (!ID_OF[code]) return;
+  showScreen(ID_OF[code], "prev");
 }
 
 function choose(follow, via) {
   if (via !== "auto") playClick();
   const from = screenId;
-  const at = CLIMB.indexOf(from);
   const karmaBefore = karma;
   karma = follow
     ? ada.exports.bardo_karma_lighten(karma)
     : ada.exports.bardo_karma_heavy(karma);
-  if (SCREEN[from] && SCREEN[from].branch) {
-    let pick = follow ? 0 : 9;
-    if (SCREEN[from].branch === 3) pick = follow ? 3 : 4;
-    const code = ada.exports.bardo_womb_path(SCREEN[from].branch, pick, destination, karma);
-    const next = WOMB_ID[code];
-    if (!next) return;
-    if (code >= 20) destination = code - 20;
-    showScreen(next, follow ? "follow" : "dont");
-    if (via === "auto") noteStep(follow ? "follow" : "dont", from, screenId, { karmaBefore: karmaBefore });
-    return;
-  }
-  if (at < 0) return;
-  if (SCREEN[from] && SCREEN[from].frame && from !== "coda") {
-    const next = follow ? CLIMB[at + 1] : (at > 0 ? CLIMB[at - 1] : from);
-    showScreen(next, follow ? "follow" : "dont");
-    if (via === "auto") noteStep(follow ? "follow" : "dont", from, screenId, { karmaBefore: karmaBefore });
-    return;
-  }
-  if (!follow && from === "womb") {
-    const code = ada.exports.bardo_womb_path(0, 0, destination, karma);
-    showScreen(WOMB_ID[code] || "visions", "dont");
-    if (via === "auto") noteStep("dont", from, screenId, { karmaBefore: karmaBefore });
-    return;
-  }
-  if (SCREEN[from] && SCREEN[from].clear) {
-    const nextCode = ada.exports.bardo_clear_step(SCREEN[from].clear, follow ? 1 : 0);
-    const next = CLEAR_ID[nextCode];
-    if (!next) return;
-    if (!follow && nextCode === 18) forcedArrival = "arrivePass19";
-    if (!follow && nextCode === 19) forcedArrival = "arrivePass20";
-    showScreen(next, follow ? "follow" : "dont");
-    if (via === "auto") noteStep(follow ? "follow" : "dont", from, screenId, { karmaBefore: karmaBefore });
-    return;
-  }
-  if (follow && from === "p1") {
-    const nextCode = ada.exports.bardo_clear_step(18, 1);
-    const next = CLEAR_ID[nextCode];
-    showScreen(next, "follow");
-    if (via === "auto") noteStep("follow", from, screenId, { karmaBefore: karmaBefore });
-    return;
-  }
+  const code = ada.exports.bardo_follow_move(direction, NUM_OF[from], follow ? 1 : 0, destination, karma);
+  const next = ID_OF[code];
+  if (!next || next === from) return;
+  if (code >= 70 && code <= 75) destination = code - 70;
+  if (!follow && from === "f1") forcedArrival = direction === 0 ? "arriveSkipJung" : "arriveSkipBook";
   if (!follow && SCREEN[from] && SCREEN[from].peace) {
-    const code = ada.exports.bardo_dull_realm(SCREEN[from].book);
-    const realmCode = code < 0 ? ada.exports.bardo_karma_realm(karma) : code;
-    destination = realmCode;
-    forcedArrival = code < 0 ? "" : ("arrivePeace" + SCREEN[from].book);
-    showScreen(REALMS[realmCode], "dont");
-    if (via === "auto") noteStep("dont", from, screenId, { karmaBefore: karmaBefore });
-    return;
+    forcedArrival = SCREEN[from].book === 6 ? "" : ("arrivePeace" + SCREEN[from].book);
   }
-  const next = follow ? CLIMB[at + 1] : (at === 0 ? rebirthId() : CLIMB[at - 1]);
+  if (!follow && from === "c19") forcedArrival = "arrivePass19";
+  if (!follow && from === "c20") forcedArrival = "arrivePass20";
   showScreen(next, follow ? "follow" : "dont");
   if (via === "auto") noteStep(follow ? "follow" : "dont", from, screenId, { karmaBefore: karmaBefore });
 }
@@ -3084,6 +3160,10 @@ function onHit(region, via) {
 }
 
 function noteStep(action, from, led, extra) {
+  const repeat = direction + ":" + from + ">" + action;
+  if (repeat === repeatKey) repeatCount += 1;
+  else { repeatKey = repeat; repeatCount = 1; }
+  if (repeatCount === 40 && loopLog.indexOf(repeat) < 0) loopLog.push(repeat);
   seenScreens[from] = true;
   seenScreens[led] = true;
   seenLinks[from + ">" + action] = true;
@@ -3214,6 +3294,27 @@ function saveDiary() {
   diaryDirty = false;
 }
 
+function auditMoves() {
+  const bad = [];
+  lifeScreens().forEach(function (id) {
+    const code = NUM_OF[id];
+    if (code === undefined) return;
+    const actions = actionsFor(id);
+    [0, 1].forEach(function (dir) {
+      const name = dir === 0 ? "jung" : "book";
+      if (actions.some(function (action) { return action.kind === "follow"; })) {
+        const dest = ada.exports.bardo_follow_move(dir, code, 1, -1, 500);
+        if (dest < 0 || ID_OF[dest] === id) bad.push(name + ":" + id + ">follow");
+      }
+      if (actions.some(function (action) { return action.kind === "dont"; })) {
+        const dest = ada.exports.bardo_follow_move(dir, code, 0, -1, 500);
+        if (dest < 0 || ID_OF[dest] === id) bad.push(name + ":" + id + ">dont");
+      }
+    });
+  });
+  window.__noOps = bad;
+}
+
 function clearDiary() {
   diary = { screens: {} };
   tries = {};
@@ -3274,9 +3375,7 @@ function actionsFor(screen) {
   if (screen === "coda" || (SCREEN[screen] && (SCREEN[screen].frame || SCREEN[screen].entry || SCREEN[screen].branch))) {
     const list = screen === "coda"
       ? [{ id: "again", kind: "again" }]
-      : screen === "f1"
-        ? [{ id: "follow", kind: "follow" }]
-        : [
+      : [
           { id: "follow", kind: "follow" },
           { id: "dont", kind: "dont" }
         ];
@@ -3365,7 +3464,24 @@ function publishCoverage() {
 }
 
 function coverageComplete() {
-  return coverageNow().complete;
+  return !!(orderSnap[0] && orderSnap[0].complete && orderSnap[1] && orderSnap[1].complete);
+}
+
+function advanceOrder() {
+  if (!coverageNow().complete) return false;
+  orderSnap[direction] = coverageNow();
+  const other = direction === 0 ? 1 : 0;
+  if (!orderSnap[other]) {
+    direction = other;
+    tries = {};
+    seenScreens = {};
+    seenLinks = {};
+    methodsDone = 0;
+    destination = -1;
+    showScreen("f1", "order");
+    return false;
+  }
+  return true;
 }
 
 function runFile() {
@@ -3383,6 +3499,7 @@ function runFile() {
       incomplete: true
     });
   }
+  orderSnap[direction] = coverageNow();
   return {
     schema: "bardo-run",
     stamp: STAMP,
@@ -3391,7 +3508,10 @@ function runFile() {
     finishedAt: done ? new Date().toISOString() : null,
     truncated: runTruncated,
     stepsStored: stepTotal,
-    coverage: coverageNow(),
+    coverage: {
+      jung: orderSnap[0] || coverageNow(),
+      book: orderSnap[1] || { screens: "0/0", links: "0/0", complete: false }
+    },
     diary: diary,
     lives: stored.map(function (item) {
       return {
@@ -3405,7 +3525,9 @@ function runFile() {
     }),
     totals: totals,
     unreached: unreachedNow(),
-    deadEnds: []
+    deadEnds: [],
+    noOps: window.__noOps || [],
+    loops: loopLog
   };
 }
 
@@ -3434,9 +3556,11 @@ function hideAutoCover() {
 
 function paintAutoStats() {
   const cov = coverageNow();
+  const jung = orderSnap[0] || (direction === 0 ? cov : null);
+  const book = orderSnap[1] || (direction === 1 ? cov : null);
   const line = t("autoLives") + " " + (lifeTotals ? lifeTotals.lives : 0)
-    + " · " + t("autoScreens") + " " + cov.screens
-    + " · " + t("autoLinks") + " " + cov.links
+    + " · Jung " + (jung ? jung.screens + " " + jung.links : "—")
+    + " · Book " + (book ? book.screens + " " + book.links : "—")
     + " · " + t("autoKarma") + " " + karma;
   const stats = document.getElementById("auto-stats");
   const ask = document.getElementById("auto-ask-stats");
@@ -3495,7 +3619,7 @@ function autoFrameStep() {
     while (autoRunning && !autoStopRequested && !autoPrompt && steps < cap) {
       performAutoAction();
       steps += 1;
-      if (!autoKeepGoing && coverageComplete()) {
+      if (!autoKeepGoing && advanceOrder()) {
         showFinishPrompt();
         break;
       }
@@ -3527,7 +3651,7 @@ function beginAgain(via) {
   poisonSeen = -1;
   wanderTick = 0;
   pendingAction = 0;
-  showScreen("womb", "again");
+  showScreen(direction === 0 ? "womb" : "c20", "again");
   if (via === "auto") noteStep("again", from, "womb", { karmaBefore: karmaBefore });
 }
 
@@ -3549,25 +3673,21 @@ function actionHelps(action) {
       return other.kind !== "follow" && other.kind !== "dont" && other.kind !== "again"
         && other.kind !== "path" && other.kind !== "coda"
         && !seenLinks[screenId + ">" + other.id];
-    });
+    }) || (screenId === "womb" && !seenLinks["womb>petals"]);
     if (pending) return false;
   }
-  if (action.kind === "follow") {
-    const at = CLIMB.indexOf(screenId);
-    const nxt = at >= 0 ? CLIMB[at + 1] : "";
-    if (nxt && (!seenScreens[nxt] || actionsFor(nxt).some(function (other) { return !seenLinks[nxt + ">" + other.id]; }))) return true;
+  if (action.kind === "follow" && NUM_OF[screenId] !== undefined) {
+    const dest = ada.exports.bardo_follow_move(direction, NUM_OF[screenId], 1, destination, karma);
+    const id = ID_OF[dest];
+    if (id && id !== screenId && (!seenScreens[id] || actionsFor(id).some(function (other) {
+      return !seenLinks[id + ">" + other.id];
+    }))) return true;
   }
   const link = screenId + ">" + action.id;
   if (!seenLinks[link]) return true;
   if (action.kind === "light" && !seenScreens[REALMS[action.arg]]) return true;
   if (action.kind === "figure" && !seenLinks[link]) return true;
   if (action.kind === "petal" && action.arg === methodsDone + 1 && !seenLinks["womb>petals"]) return true;
-  if (action.kind === "follow" && screenId === "wish" && !seenScreens.w14) return true;
-  if (action.kind === "follow" && SCREEN[screenId] && SCREEN[screenId].cal) {
-    const at = CLIMB.indexOf(screenId);
-    const nxt = CLIMB[at + 1];
-    if (nxt && !seenScreens[nxt]) return true;
-  }
   if (action.kind === "dont" && screenId === "womb") {
     const realm = destination >= 0 && destination <= 5
       ? REALMS[destination]
@@ -3604,9 +3724,13 @@ function pickAction() {
   const helpful = pool.filter(actionHelps);
   const choice = helpful.length ? helpful : pool;
   const unseen = choice.filter(function (action) { return !tries[screenId + ">" + action.id]; });
+  const nextPetal = actionsFor(screenId).find(function (action) {
+    return action.kind === "petal" && action.arg === methodsDone + 1 && !seenLinks["womb>petals"];
+  });
+  if (nextPetal) return nextPetal;
   const ready = unseen.length ? unseen : choice;
-  const back = ready.filter(function (action) { return action.kind === "dont"; });
-  const use = back.length && ready.some(function (action) { return action.kind === "follow"; }) ? back : ready;
+  const forward = ready.filter(function (action) { return action.kind === "follow"; });
+  const use = forward.length ? forward : ready;
   return use[Math.floor(Math.random() * use.length)];
 }
 
@@ -3706,12 +3830,79 @@ function autoApply(action) {
   render();
 }
 
+function edgesFrom(id) {
+  const code = NUM_OF[id];
+  const out = [];
+  if (code === undefined) return out;
+  const actions = actionsFor(id);
+  if (id === "womb") out.push("good");
+  if (id === "judge") out.push("liberation");
+  if (actions.some(function (action) { return action.kind === "follow"; })) {
+    const dest = ID_OF[ada.exports.bardo_follow_move(direction, code, 1, destination, karma)];
+    if (dest) out.push(dest);
+  }
+  if (actions.some(function (action) { return action.kind === "dont"; })) {
+    const dest = ID_OF[ada.exports.bardo_follow_move(direction, code, 0, destination, karma)];
+    if (dest) out.push(dest);
+  }
+  actions.forEach(function (action) {
+    if (action.kind === "coda") out.push("coda");
+    if (action.kind === "again") out.push(direction === 0 ? "womb" : "c20");
+    if (action.kind === "path" && action.choice === 1) out.push("amitabha");
+    if (action.kind === "path" && action.choice === 2) out.push("tushita");
+  });
+  const nxt = ada.exports.bardo_tour_move(direction, code, 1);
+  const prev = ada.exports.bardo_tour_move(direction, code, -1);
+  if (ID_OF[nxt]) out.push(ID_OF[nxt]);
+  if (prev < 0) out.push("opening");
+  else if (ID_OF[prev]) out.push(ID_OF[prev]);
+  return out;
+}
+
+function seekScreen() {
+  const pending = lifeScreens().filter(function (id) {
+    return !seenScreens[id] || actionsFor(id).some(function (action) {
+      return !seenLinks[id + ">" + action.id];
+    }) || (id === "womb" && !seenLinks["womb>petals"]);
+  });
+  if (!pending.length) return "";
+  const queue = [screenId];
+  const seen = {};
+  const from = {};
+  seen[screenId] = true;
+  for (let i = 0; i < queue.length; i++) {
+    const id = queue[i];
+    if (id !== screenId && pending.indexOf(id) >= 0) {
+      let step = id;
+      while (from[step] && from[step] !== screenId) step = from[step];
+      return step;
+    }
+    edgesFrom(id).forEach(function (next) {
+      if (seen[next]) return;
+      seen[next] = true;
+      from[next] = id;
+      queue.push(next);
+    });
+  }
+  return "";
+}
+
 function performAutoAction() {
-  if (!actionsFor(screenId).length) {
+  const here = actionsFor(screenId);
+  const unseenHere = here.some(function (action) { return !seenLinks[screenId + ">" + action.id]; })
+    || (screenId === "womb" && !seenLinks["womb>petals"]);
+  if (!here.length) {
     const from = screenId;
-    showScreen(direction === 0 ? "f1" : "wish", "auto");
+    showScreen("f1", "auto");
     noteStep("start", from, screenId, { karmaBefore: karma });
     return;
+  }
+  if (!unseenHere) {
+    const hop = seekScreen();
+    if (hop) {
+      showScreen(hop, "seek");
+      return;
+    }
   }
   const action = pickAction();
   if (!action) return;
@@ -3727,12 +3918,16 @@ function startAuto() {
   runComplete = false;
   runTruncated = false;
   stepTotal = 0;
+  orderSnap = { 0: null, 1: null };
+  loopLog = [];
+  repeatKey = "";
+  repeatCount = 0;
   lives = [];
   life = { steps: [], karma: karma, stepCount: 0 };
   lifeTotals = freshTotals();
   window.__autoLives = 0;
   applyDiary();
-  if (screenId === "opening" || screenId === "clock") showScreen(direction === 0 ? "f1" : "wish", "auto");
+  if (screenId === "opening" || screenId === "clock") showScreen("f1", "auto");
   seenScreens[screenId] = true;
   publishCoverage();
   if (!autoKeepGoing && coverageComplete()) {
@@ -3875,6 +4070,8 @@ async function boot() {
     }
   });
   await loadIconography();
+  if (window.innerWidth <= 700) document.body.classList.add("curves-folded");
+  auditMoves();
   loadDiary();
   remember("load");
   render();
@@ -3883,19 +4080,6 @@ async function boot() {
 
 function setDirection(next) {
   direction = next;
-  milli = ada.exports.bardo_start(direction);
-  methodsDone = 0;
-  destination = -1;
-  poisonSeen = -1;
-  endingLocked = false;
-  turned = false;
-  lineKey = "";
-  detailKey = "";
-  arrivalKey = "";
-  selectedKey = "";
-  if (viewMode !== "opening") screenId = "clock";
-  cardsKey = "";
-  if (viewMode !== "opening") viewMode = "tour";
   render();
 }
 
@@ -3928,17 +4112,10 @@ function pollVersion() {
 document.getElementById("dir-jung").addEventListener("click", function () { setDirection(0); playClick(); });
 document.getElementById("dir-book").addEventListener("click", function () { setDirection(1); playClick(); });
 document.getElementById("day").addEventListener("input", function (event) {
-  endingLocked = false;
-  turned = false;
-  lineKey = "";
-  detailKey = "";
-  arrivalKey = "";
-  selectedKey = "";
-  screenId = "clock";
-  milli = ada.exports.bardo_milli_of_day(Number(event.target.value));
-  if (viewMode === "opening") viewMode = "tour";
-  cardsKey = "";
-  render();
+  const day = Number(event.target.value);
+  const code = ada.exports.bardo_day_screen(day);
+  if (code < 0 || !ID_OF[code]) return;
+  showScreen(ID_OF[code], "scrub", { day: day });
 });
 document.getElementById("go").addEventListener("click", function () {
   if (viewMode === "opening") showScreen(direction === 0 ? "f1" : firstId(), "enter");
@@ -3961,8 +4138,15 @@ document.getElementById("dissolve-label").addEventListener("click", function () 
 });
 document.getElementById("follow").addEventListener("click", function () { choose(true); });
 document.getElementById("dont").addEventListener("click", function () { choose(false); });
-document.getElementById("again").addEventListener("click", function () { beginAgain(); });
+document.getElementById("again").addEventListener("click", function () {
+  if (screenId === "coda") showScreen("opening", "opening");
+  else beginAgain();
+});
 document.getElementById("coda").addEventListener("click", function () { showScreen("coda", "coda"); });
+document.getElementById("curve-toggle").addEventListener("click", function () {
+  document.body.classList.toggle("curves-folded");
+  render();
+});
 document.getElementById("auto").addEventListener("click", function () {
   if (autoRunning || autoPrompt) requestStop();
   else startAuto();
