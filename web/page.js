@@ -16,6 +16,16 @@ let endingLocked = false;
 let turned = false;
 let poisonSeen = -1;
 let autoTimer = 0;
+let autoRunning = false;
+let autoStopRequested = false;
+let lineKey = "";
+let detailKey = "";
+let arrivalKey = "";
+let selectedKey = "";
+let lives = [];
+let life = null;
+let seenScreens = {};
+let seenLinks = {};
 const pathLog = [];
 let methodsDone = 0;
 let destination = -1;
@@ -32,7 +42,10 @@ let rain = null;
 const curves = { clarity: [], intensity: [], complexity: [] };
 
 function t(key) {
-  return STRINGS[lang][key];
+  const overlay = STRINGS[lang];
+  if (overlay && Object.prototype.hasOwnProperty.call(overlay, key)) return overlay[key];
+  const base = STRINGS.en[key];
+  return base === undefined ? key : base;
 }
 
 function ints(ptr, n) {
@@ -50,13 +63,11 @@ function phaseText(code, named) {
 }
 
 function applyStaticText() {
-  document.documentElement.lang = lang === "de" ? "de" : "en-GB";
+  document.documentElement.lang = "en-GB";
   document.title = t("title");
   document.querySelectorAll("[data-k]").forEach(function (el) {
     el.textContent = t(el.dataset.k);
   });
-  document.getElementById("lang-en").setAttribute("aria-pressed", String(lang === "en"));
-  document.getElementById("lang-de").setAttribute("aria-pressed", String(lang === "de"));
   if (rain) rain.refreshLabels();
   if (crashNotice) {
     document.getElementById("crash").textContent = t("crash").replace("{notice}", crashNotice);
@@ -102,6 +113,24 @@ const REALM_QUOTE = {
   deva: "quoteDeva", asura: "quoteAsura", human: "quoteHuman",
   animal: "quoteAnimal", preta: "quotePreta", hell: "quoteHell"
 };
+const ARRIVE = {
+  judge: "arriveJudge", lights: "arriveLights", womb: "arriveWomb",
+  deva: "arriveDeva", asura: "arriveAsura", human: "arriveHuman",
+  animal: "arriveAnimal", preta: "arrivePreta", hell: "arriveHell"
+};
+const ALL_SCREENS = ["opening", "clock", "womb", "lights", "judge", "wish", "good"]
+  .concat(REALMS);
+const CHOICE_LINKS = [
+  { from: "wish", button: "follow" }, { from: "wish", button: "dont" },
+  { from: "judge", button: "follow" }, { from: "judge", button: "dont" },
+  { from: "lights", button: "follow" }, { from: "lights", button: "dont" },
+  { from: "womb", button: "follow" }, { from: "womb", button: "dont" },
+  { from: "womb", button: "petals" },
+  { from: "good", button: "again" },
+  { from: "deva", button: "again" }, { from: "asura", button: "again" },
+  { from: "human", button: "again" }, { from: "animal", button: "again" },
+  { from: "preta", button: "again" }, { from: "hell", button: "again" }
+];
 
 function tourList() {
   const teach = direction === 0
@@ -142,6 +171,12 @@ function sceneCopy(code) {
   if (code === 3) return ["sceneJudge", "bodyJudge"];
   if (code === 4) return ["sceneWish", "bodyWish"];
   return ["sceneClock", "bodyClock"];
+}
+
+function currentInfo(scene) {
+  if (lineKey) return t(lineKey);
+  if (arrivalKey) return t(arrivalKey);
+  return t(infoKey(scene));
 }
 
 function infoKey(scene) {
@@ -186,7 +221,9 @@ function updateChrome(out) {
   book.setAttribute("aria-pressed", String(direction === 1));
   document.getElementById("prev").textContent = t("prev");
   document.getElementById("start").textContent = t("start");
-  document.getElementById("auto").textContent = t("auto");
+  const autoButton = document.getElementById("auto");
+  autoButton.textContent = autoRunning ? t("stop") : t("auto");
+  autoButton.setAttribute("aria-pressed", String(autoRunning));
   document.getElementById("next").textContent = t("next");
   document.getElementById("menu").textContent = t("menu");
   document.getElementById("debug").textContent = t("debug");
@@ -198,14 +235,17 @@ function updateChrome(out) {
   document.body.classList.toggle("is-opening", viewMode === "opening");
   document.body.classList.toggle("is-ending", ending);
   document.body.classList.toggle("has-choice", teaching);
-  document.getElementById("enter").textContent = t(infoKey(side[0]));
+  document.getElementById("enter").textContent = currentInfo(side[0]);
   const quote = document.getElementById("quote");
   if (ending) {
     quote.textContent = t(screenId === "good" ? "quoteGood" : REALM_QUOTE[screenId]);
   }
   const names = sceneCopy(viewMode === "opening" ? -1 : side[0]);
-  const moreBody = viewMode === "opening" ? t("lead") + " " + t("moreEnter") : t(names[1]);
+  const moreBody = detailKey
+    ? t(detailKey)
+    : (viewMode === "opening" ? t("lead") + " " + t("moreEnter") : t(names[1]));
   document.getElementById("more-body").textContent = moreBody;
+  document.getElementById("curves").style.display = detailKey ? "none" : "block";
   document.getElementById("outcome").textContent = viewMode === "opening" || ending ? "" : outcomeText(side[1]);
   const list = tourList();
   const index = list.indexOf(screenId);
@@ -314,23 +354,32 @@ function ensureLoop() {
   });
 }
 
-function placeChoices() {
+function placePanels() {
   const stage = window.__stage;
   const choices = document.getElementById("choices");
-  if (!stage || !choices) return;
+  const more = document.getElementById("more");
+  if (!stage || !choices || !more) return;
   const top = (stage.y + stage.h - 52) + "px";
   const left = stage.x + "px";
   const width = stage.w + "px";
   if (choices.style.top !== top) choices.style.top = top;
   if (choices.style.left !== left) choices.style.left = left;
   if (choices.style.width !== width) choices.style.width = width;
+  const panelTop = stage.y + 8;
+  const choiceTop = stage.y + stage.h - 56;
+  more.style.top = panelTop + "px";
+  more.style.left = left;
+  more.style.width = width;
+  more.style.bottom = "auto";
+  more.style.transform = "none";
+  more.style.maxHeight = Math.max(72, choiceTop - panelTop - 8) + "px";
 }
 
 function render() {
   const out = compute();
   updateChrome(out);
   drawCanvas();
-  placeChoices();
+  placePanels();
   ensureLoop();
   drawGraph(out[2]);
 }
@@ -350,17 +399,13 @@ function sampleCurves() {
   compute();
 }
 
-function stopAuto() {
-  if (autoTimer) clearInterval(autoTimer);
-  autoTimer = 0;
-  const button = document.getElementById("auto");
-  if (button) button.setAttribute("aria-pressed", "false");
-}
-
 function showScreen(id, button, extra) {
-  if (button !== "auto") stopAuto();
   screenId = id;
   remember(button, extra);
+  selectedKey = "";
+  lineKey = "";
+  detailKey = "";
+  arrivalKey = button === "dont" && ARRIVE[id] ? ARRIVE[id] : "";
   document.getElementById("more").hidden = true;
   if (id === "opening") {
     viewMode = "opening";
@@ -422,12 +467,17 @@ function goPrev() {
   showScreen(tourList()[index - 1], "prev");
 }
 
-function choose(follow) {
-  playClick();
+function choose(follow, via) {
+  if (via !== "auto") playClick();
   if (!SCENE_CODE[screenId]) return;
+  const from = screenId;
   if (follow && screenId === "wish") {
     turned = true;
+    lineKey = "infoWishTurn";
+    detailKey = "bodyWish";
+    arrivalKey = "";
     remember("follow", { onward: "chonyid" });
+    if (via === "auto") noteStep("follow", from, "wish");
     render();
     return;
   }
@@ -435,30 +485,220 @@ function choose(follow) {
     ? (screenId === "womb" ? "good" : screenId === "lights" ? "judge" : "wish")
     : (screenId === "wish" ? "judge" : screenId === "judge" ? "lights" : screenId === "lights" ? "womb" : karmicId());
   showScreen(next, follow ? "follow" : "dont");
+  if (via === "auto") noteStep(follow ? "follow" : "dont", from, screenId);
+}
+
+function explainOf(action, arg) {
+  if (action === 1 && arg >= 1 && arg <= 5) {
+    return { line: "tapPetal" + arg, detail: "detailPetal" + arg };
+  }
+  if (action === 2) {
+    return arg === 0
+      ? { line: "transferA", detail: "detailAmitabha" }
+      : { line: "transferT", detail: "detailTusita" };
+  }
+  if (action === 3 && arg >= 0 && arg <= 3) {
+    const names = ["east", "south", "west", "north"];
+    return { line: names[arg], detail: "detailSign" + arg };
+  }
+  if (action === 4 && arg >= 0 && arg <= 5) {
+    return { line: "tapLight" + arg, detail: "detailLight" + arg };
+  }
+  if (action === 5) return { line: "tapMirror", detail: "detailMirror" };
+  if (action === 6) return { line: "tapPass", detail: "detailPass" };
+  if (action === 7 && arg >= 0 && arg <= 2) {
+    return { line: "tapAbyss" + arg, detail: "detailAbyss" + arg };
+  }
+  if (action === 8) return { line: "tapPebbleW", detail: "detailPebbleW" };
+  if (action === 9) return { line: "tapPebbleB", detail: "detailPebbleB" };
+  return null;
+}
+
+function applyAction(action, arg) {
+  pendingAction = action;
+  pendingArg = arg;
+  compute();
+}
+
+function onHit(region, via) {
+  const spec = explainOf(region.action, region.arg);
+  if (!spec) return;
+  const key = region.action + ":" + region.arg;
+  const acts = region.action >= 1 && region.action <= 7;
+  if (selectedKey === key && acts) {
+    const from = screenId;
+    const before = methodsDone;
+    applyAction(region.action, region.arg);
+    if (via !== "auto") playClick();
+    if (region.action === 1 && from === "womb" && methodsDone >= 5) {
+      showScreen("good", "petals");
+      if (via === "auto") noteStep("petals", from, "good");
+      return;
+    }
+    const outcome = sidpa()[1];
+    if (outcome === 8) lineKey = "outOrder";
+    else if (region.action === 1 && methodsDone > before) lineKey = "tapClosed";
+    else if (outcome === 6) lineKey = "outFree";
+    else if (outcome === 7) lineKey = "outStay";
+    else if (outcome === 4) lineKey = "outAllow";
+    else if (outcome === 5) lineKey = "outRefuse";
+    else if (outcome === 2) lineKey = "outAmitabha";
+    else if (outcome === 3) lineKey = "outTusita";
+    else if (outcome === 9) lineKey = region.arg === 0 ? "outAnger" : region.arg === 1 ? "outDesire" : "outIgnorance";
+    else if (region.action === 4) lineKey = spec.line;
+    else lineKey = spec.line;
+    detailKey = spec.detail;
+    arrivalKey = "";
+    if (via === "auto") noteStep("tap", from, screenId);
+    render();
+    return;
+  }
+  selectedKey = key;
+  lineKey = spec.line;
+  detailKey = spec.detail;
+  arrivalKey = "";
+  if (via === "auto") noteStep("tap", screenId, screenId);
+  render();
+}
+
+function noteStep(action, from, led) {
+  seenScreens[from] = true;
+  seenScreens[led] = true;
+  seenLinks[from + ">" + action] = true;
+  if (!life) life = { steps: [] };
+  life.steps.push({ screen: from, action: action, led: led, t: Date.now() });
+  if (led === "good" || REALMS.indexOf(led) >= 0) {
+    life.ended = led;
+    lives.push(life);
+    life = { steps: [] };
+    window.__autoLives = lives.length;
+  }
+}
+
+function runFile() {
+  const totals = { lives: 0, good: 0, incomplete: 0, rebirths: {} };
+  REALMS.forEach(function (name) { totals.rebirths[name] = 0; });
+  lives.forEach(function (item) {
+    if (!item.ended) {
+      totals.incomplete += 1;
+      return;
+    }
+    totals.lives += 1;
+    if (item.ended === "good") totals.good += 1;
+    else if (totals.rebirths[item.ended] !== undefined) totals.rebirths[item.ended] += 1;
+  });
+  return {
+    schema: "bardo-run",
+    stamp: STAMP,
+    lives: lives.map(function (item) {
+      return {
+        steps: item.steps,
+        ended: item.ended || "",
+        incomplete: item.incomplete === true
+      };
+    }),
+    totals: totals,
+    unreached: {
+      screens: ALL_SCREENS.filter(function (id) { return !seenScreens[id]; }),
+      links: CHOICE_LINKS.filter(function (link) {
+        return !seenLinks[link.from + ">" + link.button];
+      })
+    },
+    deadEnds: [{
+      from: "wish",
+      button: "follow",
+      onward: "chonyid",
+      note: "Following here would open Chönyid, which is not in this part of the tour."
+    }]
+  };
+}
+
+function downloadRun() {
+  const blob = new Blob([JSON.stringify(runFile(), null, 2)], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "bardo-run.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
+}
+
+function finishAuto() {
+  if (autoTimer) clearTimeout(autoTimer);
+  autoTimer = 0;
+  if (life && life.steps.length && !life.ended) {
+    life.ended = "";
+    life.incomplete = true;
+    lives.push(life);
+  }
+  life = null;
+  autoRunning = false;
+  autoStopRequested = false;
+  downloadRun();
+  render();
+}
+
+function scheduleAuto() {
+  const pace = window.__autoPace || 3000;
+  autoTimer = setTimeout(autoStep, pace);
+}
+
+function autoStep() {
+  autoTimer = 0;
+  if (!autoRunning) return;
+  performAutoAction();
+  if (autoStopRequested || !autoRunning) {
+    finishAuto();
+    return;
+  }
+  scheduleAuto();
+}
+
+function performAutoAction() {
+  const ended = screenId === "good" || REALMS.indexOf(screenId) >= 0;
+  if (ended || viewMode === "ending") {
+    const from = screenId;
+    goStart();
+    noteStep("again", from, screenId);
+    return;
+  }
+  if (!SCENE_CODE[screenId]) {
+    const from = screenId;
+    showScreen(firstId(), "auto");
+    noteStep("start", from, screenId);
+    return;
+  }
+  const roll = Math.random();
+  if (roll < 0.5) choose(false, "auto");
+  else if (roll < 0.75) choose(true, "auto");
+  else {
+    const list = window.__regions || [];
+    if (!list.length) choose(false, "auto");
+    else onHit(list[Math.floor(Math.random() * list.length)], "auto");
+  }
 }
 
 function startAuto() {
-  stopAuto();
+  if (autoRunning) return;
+  autoRunning = true;
+  autoStopRequested = false;
+  lives = [];
+  life = { steps: [] };
+  seenScreens = {};
+  seenLinks = {};
+  window.__autoLives = 0;
+  seenScreens[screenId] = true;
   if (screenId === "opening" || tourList().indexOf(screenId) < 0) showScreen(firstId(), "auto");
-  const pace = window.__autoPace || 4500;
-  document.getElementById("auto").setAttribute("aria-pressed", "true");
-  autoTimer = setInterval(function () {
-    const list = tourList();
-    const index = list.indexOf(screenId);
-    if (index < 0 || index >= list.length - 1) {
-      stopAuto();
-      return;
-    }
-    showScreen(list[index + 1], "auto");
-  }, pace);
+  seenScreens[screenId] = true;
+  scheduleAuto();
+  render();
 }
 
-function act(action, arg) {
-  pendingAction = action;
-  pendingArg = arg;
-  playClick();
-  cardsKey = "";
-  render();
+function requestStop() {
+  if (!autoRunning) return;
+  autoStopRequested = true;
+  if (!autoTimer) finishAuto();
 }
 
 function loadGlyphs() {
@@ -484,7 +724,7 @@ function report() {
     schema: "bardo-d009",
     stamp: STAMP,
     settings: {
-      language: lang === "de" ? "de" : "en-GB",
+      language: "en-GB",
       direction: direction === 0 ? "jung-reverse" : "book-order",
       day: Number(state.dataset.day),
       phase: state.dataset.phase,
@@ -585,7 +825,6 @@ async function boot() {
 }
 
 function setDirection(next) {
-  stopAuto();
   direction = next;
   milli = ada.exports.bardo_start(direction);
   methodsDone = 0;
@@ -593,6 +832,10 @@ function setDirection(next) {
   poisonSeen = -1;
   endingLocked = false;
   turned = false;
+  lineKey = "";
+  detailKey = "";
+  arrivalKey = "";
+  selectedKey = "";
   cardsKey = "";
   if (viewMode !== "opening") viewMode = "tour";
   render();
@@ -624,18 +867,15 @@ function pollVersion() {
     .catch(function () { /* a failed poll is not a new build */ });
 }
 
-document.getElementById("lang-en").addEventListener("click", function () {
-  lang = "en"; applyStaticText(); render();
-});
-document.getElementById("lang-de").addEventListener("click", function () {
-  lang = "de"; applyStaticText(); render();
-});
 document.getElementById("dir-jung").addEventListener("click", function () { setDirection(0); playClick(); });
 document.getElementById("dir-book").addEventListener("click", function () { setDirection(1); playClick(); });
 document.getElementById("day").addEventListener("input", function (event) {
-  stopAuto();
   endingLocked = false;
   turned = false;
+  lineKey = "";
+  detailKey = "";
+  arrivalKey = "";
+  selectedKey = "";
   milli = ada.exports.bardo_milli_of_day(Number(event.target.value));
   if (viewMode === "opening") viewMode = "tour";
   cardsKey = "";
@@ -648,26 +888,16 @@ document.getElementById("follow").addEventListener("click", function () { choose
 document.getElementById("dont").addEventListener("click", function () { choose(false); });
 document.getElementById("again").addEventListener("click", goStart);
 document.getElementById("auto").addEventListener("click", function () {
-  if (autoTimer) stopAuto();
+  if (autoRunning) requestStop();
   else startAuto();
-});
-document.addEventListener("pointerdown", function (event) {
-  if (!autoTimer) return;
-  if (event.target && event.target.closest && event.target.closest("#auto")) return;
-  stopAuto();
-}, true);
-document.addEventListener("keydown", function (event) {
-  if (autoTimer && event.key !== "F9") stopAuto();
 });
 document.getElementById("enter").addEventListener("click", function () {
   const more = document.getElementById("more");
-  if (more.hidden) {
-    more.hidden = false;
+  more.hidden = !more.hidden;
+  if (!more.hidden) {
+    placePanels();
     drawGraph(Number(document.getElementById("state").dataset.day || "0"));
-    return;
   }
-  more.hidden = true;
-  if (viewMode === "opening") showScreen(firstId(), "enter");
 });
 document.getElementById("menu").addEventListener("click", function () {
   const panel = document.getElementById("menu-panel");
@@ -720,7 +950,7 @@ viz.addEventListener("pointerup", function (event) {
   const y = event.clientY - rect.top;
   for (let i = regions.length - 1; i >= 0; i--) {
     if (hitContains(regions[i], x, y)) {
-      act(regions[i].action, regions[i].arg);
+      onHit(regions[i]);
       return;
     }
   }
@@ -728,7 +958,7 @@ viz.addEventListener("pointerup", function (event) {
 addEventListener("resize", function () {
   if (!ada) return;
   drawCanvas();
-  placeChoices();
+  placePanels();
   drawGraph(Number(document.getElementById("state").dataset.day || "0"));
 });
 

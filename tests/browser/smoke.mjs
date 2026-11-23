@@ -148,12 +148,11 @@ try {
     const rainDim = await page.$eval("#rain", (el) => getComputedStyle(el).opacity);
     assert(Number(rainDim) <= 0.35, name + " rain not dimmed " + rainDim);
     await page.click("#menu");
-    await page.click("#lang-de");
-    const de = await page.$eval("#enter", (el) => el.textContent);
-    assert(de.includes("Bardo"), name + " german title " + de);
+    assert(await page.$("#lang-de") === null, name + " language switch still present");
+    const title = await page.$eval("#enter", (el) => el.textContent);
+    assert(title.includes("Bardo"), name + " title " + title);
     const lang = await page.$eval("html", (el) => el.lang);
-    assert(lang === "de", name + " lang " + lang);
-    await page.click("#lang-en");
+    assert(lang === "en-GB", name + " lang " + lang);
     await page.click("#menu");
     await page.click("#next");
     let scene = await page.$eval("#state", (el) => el.dataset.scene);
@@ -166,12 +165,22 @@ try {
     await shot("sidpa-womb");
     const petal = await page.evaluate(() => window.__regions.find((r) => r.action === 1 && r.arg === 1));
     await page.mouse.click(petal.clientX, petal.clientY);
+    const explained = await page.$eval("#enter", (el) => el.textContent);
+    assert(/resolve/i.test(explained), name + " petal explain " + explained);
+    const heldMethods = await page.$eval("#state", (el) => el.dataset.methods);
+    assert(heldMethods === "0", name + " first tap closed a petal " + heldMethods);
+    await page.mouse.click(petal.clientX, petal.clientY);
     const methods = await page.$eval("#state", (el) => el.dataset.methods);
     assert(methods === "1", name + " petal did not close " + methods);
     await page.click("#next");
     scene = await page.$eval("#state", (el) => el.dataset.scene);
     assert(scene === "2", name + " expected lights, got " + scene);
     const light = await page.evaluate(() => window.__regions.find((r) => r.action === 4 && r.arg === 0));
+    await page.mouse.click(light.clientX, light.clientY);
+    const lightLine = await page.$eval("#enter", (el) => el.textContent);
+    assert(/white|gods/i.test(lightLine), name + " light explain " + lightLine);
+    const brightHeld = await page.$eval("#state", (el) => el.dataset.brightest);
+    assert(brightHeld === "-1", name + " first tap chose a light " + brightHeld);
     await page.mouse.click(light.clientX, light.clientY);
     const bright = await page.$eval("#state", (el) => el.dataset.brightest);
     assert(bright === "0", name + " brightest " + bright);
@@ -214,6 +223,39 @@ try {
       let now = await page.$eval("#state", (el) => el.dataset.screen);
       assert(now === "womb", name + " start screen " + now);
       await shot("choice");
+      await page.click("#next");
+      const sector = await page.evaluate(() => window.__regions.find((r) => r.action === 4 && r.arg === 0));
+      await page.mouse.click(sector.clientX, sector.clientY);
+      const wheelLine = await page.$eval("#enter", (el) => el.textContent);
+      assert(/white|gods/i.test(wheelLine), name + " wheel line " + wheelLine);
+      await shot("explain");
+      await page.click("#enter");
+      const panel = await page.evaluate(() => {
+        const more = document.getElementById("more").getBoundingClientRect();
+        const choices = document.getElementById("choices").getBoundingClientRect();
+        const info = getComputedStyle(document.getElementById("enter"));
+        const overlap = more.bottom > choices.top + 1 && more.top < choices.bottom - 1;
+        return {
+          hidden: document.getElementById("more").hidden,
+          overlap: overlap,
+          userSelect: info.userSelect,
+          color: info.color
+        };
+      });
+      assert(panel.hidden === false, name + " detail stayed closed");
+      assert(!panel.overlap, name + " detail covers the choices");
+      assert(panel.userSelect === "none", name + " info selects " + panel.userSelect);
+      assert(panel.color === "rgb(247, 244, 234)", name + " info colour " + panel.color);
+      await shot("detail");
+      await page.click("#enter");
+      await page.click("#next");
+      await page.click("#dont");
+      now = await page.$eval("#state", (el) => el.dataset.screen);
+      assert(now === "lights", name + " dont from judge " + now);
+      const arrived = await page.$eval("#enter", (el) => el.textContent);
+      assert(/mirror/i.test(arrived) && /birth/i.test(arrived), name + " arrival " + arrived);
+      await shot("arrive");
+      await page.click("#start");
       await page.click("#follow");
       now = await page.$eval("#state", (el) => el.dataset.screen);
       assert(now === "good", name + " follow screen " + now);
@@ -235,17 +277,30 @@ try {
       await shot("menu-note");
       await page.click("#menu");
     }
-    if (width === 1366) {
-      await page.evaluate(() => { window.__autoPace = 300; });
+    if (width === 390 || width === 1366) {
+      await mkdir("/opt/cursor/artifacts", { recursive: true });
+      await rm(join(outDir, "bardo-report.json"), { force: true });
+      await rm(join(outDir, "bardo-run.json"), { force: true });
+      await page.evaluate(() => { window.__autoPace = 40; });
       await page.click("#start");
       await page.click("#auto");
-      await page.waitForFunction(() => document.getElementById("state").dataset.screen === "lights");
+      const stopLabel = await page.$eval("#auto", (el) => el.textContent.trim());
+      assert(stopLabel === "Stop", name + " auto label " + stopLabel);
+      await shot("auto");
       await page.click("#viz");
-      await new Promise((resolve) => setTimeout(resolve, 700));
-      const held = await page.$eval("#state", (el) => el.dataset.screen);
-      assert(held === "lights", name + " auto did not stop at " + held);
-      const pressedAuto = await page.$eval("#auto", (el) => el.getAttribute("aria-pressed"));
-      assert(pressedAuto === "false", name + " auto stayed on");
+      await page.keyboard.press("F9");
+      await page.waitForFunction(() => window.__autoLives >= 3, { timeout: 20000 });
+      const still = await page.$eval("#auto", (el) => el.textContent.trim());
+      assert(still === "Stop", name + " F9 stopped auto");
+      await page.click("#auto");
+      const run = await readReport("bardo-run.json");
+      assert(run.schema === "bardo-run", name + " run schema");
+      assert(run.totals.lives >= 3, name + " lives " + run.totals.lives);
+      assert(Array.isArray(run.lives) && run.lives.length >= 3, name + " life list");
+      assert(run.totals.good + Object.values(run.totals.rebirths).reduce((a, b) => a + b, 0) >= 3, name + " endings");
+      assert(Array.isArray(run.unreached.screens) && Array.isArray(run.unreached.links), name + " unreached");
+      assert(run.deadEnds && run.deadEnds[0].onward === "chonyid", name + " dead end");
+      await copyFile(join(outDir, "bardo-run.json"), join("/opt/cursor/artifacts", "bardo-run.json"));
     }
     assert(logs.length === 0, name + " console " + logs.join(" | "));
     await page.close();
@@ -258,6 +313,7 @@ try {
   assert(reduced.logs.length === 0, "reduced console " + reduced.logs.join(" | "));
   await reduced.page.close();
 
+  await rm(join(outDir, "bardo-report.json"), { force: true });
   const reportPage = await open(browser, 1280, 800, false);
   await reportPage.page.click("#next");
   await reportPage.page.click("#follow");
@@ -283,7 +339,7 @@ try {
   assert(reportPage.logs.length === 0, "report console");
   await reportPage.page.close();
   await mkdir("/opt/cursor/artifacts", { recursive: true });
-  for (const name of ["opening-390.png", "opening-1366.png", "choice-390.png", "choice-1366.png", "good-390.png", "good-1366.png", "rebirth-390.png", "rebirth-1366.png", "menu-note-390.png", "menu-note-1366.png"]) {
+  for (const name of ["explain-390.png", "explain-1366.png", "detail-390.png", "detail-1366.png", "auto-390.png", "auto-1366.png", "arrive-390.png", "arrive-1366.png"]) {
     await copyFile(join(outDir, name), join("/opt/cursor/artifacts", name));
   }
   console.log("browser smoke ok", stamp);

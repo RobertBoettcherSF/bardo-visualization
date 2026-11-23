@@ -292,6 +292,8 @@ function drawMirror(ctx, w, h) {
   ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
   ctx.fill();
   addDisc(5, 0, cx, cy, Math.min(rx, ry) * 0.85);
+  addDisc(8, 0, cx - rx - 22, cy, 28);
+  addDisc(9, 0, cx + rx + 22, cy, 28);
   for (let i = 0; i < 5; i++) {
     ctx.beginPath();
     ctx.arc(cx - rx - 22, cy - 24 + i * 14, 7, 0, Math.PI * 2);
