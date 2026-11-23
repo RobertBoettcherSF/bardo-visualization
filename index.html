@@ -7,7 +7,7 @@
 <style>
 @font-face {
   font-family: "Rain Devanagari";
-  src: url("assets/devanagari-subset.woff2?v=cb32c5d") format("woff2");
+  src: url("assets/devanagari-subset.woff2?v=df185f1") format("woff2");
   font-display: swap;
 }
 * { box-sizing: border-box; }
@@ -83,8 +83,26 @@ button[aria-pressed="true"] { background: #e7e2d4; color: #111; }
   font: 500 1.15rem/1.3 Georgia, "Iowan Old Style", Palatino, serif;
   text-shadow: 0 1px 6px #000;
 }
-#go { margin-top: 6px; }
+#go, #again { margin-top: 6px; }
 body:not(.is-opening) #go { display: none; }
+body:not(.is-ending) #again, body:not(.is-ending) #quote { display: none; }
+.quote {
+  width: min(36rem, calc(100vw - 1.5rem));
+  margin: 4px auto 0; padding: 0 12px;
+  text-align: center; color: #f7f4ea;
+  font: italic 0.95rem/1.35 Georgia, "Iowan Old Style", Palatino, serif;
+  text-shadow: 0 1px 6px #000;
+}
+#choices {
+  position: fixed; z-index: 4;
+  display: none; gap: 8px; justify-content: center;
+  pointer-events: none;
+}
+body.has-choice #choices { display: flex; }
+#choices button {
+  pointer-events: auto; flex: 1; max-width: 48%;
+  font-size: 14px; line-height: 1.2; padding: 4px 8px;
+}
 #more {
   position: fixed; z-index: 4;
   left: 50%; bottom: calc(env(safe-area-inset-bottom) + 8.2rem);
@@ -112,7 +130,7 @@ body:not(.is-opening) #go { display: none; }
 <body>
 <canvas id="rain" aria-hidden="true"></canvas>
 <canvas id="viz"></canvas>
-<p id="stamp" class="stamp" data-dbg>v0.3 b20261123-1241 cb32c5d</p>
+<p id="stamp" class="stamp" data-dbg>v0.4 b20261123-1302 df185f1</p>
 <button type="button" id="menu" aria-expanded="false" aria-controls="menu-panel"></button>
 <div id="menu-panel" hidden>
   <div class="row">
@@ -139,22 +157,29 @@ body:not(.is-opening) #go { display: none; }
 <p id="errors" hidden></p>
 <div id="caption">
   <h1 id="enter" class="info"></h1>
+  <p id="quote" class="quote"></p>
   <button type="button" id="go" data-k="enter"></button>
+  <button type="button" id="again" data-k="again"></button>
+</div>
+<div id="choices">
+  <button type="button" id="follow" data-k="follow"></button>
+  <button type="button" id="dont" data-k="dont"></button>
 </div>
 <div id="more" hidden>
   <p id="more-body"></p>
   <p id="outcome"></p>
   <canvas id="curves" width="640" height="120"></canvas>
 </div>
-<div id="state" data-day="49" data-phase="" data-clarity="" data-intensity="" data-complexity="" data-mantra="" data-scene="" data-brightest="-1" data-outcome="0" data-methods="0"></div>
+<div id="state" data-day="49" data-phase="" data-clarity="" data-intensity="" data-complexity="" data-mantra="" data-scene="" data-screen="opening" data-brightest="-1" data-outcome="0" data-methods="0"></div>
 <div id="bar" class="bar">
   <button type="button" id="prev"></button>
   <button type="button" id="start"></button>
+  <button type="button" id="auto" data-k="auto" aria-pressed="false"></button>
   <button type="button" id="next"></button>
 </div>
 <noscript><p>This page needs JavaScript. Diese Seite braucht JavaScript.</p></noscript>
 <script>
-const WASM_BASE64 = "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";
+const WASM_BASE64 = "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";
 const STRINGS = {
   en: {
     title: "The Bardo states",
@@ -165,13 +190,38 @@ const STRINGS = {
     infoLights: "Six dull lights. The bright sector is the destination.",
     infoJudge: "The mirror of karma, with white pebbles and black.",
     infoWish: "The wish-body, moved by a grey wind.",
+    infoWishTurn: "The wish-body is one’s own mind. The next bardo is not in this part of the tour.",
+    infoGood: "The womb door is closed. A precious human birth may be chosen.",
+    infoDeva: "Karmic rebirth as a god.",
+    infoAsura: "Karmic rebirth as a demigod.",
+    infoHuman: "A karmic human birth, not the precious one.",
+    infoAnimal: "Karmic rebirth as an animal.",
+    infoPreta: "Karmic rebirth as a hungry ghost.",
+    infoHell: "Karmic rebirth in the hells.",
+    quoteGood: "Five methods can close the womb. If a birth is taken, the book prefers the southern continent, where the teaching is current.",
+    quoteDeva: "Be not fond of the dull white light of the devas.",
+    quoteAsura: "A dull green light from the asuras.",
+    quoteHuman: "A dull yellow light from human beings.",
+    quoteAnimal: "A dull blue light from the brutes.",
+    quotePreta: "A dull red light from the pretas.",
+    quoteHell: "Be not fond of the dull, smoke-coloured light from Hell.",
+    beingDeva: "A god: long-lived, then bound to fall.",
+    beingAsura: "A demigod, born to strife.",
+    beingHuman: "A human being, entered by karma.",
+    beingAnimal: "An animal, dull and driven.",
+    beingPreta: "A hungry ghost, never filled.",
+    beingHell: "A being of the hells, in heat or in cold.",
     infoClock: "The 49-day clock. Clarity falls as the days pass.",
     moreEnter: "Next begins the tour at the Sidpa end.",
     readMore: "Read more",
     about: "About this scene",
     prev: "Previous",
     start: "Start",
+    auto: "Auto",
     next: "Next",
+    follow: "Follow the advice",
+    dont: "Don't follow it",
+    again: "Begin again",
     soundOff: "Sound off",
     soundOn: "Sound on",
     jungShort: "Jung",
@@ -276,13 +326,38 @@ const STRINGS = {
     infoLights: "Sechs matte Lichter. Der helle Ausschnitt ist das Ziel.",
     infoJudge: "Der Spiegel des Karma, weiße Steine und schwarze.",
     infoWish: "Der Wunschkörper, vom grauen Wind bewegt.",
+    infoWishTurn: "Der Wunschkörper ist der eigene Geist. Der nächste Bardo ist in diesem Teil der Führung noch nicht da.",
+    infoGood: "Die Schoßpforte ist geschlossen. Eine kostbare menschliche Geburt kann gewählt werden.",
+    infoDeva: "Karmische Wiedergeburt als Gott.",
+    infoAsura: "Karmische Wiedergeburt als Halbgott.",
+    infoHuman: "Eine karmische Menschengeburt, nicht die kostbare.",
+    infoAnimal: "Karmische Wiedergeburt als Tier.",
+    infoPreta: "Karmische Wiedergeburt als Hungergeist.",
+    infoHell: "Karmische Wiedergeburt in den Höllen.",
+    quoteGood: "Fünf Weisen können den Schoß schließen. Muss eine Geburt genommen werden, bevorzugt das Buch den südlichen Kontinent, wo die Lehre gilt.",
+    quoteDeva: "Hänge nicht am matten weißen Licht der Götter.",
+    quoteAsura: "Ein mattes grünes Licht von den Asuras.",
+    quoteHuman: "Ein mattes gelbes Licht von den Menschen.",
+    quoteAnimal: "Ein mattes blaues Licht von den Tieren.",
+    quotePreta: "Ein mattes rotes Licht von den Pretas.",
+    quoteHell: "Hänge nicht am matten, rauchfarbenen Licht aus der Hölle.",
+    beingDeva: "Ein Gott: langlebig, dann dem Fall verfallen.",
+    beingAsura: "Ein Halbgott, zum Streit geboren.",
+    beingHuman: "Ein Mensch, durch Karma eingetreten.",
+    beingAnimal: "Ein Tier, stumpf und getrieben.",
+    beingPreta: "Ein Hungergeist, nie gesättigt.",
+    beingHell: "Ein Wesen der Höllen, in Hitze oder Kälte.",
     infoClock: "Die Uhr der 49 Tage. Die Klarheit fällt.",
     moreEnter: "Weiter beginnt die Führung am Sidpa-Ende.",
     readMore: "Weiterlesen",
     about: "Zu dieser Szene",
     prev: "Zurück",
     start: "Anfang",
+    auto: "Auto",
     next: "Weiter",
+    follow: "Dem Rat folgen",
+    dont: "Ihm nicht folgen",
+    again: "Von vorn beginnen",
     soundOff: "Ton aus",
     soundOn: "Ton an",
     jungShort: "Jung",
@@ -381,8 +456,11 @@ const STRINGS = {
 };
 
 // Evolved from interactive-formulas rain.js (v0.11).
-// Pitch 14, glyph 13, gap 14, head #d9ffc3, trail #83c79d, 60 ms frames.
-// Columns spell whole grapheme clusters. A lone virama is never drawn.
+// Pitch 14, glyph 13, gap 14, head #d9ffc3, trail #83c79d.
+// frameMs is the motion timebase (how far a column used to move per 60 ms
+// tick), not a frame cap. Columns spell whole grapheme clusters.
+// Each mantra is drawn once into a strip and blitted, so a wide window
+// does not call fillText for every glyph on every frame.
 const RAIN = {
   columnPitch: 14,
   fontSize: 13,
@@ -403,6 +481,8 @@ function startRain(opts) {
   let height = 0;
   let columns = [];
   let last = 0;
+  let strips = {};
+  let rainDpr = 1;
 
   function trailLength(h) {
     return Math.max(RAIN.minTrail, Math.ceil(h / RAIN.glyphGap));
@@ -418,6 +498,29 @@ function startRain(opts) {
     return glyphs;
   }
 
+  function strip(mantra, trail, alphaScale) {
+    const key = mantra + ":" + trail + ":" + alphaScale + ":" + rainDpr;
+    if (strips[key]) return strips[key];
+    const glyphs = fillGlyphs(mantra, trail);
+    const w = RAIN.columnPitch;
+    const h = trail * RAIN.glyphGap + RAIN.fontSize;
+    const image = document.createElement("canvas");
+    image.width = Math.max(1, Math.round(w * rainDpr));
+    image.height = Math.max(1, Math.round(h * rainDpr));
+    const pen = image.getContext("2d");
+    pen.setTransform(rainDpr, 0, 0, rainDpr, 0, 0);
+    pen.font = RAIN.fontSize + 'px "Rain Devanagari", serif';
+    pen.textAlign = "center";
+    for (let i = 0; i < glyphs.length; i++) {
+      const base = Math.max(0.08, (1 - i / (glyphs.length + 1)) * 0.85);
+      pen.globalAlpha = Math.min(1, base * alphaScale);
+      pen.fillStyle = i === 0 ? RAIN.head : RAIN.body;
+      pen.fillText(glyphs[i], w / 2, trail * RAIN.glyphGap - i * RAIN.glyphGap);
+    }
+    strips[key] = image;
+    return image;
+  }
+
   function makeColumns() {
     const count = Math.max(0, Math.ceil(width / RAIN.columnPitch));
     const trail = trailLength(height);
@@ -428,8 +531,7 @@ function startRain(opts) {
         x: i * RAIN.columnPitch + RAIN.columnPitch / 2,
         y: Math.random() * (height + trail * RAIN.glyphGap) - trail * RAIN.glyphGap,
         speed: 0.7 + Math.random() * 1.6,
-        mantra: mantra,
-        glyphs: fillGlyphs(mantra, trail)
+        mantra: mantra
       });
     }
   }
@@ -437,42 +539,41 @@ function startRain(opts) {
   function resize() {
     width = innerWidth;
     height = innerHeight;
-    const dpr = Math.min(devicePixelRatio || 1, 1.5);
-    canvas.width = Math.round(width * dpr);
-    canvas.height = Math.round(height * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    rainDpr = 1;
+    strips = {};
+    canvas.width = Math.round(width * rainDpr);
+    canvas.height = Math.round(height * rainDpr);
+    ctx.setTransform(rainDpr, 0, 0, rainDpr, 0, 0);
     makeColumns();
-    draw(false);
+    draw(RAIN.frameMs);
   }
 
-  function draw(move) {
+  function draw(dt) {
     const scale = opts.scales();
     const speedScale = scale.speed / 1000;
     const alphaScale = scale.alpha / 1000;
-    const stride = scale.stride;
+    const stride = scale.stride || 1;
+    const step = dt / RAIN.frameMs;
     ctx.clearRect(0, 0, width, height);
-    ctx.font = RAIN.fontSize + 'px "Rain Devanagari", serif';
-    ctx.textAlign = "center";
     const trail = trailLength(height);
+    const stripH = trail * RAIN.glyphGap + RAIN.fontSize;
     for (let c = 0; c < columns.length; c++) {
       const column = columns[c];
-      if (move) {
-        column.y += column.speed * 3.2 * speedScale;
-        if (column.y - column.glyphs.length * RAIN.glyphGap > height) {
-          column.y = -RAIN.glyphGap;
-          column.mantra = (column.mantra % 3) + 1;
-          column.glyphs = fillGlyphs(column.mantra, trail);
-        }
+      column.y += column.speed * 3.2 * speedScale * step;
+      if (column.y - trail * RAIN.glyphGap > height) {
+        column.y = -RAIN.glyphGap;
+        column.mantra = (column.mantra % 3) + 1;
       }
       if (c % stride !== 0) continue;
-      for (let i = 0; i < column.glyphs.length; i++) {
-        const base = Math.max(0.08, (1 - i / (column.glyphs.length + 1)) * 0.85);
-        ctx.globalAlpha = Math.min(1, base * alphaScale);
-        ctx.fillStyle = i === 0 ? RAIN.head : RAIN.body;
-        ctx.fillText(column.glyphs[i], column.x, column.y - i * RAIN.glyphGap);
-      }
+      const image = strip(column.mantra, trail, alphaScale);
+      ctx.drawImage(
+        image,
+        column.x - RAIN.columnPitch / 2,
+        column.y - trail * RAIN.glyphGap,
+        RAIN.columnPitch,
+        stripH
+      );
     }
-    ctx.globalAlpha = 1;
   }
 
   function refreshLabels() {
@@ -482,10 +583,10 @@ function startRain(opts) {
   }
 
   function frame(time) {
-    if (!paused && !document.hidden && time - last >= RAIN.frameMs) {
-      draw(true);
+    if (!paused && !document.hidden) {
+      const dt = last === 0 ? RAIN.frameMs : Math.min(48, time - last);
       last = time;
-      opts.onFrame();
+      draw(dt);
     }
     requestAnimationFrame(frame);
   }
@@ -501,7 +602,8 @@ function startRain(opts) {
   addEventListener("resize", resize);
   resize();
   document.fonts.load(RAIN.fontSize + 'px "Rain Devanagari"').then(function () {
-    draw(false);
+    strips = {};
+    draw(0);
   });
   refreshLabels();
   requestAnimationFrame(frame);
@@ -586,10 +688,20 @@ let originX = 0;
 let originY = 0;
 let bg = null;
 let bgKey = "";
+let regionKey = "";
 
-function stageBox(width, height, opening) {
+const REALM_WASH = {
+  deva: "#c9c3b5",
+  asura: "#4a5e48",
+  human: "#a89a55",
+  animal: "#3a4a62",
+  preta: "#7a4548",
+  hell: "#5c5550"
+};
+
+function stageBox(width, height, opening, ending) {
   const bar = 72;
-  const caption = opening ? 108 : 56;
+  const caption = opening ? 108 : ending ? 168 : 56;
   const top = 40;
   const availW = Math.max(40, width - 16);
   const availH = Math.max(40, height - bar - caption - top);
@@ -765,10 +877,10 @@ function drawPetals(ctx, cx, cy, radius, done, time) {
   for (let i = 0; i < 5; i++) {
     const sway = Math.sin(time / 800 + i) * 1.5;
     const angle = -Math.PI / 2 + i * (Math.PI * 2 / 5);
-    const px = cx + Math.cos(angle) * radius * 0.58 + sway;
+    const px = cx + Math.cos(angle) * radius * 0.58;
     const py = cy + Math.sin(angle) * radius * 0.58;
     ctx.save();
-    ctx.translate(px, py);
+    ctx.translate(px + sway, py);
     ctx.rotate(angle);
     ctx.beginPath();
     ctx.ellipse(0, 0, radius * 0.36, radius * 0.18, 0, 0, Math.PI * 2);
@@ -882,6 +994,28 @@ function drawMirror(ctx, w, h) {
   addDisc(6, 0, cx, py, 22);
 }
 
+function drawRealmLight(ctx, w, h, screen) {
+  const colour = REALM_WASH[screen] || "#a89a55";
+  const cx = w / 2;
+  const cy = h * 0.46;
+  const r = Math.min(w, h) * 0.28;
+  const glow = ctx.createRadialGradient(cx, cy, r * 0.2, cx, cy, r * 1.4);
+  glow.addColorStop(0, colour);
+  glow.addColorStop(1, "rgba(0, 0, 0, 0)");
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 1.4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = colour;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = "#e0c36a";
+  ctx.lineWidth = 6;
+  ctx.stroke();
+}
+
 function drawWishBody(ctx, w, h, model) {
   const colours = ["#f4f1e6", "#1c1c1c", "#a33b32"];
   const yA = h * 0.72;
@@ -941,7 +1075,7 @@ function paintAll(time, model) {
   const ctx = canvas.getContext("2d");
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, width, height);
-  const box = stageBox(width, height, model.opening);
+  const box = stageBox(width, height, model.opening, model.ending);
   window.__stage = box;
   const kind = model.opening ? "open" : String(model.scene);
   const layer = ensureBg(kind, box, dpr);
@@ -956,12 +1090,17 @@ function paintAll(time, model) {
   originY = box.y;
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const t = reduced ? 0 : time;
-  if (model.opening || model.scene === 0 && model.opening) {
+  if (model.opening) {
     const cx = box.w / 2;
     const cy = box.h * 0.52;
     const r = Math.min(box.w, box.h) * 0.42;
     drawHalo(ctx, cx, cy - box.h * 0.04, r, t);
     drawBuddha(ctx, cx, cy, Math.min(box.w, box.h) * 0.46);
+  } else if (model.screen === "good") {
+    const radius = Math.min(box.w, box.h) * 0.3;
+    drawPetals(ctx, box.w / 2, box.h * 0.42, radius, 5, t);
+  } else if (REALM_WASH[model.screen]) {
+    drawRealmLight(ctx, box.w, box.h, model.screen);
   } else if (model.scene === 0) {
     paintAxesLocal(ctx, box.w, box.h, model);
   } else if (model.scene === 1) {
@@ -976,12 +1115,19 @@ function paintAll(time, model) {
     drawWishBody(ctx, box.w, box.h, model);
   }
   ctx.restore();
-  const rect = canvas.getBoundingClientRect();
-  window.__regions = regions.map(function (region) {
-    const x = region.kind === "disc" ? region.x : region.hitX;
-    const y = region.kind === "disc" ? region.y : region.hitY;
-    return { action: region.action, arg: region.arg, clientX: rect.left + x, clientY: rect.top + y };
-  });
+  const key = [
+    model.screen, model.methods, model.bright,
+    Math.round(box.x), Math.round(box.y), Math.round(box.w), Math.round(box.h)
+  ].join(":");
+  if (key !== regionKey) {
+    regionKey = key;
+    const rect = canvas.getBoundingClientRect();
+    window.__regions = regions.map(function (region) {
+      const x = region.kind === "disc" ? region.x : region.hitX;
+      const y = region.kind === "disc" ? region.y : region.hitY;
+      return { action: region.action, arg: region.arg, clientX: rect.left + x, clientY: rect.top + y };
+    });
+  }
 }
 
 function paintAxesLocal(ctx, w, h, model) {
@@ -1030,7 +1176,7 @@ function hitContains(region, x, y) {
   return ang >= start && ang <= region.a1;
 }
 
-const STAMP = "v0.3 b20261123-1241 cb32c5d";
+const STAMP = "v0.4 b20261123-1302 df185f1";
 const RAW_VERSION = "https://raw.githubusercontent.com/RobertBoettcherSF/bardo-visualization/main/version.txt";
 const REPO_API = "https://api.github.com/repos/RobertBoettcherSF/bardo-visualization/commits/main";
 const REALM_COLOUR = ["#C9C3B5", "#4A5E48", "#A89A55", "#3A4A62", "#7A4548", "#5C5550"];
@@ -1043,6 +1189,12 @@ let fps = 0;
 let frameCount = 0;
 let frameStamp = 0;
 let viewMode = "opening";
+let screenId = "opening";
+let endingLocked = false;
+let turned = false;
+let poisonSeen = -1;
+let autoTimer = 0;
+const pathLog = [];
 let methodsDone = 0;
 let destination = -1;
 let wanderTick = 0;
@@ -1112,7 +1264,45 @@ function compute() {
   const side = sidpa();
   if (side[2] >= 0) methodsDone = side[2];
   if (side[3] >= 0) destination = side[3];
+  if (side[6] >= 0) poisonSeen = side[6];
   return output();
+}
+
+const SCENE_ID = { 1: "womb", 2: "lights", 3: "judge", 4: "wish" };
+const SCENE_CODE = { womb: 1, lights: 2, judge: 3, wish: 4 };
+const ANCHOR = { womb: 49, lights: 39, judge: 32, wish: 22 };
+const REALMS = ["deva", "asura", "human", "animal", "preta", "hell"];
+const REALM_INFO = {
+  deva: "infoDeva", asura: "infoAsura", human: "infoHuman",
+  animal: "infoAnimal", preta: "infoPreta", hell: "infoHell"
+};
+const REALM_QUOTE = {
+  deva: "quoteDeva", asura: "quoteAsura", human: "quoteHuman",
+  animal: "quoteAnimal", preta: "quotePreta", hell: "quoteHell"
+};
+
+function tourList() {
+  const teach = direction === 0
+    ? ["womb", "lights", "judge", "wish"]
+    : ["wish", "judge", "lights", "womb"];
+  return teach.concat(["good"]).concat(REALMS);
+}
+
+function firstId() {
+  return direction === 0 ? "womb" : "wish";
+}
+
+function screenFromScene(scene) {
+  return SCENE_ID[scene] || "clock";
+}
+
+function remember(button, extra) {
+  const entry = { screen: screenId, button: button, t: Date.now() };
+  if (extra) {
+    Object.keys(extra).forEach(function (key) { entry[key] = extra[key]; });
+  }
+  pathLog.push(entry);
+  if (pathLog.length > 80) pathLog.shift();
 }
 
 function outcomeText(code) {
@@ -1133,11 +1323,14 @@ function sceneCopy(code) {
 }
 
 function infoKey(scene) {
-  if (viewMode === "opening") return "title";
-  if (scene === 1) return "infoWomb";
-  if (scene === 2) return "infoLights";
-  if (scene === 3) return "infoJudge";
-  if (scene === 4) return "infoWish";
+  if (viewMode === "opening" || screenId === "opening") return "title";
+  if (screenId === "good") return "infoGood";
+  if (REALM_INFO[screenId]) return REALM_INFO[screenId];
+  if (screenId === "wish" && turned) return "infoWishTurn";
+  if (scene === 1 || screenId === "womb") return "infoWomb";
+  if (scene === 2 || screenId === "lights") return "infoLights";
+  if (scene === 3 || screenId === "judge") return "infoJudge";
+  if (scene === 4 || screenId === "wish") return "infoWish";
   return "infoClock";
 }
 
@@ -1152,7 +1345,9 @@ function updateChrome(out) {
   state.dataset.intensity = String(out[5]);
   state.dataset.complexity = String(out[6]);
   state.dataset.mantra = String(out[8]);
+  if (viewMode !== "opening" && !endingLocked) screenId = screenFromScene(side[0]);
   state.dataset.scene = String(side[0]);
+  state.dataset.screen = screenId;
   state.dataset.brightest = String(side[3]);
   state.dataset.outcome = String(side[1]);
   state.dataset.methods = String(side[2]);
@@ -1169,21 +1364,32 @@ function updateChrome(out) {
   book.setAttribute("aria-pressed", String(direction === 1));
   document.getElementById("prev").textContent = t("prev");
   document.getElementById("start").textContent = t("start");
+  document.getElementById("auto").textContent = t("auto");
   document.getElementById("next").textContent = t("next");
   document.getElementById("menu").textContent = t("menu");
   document.getElementById("debug").textContent = t("debug");
   const sound = document.getElementById("sound");
   sound.textContent = soundEnabled() ? t("soundOn") : t("soundOff");
   sound.setAttribute("aria-pressed", String(soundEnabled()));
+  const teaching = SCENE_CODE[screenId] !== undefined;
+  const ending = viewMode === "ending";
   document.body.classList.toggle("is-opening", viewMode === "opening");
+  document.body.classList.toggle("is-ending", ending);
+  document.body.classList.toggle("has-choice", teaching);
   document.getElementById("enter").textContent = t(infoKey(side[0]));
+  const quote = document.getElementById("quote");
+  if (ending) {
+    quote.textContent = t(screenId === "good" ? "quoteGood" : REALM_QUOTE[screenId]);
+  }
   const names = sceneCopy(viewMode === "opening" ? -1 : side[0]);
   const moreBody = viewMode === "opening" ? t("lead") + " " + t("moreEnter") : t(names[1]);
   document.getElementById("more-body").textContent = moreBody;
-  document.getElementById("outcome").textContent = viewMode === "opening" ? "" : outcomeText(side[1]);
+  document.getElementById("outcome").textContent = viewMode === "opening" || ending ? "" : outcomeText(side[1]);
+  const list = tourList();
+  const index = list.indexOf(screenId);
   document.getElementById("prev").disabled = viewMode === "opening";
-  document.getElementById("next").disabled = viewMode === "tour" && side[0] !== 0 && side[13] < 0;
-  const wantWind = viewMode === "tour" && side[0] !== 0;
+  document.getElementById("next").disabled = index === list.length - 1;
+  const wantWind = viewMode !== "opening";
   if (wantWind !== windWanted) {
     windWanted = wantWind;
     setWind(wantWind);
@@ -1243,6 +1449,8 @@ function modelNow() {
   const side = sidpa();
   return {
     opening: viewMode === "opening",
+    ending: viewMode === "ending",
+    screen: screenId,
     scene: side[0],
     methods: side[2],
     bright: side[3],
@@ -1250,6 +1458,17 @@ function modelNow() {
     y: side[9],
     curves: curves
   };
+}
+
+function noteFrame(now) {
+  frameCount += 1;
+  if (frameStamp === 0) frameStamp = now;
+  const span = now - frameStamp;
+  if (span >= 1000) {
+    fps = frameCount * 1000 / span;
+    frameCount = 0;
+    frameStamp = now;
+  }
 }
 
 function drawCanvas() {
@@ -1261,19 +1480,35 @@ function ensureLoop() {
   if (looping) return;
   looping = true;
   requestAnimationFrame(function tick(now) {
-    if (ada && viewMode === "tour" && sidpa()[0] === 4 && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (ada && screenId === "wish" && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       wanderTick = (wanderTick + 1) % 100000;
       compute();
     }
-    if (ada) paintAll(now, modelNow());
+    if (ada) {
+      paintAll(now, modelNow());
+      noteFrame(now);
+    }
     requestAnimationFrame(tick);
   });
+}
+
+function placeChoices() {
+  const stage = window.__stage;
+  const choices = document.getElementById("choices");
+  if (!stage || !choices) return;
+  const top = (stage.y + stage.h - 52) + "px";
+  const left = stage.x + "px";
+  const width = stage.w + "px";
+  if (choices.style.top !== top) choices.style.top = top;
+  if (choices.style.left !== left) choices.style.left = left;
+  if (choices.style.width !== width) choices.style.width = width;
 }
 
 function render() {
   const out = compute();
   updateChrome(out);
   drawCanvas();
+  placeChoices();
   ensureLoop();
   drawGraph(out[2]);
 }
@@ -1293,50 +1528,107 @@ function sampleCurves() {
   compute();
 }
 
-function showOpening() {
-  viewMode = "opening";
-  animating = false;
-  document.getElementById("more").hidden = true;
-  render();
+function stopAuto() {
+  if (autoTimer) clearInterval(autoTimer);
+  autoTimer = 0;
+  const button = document.getElementById("auto");
+  if (button) button.setAttribute("aria-pressed", "false");
 }
 
-function showTour() {
-  viewMode = "tour";
+function showScreen(id, button, extra) {
+  if (button !== "auto") stopAuto();
+  screenId = id;
+  remember(button, extra);
   document.getElementById("more").hidden = true;
-}
-
-function enterTour() {
-  showTour();
-  if (sidpa()[0] === 0) {
-    const first = ada.exports.bardo_first(direction);
-    milli = ada.exports.bardo_milli_of_day(ada.exports.bardo_anchor(first));
+  if (id === "opening") {
+    viewMode = "opening";
+    endingLocked = false;
+    turned = false;
+  } else if (ANCHOR[id]) {
+    viewMode = "tour";
+    endingLocked = false;
+    if (id !== "wish") turned = false;
+    milli = ada.exports.bardo_milli_of_day(ANCHOR[id]);
+  } else {
+    viewMode = "ending";
+    endingLocked = true;
+    turned = false;
   }
   cardsKey = "";
   render();
 }
 
-function goScene(code) {
-  milli = ada.exports.bardo_milli_of_day(ada.exports.bardo_anchor(code));
-  showTour();
-  cardsKey = "";
-  render();
+function showOpening() {
+  showScreen("opening", "prev");
+}
+
+function karmicId() {
+  const code = ada.exports.bardo_realm(destination, poisonSeen);
+  return REALMS[code] || "human";
+}
+
+function goStart() {
+  playClick();
+  methodsDone = 0;
+  destination = -1;
+  poisonSeen = -1;
+  wanderTick = 0;
+  pendingAction = 0;
+  showScreen(firstId(), "start");
 }
 
 function goNext() {
   playClick();
-  if (viewMode === "opening") { enterTour(); return; }
-  const side = sidpa();
-  if (side[0] === 0) { enterTour(); return; }
-  if (side[13] < 0) return;
-  goScene(side[13]);
+  const list = tourList();
+  const index = list.indexOf(screenId);
+  if (screenId === "opening" || index < 0) {
+    showScreen(firstId(), "next");
+    return;
+  }
+  if (index >= list.length - 1) return;
+  showScreen(list[index + 1], "next");
 }
 
 function goPrev() {
   playClick();
-  if (viewMode === "opening") return;
-  const side = sidpa();
-  if (side[0] === 0 || side[14] < 0) { showOpening(); return; }
-  goScene(side[14]);
+  if (screenId === "opening") return;
+  const index = tourList().indexOf(screenId);
+  if (index <= 0) {
+    showScreen("opening", "prev");
+    return;
+  }
+  showScreen(tourList()[index - 1], "prev");
+}
+
+function choose(follow) {
+  playClick();
+  if (!SCENE_CODE[screenId]) return;
+  if (follow && screenId === "wish") {
+    turned = true;
+    remember("follow", { onward: "chonyid" });
+    render();
+    return;
+  }
+  const next = follow
+    ? (screenId === "womb" ? "good" : screenId === "lights" ? "judge" : "wish")
+    : (screenId === "wish" ? "judge" : screenId === "judge" ? "lights" : screenId === "lights" ? "womb" : karmicId());
+  showScreen(next, follow ? "follow" : "dont");
+}
+
+function startAuto() {
+  stopAuto();
+  if (screenId === "opening" || tourList().indexOf(screenId) < 0) showScreen(firstId(), "auto");
+  const pace = window.__autoPace || 4500;
+  document.getElementById("auto").setAttribute("aria-pressed", "true");
+  autoTimer = setInterval(function () {
+    const list = tourList();
+    const index = list.indexOf(screenId);
+    if (index < 0 || index >= list.length - 1) {
+      stopAuto();
+      return;
+    }
+    showScreen(list[index + 1], "auto");
+  }, pace);
 }
 
 function act(action, arg) {
@@ -1379,6 +1671,11 @@ function report() {
       rainPaused: rain ? rain.isPaused() : true,
       reducedMotion: rain ? rain.prefersReduced() : matchMedia("(prefers-reduced-motion: reduce)").matches
     },
+    screen: screenId,
+    viewport: { width: window.innerWidth, height: window.innerHeight },
+    devicePixelRatio: window.devicePixelRatio || 1,
+    userAgent: navigator.userAgent,
+    path: pathLog.slice(),
     fps: Math.round(fps * 10) / 10,
     errors: errors.slice(),
     crash: { afterReload: crashNotice !== "", notice: crashNotice },
@@ -1458,28 +1755,24 @@ async function boot() {
     scales: function () {
       const out = output();
       return { speed: out[9], alpha: out[10], stride: out[11] || 1 };
-    },
-    onFrame: function () {
-      frameCount += 1;
-      const now = performance.now();
-      if (frameStamp === 0) frameStamp = now;
-      if (now - frameStamp >= 1000) {
-        fps = frameCount * 1000 / (now - frameStamp);
-        frameCount = 0;
-        frameStamp = now;
-      }
     }
   });
+  remember("load");
   render();
   window.__bardoReady = true;
 }
 
 function setDirection(next) {
+  stopAuto();
   direction = next;
   milli = ada.exports.bardo_start(direction);
   methodsDone = 0;
   destination = -1;
+  poisonSeen = -1;
+  endingLocked = false;
+  turned = false;
   cardsKey = "";
+  if (viewMode !== "opening") viewMode = "tour";
   render();
 }
 
@@ -1518,12 +1811,31 @@ document.getElementById("lang-de").addEventListener("click", function () {
 document.getElementById("dir-jung").addEventListener("click", function () { setDirection(0); playClick(); });
 document.getElementById("dir-book").addEventListener("click", function () { setDirection(1); playClick(); });
 document.getElementById("day").addEventListener("input", function (event) {
+  stopAuto();
+  endingLocked = false;
+  turned = false;
   milli = ada.exports.bardo_milli_of_day(Number(event.target.value));
+  if (viewMode === "opening") viewMode = "tour";
   cardsKey = "";
   render();
 });
 document.getElementById("go").addEventListener("click", function () {
-  if (viewMode === "opening") enterTour();
+  if (viewMode === "opening") showScreen(firstId(), "enter");
+});
+document.getElementById("follow").addEventListener("click", function () { choose(true); });
+document.getElementById("dont").addEventListener("click", function () { choose(false); });
+document.getElementById("again").addEventListener("click", goStart);
+document.getElementById("auto").addEventListener("click", function () {
+  if (autoTimer) stopAuto();
+  else startAuto();
+});
+document.addEventListener("pointerdown", function (event) {
+  if (!autoTimer) return;
+  if (event.target && event.target.closest && event.target.closest("#auto")) return;
+  stopAuto();
+}, true);
+document.addEventListener("keydown", function (event) {
+  if (autoTimer && event.key !== "F9") stopAuto();
 });
 document.getElementById("enter").addEventListener("click", function () {
   const more = document.getElementById("more");
@@ -1533,7 +1845,7 @@ document.getElementById("enter").addEventListener("click", function () {
     return;
   }
   more.hidden = true;
-  if (viewMode === "opening") enterTour();
+  if (viewMode === "opening") showScreen(firstId(), "enter");
 });
 document.getElementById("menu").addEventListener("click", function () {
   const panel = document.getElementById("menu-panel");
@@ -1542,15 +1854,7 @@ document.getElementById("menu").addEventListener("click", function () {
 });
 document.getElementById("next").addEventListener("click", goNext);
 document.getElementById("prev").addEventListener("click", goPrev);
-document.getElementById("start").addEventListener("click", function () {
-  playClick();
-  methodsDone = 0;
-  destination = -1;
-  wanderTick = 0;
-  milli = ada.exports.bardo_start(direction);
-  cardsKey = "";
-  showOpening();
-});
+document.getElementById("start").addEventListener("click", goStart);
 document.getElementById("sound").addEventListener("click", function () {
   setSound(!soundEnabled());
   if (soundEnabled()) playClick();
@@ -1602,6 +1906,7 @@ viz.addEventListener("pointerup", function (event) {
 addEventListener("resize", function () {
   if (!ada) return;
   drawCanvas();
+  placeChoices();
   drawGraph(Number(document.getElementById("state").dataset.day || "0"));
 });
 
