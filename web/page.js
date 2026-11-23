@@ -321,7 +321,7 @@ function tourList() {
 }
 
 function firstId() {
-  return direction === 0 ? "womb" : "wish";
+  return direction === 0 ? "womb" : "c20";
 }
 
 function screenFromScene(scene) {
@@ -1405,8 +1405,9 @@ function beginAgain(via) {
   poisonSeen = -1;
   wanderTick = 0;
   pendingAction = 0;
-  showScreen(direction === 0 ? "womb" : "c20", "again");
-  if (via === "auto") noteStep("again", from, "womb", { karmaBefore: karmaBefore });
+  const start = firstId();
+  showScreen(start, "again");
+  if (via === "auto") noteStep("again", from, start, { karmaBefore: karmaBefore });
 }
 
 function takePath(pick, via, actionId) {
