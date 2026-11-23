@@ -308,16 +308,19 @@ try {
       await mkdir("/opt/cursor/artifacts", { recursive: true });
       await rm(join(outDir, "bardo-report.json"), { force: true });
       await rm(join(outDir, "bardo-run.json"), { force: true });
-      await page.evaluate(() => { window.__autoPace = 12; });
-      await page.click("#start");
+      await page.evaluate(() => localStorage.removeItem("bardo-auto-diary"));
+      await page.reload({ waitUntil: "domcontentloaded" });
+      await page.waitForFunction(() => window.__bardoReady === true);
+      await page.evaluate(() => { const b = document.getElementById("reload"); if (b) b.hidden = true; });
       await page.click("#auto");
-      await page.waitForFunction(() => document.getElementById("auto").textContent.trim() === "Stop");
-      await page.click("#viz");
+      await page.waitForFunction(() => !document.getElementById("auto-cover").hidden);
+      const running = await page.$eval("#auto-run h2", (el) => el.textContent.trim());
+      assert(running === "Auto running", name + " overlay " + running);
       await page.keyboard.press("F9");
       const during = await page.$eval("#auto", (el) => el.textContent.trim());
       assert(during === "Stop", name + " F9 stopped auto");
-      await page.waitForFunction(() => document.getElementById("auto").textContent.trim() === "Auto", { timeout: 45000 });
-      await shot("complete");
+      await page.waitForFunction(() => !document.getElementById("auto-ask").hidden, { timeout: 30000 });
+      await page.click("#auto-end");
       const run = await readReport("bardo-run.json");
       assert(run.schema === "bardo-run", name + " run schema");
       assert(run.complete === true, name + " run not complete " + JSON.stringify(run.coverage) + " " + JSON.stringify(run.unreached));
@@ -328,6 +331,8 @@ try {
       ["deva", "asura", "human", "animal", "preta", "hell"].forEach((realm) => {
         assert(run.lives.some((life) => life.ended === realm) || run.totals.rebirths[realm] > 0, name + " missing realm " + realm);
       });
+      assert(run.finished === true && typeof run.finishedAt === "string", name + " finished");
+      assert(run.diary && run.diary.screens && run.diary.screens["J01-B49"], name + " diary");
       assert(run.lives.some((life) => life.steps.some((step) => typeof step.karma === "number")), name + " karma not logged");
       assert(run.deadEnds && run.deadEnds[0].onward === "peaceful", name + " dead end");
       await copyFile(join(outDir, "bardo-run.json"), join("/opt/cursor/artifacts", "bardo-run.json"));
@@ -368,8 +373,46 @@ try {
   assert(f9.stamp === stamp, "F9 stamp");
   assert(reportPage.logs.length === 0, "report console");
   await reportPage.page.close();
+
+  async function shootAuto(width, height, dpr, label) {
+    const page = await browser.newPage();
+    await page.setViewport({ width, height, deviceScaleFactor: dpr });
+    const client = await page.createCDPSession();
+    await client.send("Page.setDownloadBehavior", { behavior: "allow", downloadPath: outDir });
+    await page.goto("http://127.0.0.1:" + port + "/index.html", { waitUntil: "domcontentloaded" });
+    await page.waitForFunction(() => window.__bardoReady === true);
+    await page.evaluate(() => localStorage.removeItem("bardo-auto-diary"));
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.waitForFunction(() => window.__bardoReady === true);
+    await page.evaluate(() => { const b = document.getElementById("reload"); if (b) b.hidden = true; });
+    const started = Date.now();
+    await page.evaluate(() => { window.__autoBatch = 8; });
+    await page.click("#auto");
+    await page.waitForFunction(() => {
+      const ask = document.getElementById("auto-ask");
+      const stats = document.getElementById("auto-stats");
+      return ask.hidden && stats && /Screens \d+\//.test(stats.textContent) && !stats.textContent.includes("18/18");
+    });
+    await page.screenshot({ path: join(outDir, "auto-running-" + label + ".png") });
+    await page.evaluate(() => { window.__autoBatch = 400; });
+    await page.waitForFunction(() => !document.getElementById("auto-ask").hidden, { timeout: 30000 });
+    const ms = Date.now() - started;
+    await page.screenshot({ path: join(outDir, "auto-done-" + label + ".png") });
+    await rm(join(outDir, "bardo-run.json"), { force: true });
+    await page.click("#auto-end");
+    const run = await readReport("bardo-run.json");
+    assert(run.complete === true, label + " coverage " + JSON.stringify(run.coverage));
+    console.log(label + " finished in " + ms + " ms " + run.coverage.screens + " " + run.coverage.links);
+    if (label === "1920") {
+      await copyFile(join(outDir, "bardo-run.json"), join("/opt/cursor/artifacts", "bardo-run.json"));
+    }
+    await page.close();
+  }
   await mkdir("/opt/cursor/artifacts", { recursive: true });
-  for (const name of ["wrath14-390.png", "wrath14-1366.png", "wrath13-390.png", "wrath13-1366.png", "wrath-tap-390.png", "wrath-tap-1366.png", "karma-390.png", "karma-1366.png"]) {
+  await shootAuto(1920, 1080, 0.8, "1920");
+  await shootAuto(390, 844, 2, "iphone");
+  await mkdir("/opt/cursor/artifacts", { recursive: true });
+  for (const name of ["auto-running-1920.png", "auto-done-1920.png", "auto-running-iphone.png", "auto-done-iphone.png"]) {
     await copyFile(join(outDir, name), join("/opt/cursor/artifacts", name));
   }
   console.log("browser smoke ok", stamp);

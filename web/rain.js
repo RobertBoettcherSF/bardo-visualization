@@ -126,6 +126,10 @@ function startRain(opts) {
   }
 
   function frame(time) {
+    if (window.__autoCover) {
+      requestAnimationFrame(frame);
+      return;
+    }
     if (!paused && !document.hidden) {
       const dt = last === 0 ? RAIN.frameMs : Math.min(48, time - last);
       last = time;

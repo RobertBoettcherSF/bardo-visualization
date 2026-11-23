@@ -19,6 +19,16 @@ let karma = 500;
 let autoTimer = 0;
 let autoRunning = false;
 let autoStopRequested = false;
+let autoPrompt = false;
+let autoKeepGoing = false;
+let autoQuiet = false;
+let diary = { screens: {} };
+let diaryDirty = false;
+let stepTotal = 0;
+let runTruncated = false;
+let lifeTotals = null;
+const STEP_CAP = 4000;
+const DIARY_KEY = "bardo-auto-diary";
 let lineKey = "";
 let detailKey = "";
 let arrivalKey = "";
@@ -405,6 +415,10 @@ function ensureLoop() {
   if (looping) return;
   looping = true;
   requestAnimationFrame(function tick(now) {
+    if (window.__autoCover) {
+      requestAnimationFrame(tick);
+      return;
+    }
     if (ada && screenId === "wish" && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       wanderTick = (wanderTick + 1) % 100000;
       compute();
@@ -439,6 +453,7 @@ function placePanels() {
 }
 
 function render() {
+  if (autoQuiet) return;
   const out = compute();
   updateChrome(out);
   drawCanvas();
@@ -675,13 +690,124 @@ function noteStep(action, from, led, extra) {
     Object.keys(extra).forEach(function (key) { step[key] = extra[key]; });
   }
   life.steps.push(step);
+  life.stepCount = (life.stepCount || 0) + 1;
+  stepTotal += 1;
   life.karma = karma;
+  touchDiary(from, action, led);
+  trimSteps();
   if (led === "good" || REALMS.indexOf(led) >= 0) {
     life.ended = led;
+    if (lifeTotals) {
+      lifeTotals.lives += 1;
+      if (led === "good") lifeTotals.good += 1;
+      else if (lifeTotals.rebirths[led] !== undefined) lifeTotals.rebirths[led] += 1;
+    }
     lives.push(life);
-    life = { steps: [], karma: karma };
-    window.__autoLives = lives.length;
+    life = { steps: [], karma: karma, stepCount: 0 };
+    window.__autoLives = lifeTotals ? lifeTotals.lives : lives.length;
   }
+  publishCoverage();
+}
+
+function freshTotals() {
+  const totals = { lives: 0, good: 0, incomplete: 0, rebirths: {} };
+  REALMS.forEach(function (name) { totals.rebirths[name] = 0; });
+  return totals;
+}
+
+function trimSteps() {
+  while (stepTotal > STEP_CAP) {
+    let dropped = false;
+    for (let i = 0; i < lives.length; i++) {
+      if (lives[i].steps && lives[i].steps.length) {
+        lives[i].steps.shift();
+        lives[i].stepsOmitted = (lives[i].stepsOmitted || 0) + 1;
+        stepTotal -= 1;
+        runTruncated = true;
+        dropped = true;
+        break;
+      }
+    }
+    if (!dropped && life && life.steps.length > 1) {
+      life.steps.shift();
+      life.stepsOmitted = (life.stepsOmitted || 0) + 1;
+      stepTotal -= 1;
+      runTruncated = true;
+    } else if (!dropped) {
+      break;
+    }
+  }
+}
+
+function touchDiary(from, action, led) {
+  const code = codeOf(from);
+  const ledCode = codeOf(led);
+  if (!diary.screens[code]) diary.screens[code] = { visited: 0, choices: {} };
+  diary.screens[code].visited += 1;
+  const rec = diary.screens[code].choices[action] || { count: 0, led: {} };
+  rec.count += 1;
+  rec.led[ledCode] = (rec.led[ledCode] || 0) + 1;
+  diary.screens[code].choices[action] = rec;
+  diaryDirty = true;
+}
+
+function idOfCode(code) {
+  const keys = Object.keys(SCREEN);
+  for (let i = 0; i < keys.length; i++) {
+    if (SCREEN[keys[i]].code === code) return keys[i];
+  }
+  return "";
+}
+
+function applyDiary() {
+  tries = {};
+  seenScreens = {};
+  seenLinks = {};
+  const screens = diary.screens || {};
+  Object.keys(screens).forEach(function (code) {
+    const id = idOfCode(code);
+    if (!id) return;
+    seenScreens[id] = true;
+    const choices = screens[code].choices || {};
+    Object.keys(choices).forEach(function (action) {
+      const rec = choices[action];
+      const count = rec.count || 0;
+      if (!count) return;
+      tries[id + ">" + action] = count;
+      seenLinks[id + ">" + action] = true;
+      Object.keys(rec.led || {}).forEach(function (ledCode) {
+        const led = idOfCode(ledCode);
+        if (led) seenScreens[led] = true;
+      });
+    });
+  });
+}
+
+function loadDiary() {
+  diary = { screens: {} };
+  try {
+    const raw = localStorage.getItem(DIARY_KEY);
+    if (raw) diary = JSON.parse(raw);
+    if (!diary.screens) diary.screens = {};
+  } catch (err) {
+    diary = { screens: {} };
+  }
+  applyDiary();
+}
+
+function saveDiary() {
+  if (!diaryDirty) return;
+  try { localStorage.setItem(DIARY_KEY, JSON.stringify(diary)); } catch (err) { /* private mode */ }
+  diaryDirty = false;
+}
+
+function clearDiary() {
+  diary = { screens: {} };
+  tries = {};
+  seenScreens = {};
+  seenLinks = {};
+  diaryDirty = false;
+  try { localStorage.removeItem(DIARY_KEY); } catch (err) { /* private mode */ }
   publishCoverage();
 }
 
@@ -747,7 +873,9 @@ function requiredLinks() {
     });
   });
   links.push({ from: "womb", button: "petals" });
-  return links;
+  return links.filter(function (link) {
+    return !(link.from === "w08" && link.button === "follow");
+  });
 }
 
 function unreachedNow() {
@@ -783,25 +911,35 @@ function coverageComplete() {
 }
 
 function runFile() {
-  const totals = { lives: 0, good: 0, incomplete: 0, rebirths: {} };
-  REALMS.forEach(function (name) { totals.rebirths[name] = 0; });
-  lives.forEach(function (item) {
-    if (!item.ended) {
-      totals.incomplete += 1;
-      return;
-    }
-    totals.lives += 1;
-    if (item.ended === "good") totals.good += 1;
-    else if (totals.rebirths[item.ended] !== undefined) totals.rebirths[item.ended] += 1;
-  });
+  const totals = lifeTotals || freshTotals();
+  const done = coverageComplete();
+  const stored = [];
+  lives.forEach(function (item) { stored.push(item); });
+  if (life && life.steps && life.steps.length && !life.ended) {
+    stored.push({
+      steps: life.steps,
+      stepsOmitted: life.stepsOmitted || 0,
+      stepCount: life.stepCount || life.steps.length,
+      ended: "",
+      karma: karma,
+      incomplete: true
+    });
+  }
   return {
     schema: "bardo-run",
     stamp: STAMP,
-    complete: runComplete,
+    complete: done,
+    finished: done,
+    finishedAt: done ? new Date().toISOString() : null,
+    truncated: runTruncated,
+    stepsStored: stepTotal,
     coverage: coverageNow(),
-    lives: lives.map(function (item) {
+    diary: diary,
+    lives: stored.map(function (item) {
       return {
         steps: item.steps,
+        stepsOmitted: item.stepsOmitted || 0,
+        stepCount: item.stepCount || (item.steps ? item.steps.length : 0),
         ended: item.ended || "",
         karma: item.karma,
         incomplete: item.incomplete === true
@@ -813,7 +951,7 @@ function runFile() {
       from: "J11-B08",
       button: "follow",
       onward: "peaceful",
-      note: "Following here would open the peaceful days, which are not in this part of the tour."
+      note: "Following here would open the peaceful days, which are not in this part of the tour. It is not required for coverage."
     }]
   };
 }
@@ -829,42 +967,101 @@ function downloadRun() {
   setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
 }
 
+function hideAutoCover() {
+  autoPrompt = false;
+  autoQuiet = false;
+  window.__autoCover = false;
+  const cover = document.getElementById("auto-cover");
+  if (cover) cover.hidden = true;
+  const ask = document.getElementById("auto-ask");
+  const run = document.getElementById("auto-run");
+  if (ask) ask.hidden = true;
+  if (run) run.hidden = false;
+}
+
+function paintAutoStats() {
+  const cov = coverageNow();
+  const line = t("autoLives") + " " + (lifeTotals ? lifeTotals.lives : 0)
+    + " · " + t("autoScreens") + " " + cov.screens
+    + " · " + t("autoLinks") + " " + cov.links
+    + " · " + t("autoKarma") + " " + karma;
+  const stats = document.getElementById("auto-stats");
+  const ask = document.getElementById("auto-ask-stats");
+  if (stats) stats.textContent = line;
+  if (ask) ask.textContent = line;
+  window.__autoLives = lifeTotals ? lifeTotals.lives : 0;
+}
+
+function showAutoCover() {
+  window.__autoCover = true;
+  const cover = document.getElementById("auto-cover");
+  const ask = document.getElementById("auto-ask");
+  const run = document.getElementById("auto-run");
+  if (cover) cover.hidden = false;
+  if (run) run.hidden = false;
+  if (ask) ask.hidden = true;
+  paintAutoStats();
+}
+
 function finishAuto() {
-  if (autoTimer) clearTimeout(autoTimer);
-  autoTimer = 0;
-  if (life && life.steps.length && !life.ended) {
+  autoRunning = false;
+  autoStopRequested = false;
+  autoQuiet = false;
+  if (life && life.steps && life.steps.length && !life.ended) {
     life.ended = "";
     life.incomplete = true;
+    if (lifeTotals) lifeTotals.incomplete += 1;
     lives.push(life);
   }
   life = null;
-  autoRunning = false;
-  autoStopRequested = false;
   runComplete = coverageComplete();
+  saveDiary();
+  hideAutoCover();
   downloadRun();
   render();
 }
 
-function scheduleAuto() {
-  const pace = window.__autoPace || 3000;
-  autoTimer = setTimeout(autoStep, pace);
+function showFinishPrompt() {
+  autoPrompt = true;
+  autoQuiet = false;
+  const run = document.getElementById("auto-run");
+  const ask = document.getElementById("auto-ask");
+  if (run) run.hidden = true;
+  if (ask) ask.hidden = false;
+  paintAutoStats();
+  saveDiary();
 }
 
-function autoStep() {
-  autoTimer = 0;
-  if (!autoRunning) return;
+function autoFrameStep() {
+  if (!autoRunning || autoPrompt) return;
+  const started = performance.now();
+  autoQuiet = true;
+  let steps = 0;
   try {
-    performAutoAction();
+    const cap = window.__autoBatch || 400;
+    while (autoRunning && !autoStopRequested && !autoPrompt && steps < cap) {
+      performAutoAction();
+      steps += 1;
+      if (!autoKeepGoing && coverageComplete()) {
+        showFinishPrompt();
+        break;
+      }
+      if (performance.now() - started > 12) break;
+    }
   } catch (err) {
+    autoQuiet = false;
     showError(String(err && err.message ? err.message : err));
     finishAuto();
     return;
   }
-  if (autoStopRequested || coverageComplete()) {
+  autoQuiet = false;
+  paintAutoStats();
+  if (diaryDirty) saveDiary();
+  if (autoStopRequested) {
     finishAuto();
     return;
   }
-  scheduleAuto();
+  if (autoRunning && !autoPrompt) requestAnimationFrame(autoFrameStep);
 }
 
 function beginAgain(via) {
@@ -1005,24 +1202,36 @@ function startAuto() {
   if (autoRunning) return;
   autoRunning = true;
   autoStopRequested = false;
+  autoPrompt = false;
+  autoKeepGoing = false;
   runComplete = false;
+  runTruncated = false;
+  stepTotal = 0;
   lives = [];
-  life = { steps: [], karma: karma };
-  seenScreens = {};
-  seenLinks = {};
-  tries = {};
+  life = { steps: [], karma: karma, stepCount: 0 };
+  lifeTotals = freshTotals();
   window.__autoLives = 0;
+  applyDiary();
   if (screenId === "opening" || screenId === "clock") showScreen("womb", "auto");
   seenScreens[screenId] = true;
   publishCoverage();
-  scheduleAuto();
+  if (!autoKeepGoing && coverageComplete()) {
+    showAutoCover();
+    showFinishPrompt();
+    document.getElementById("auto").textContent = t("stop");
+    document.getElementById("auto").setAttribute("aria-pressed", "true");
+    return;
+  }
+  showAutoCover();
   render();
+  requestAnimationFrame(autoFrameStep);
 }
 
 function requestStop() {
-  if (!autoRunning) return;
+  if (!autoRunning && !autoPrompt) return;
   autoStopRequested = true;
-  if (!autoTimer) finishAuto();
+  autoPrompt = false;
+  finishAuto();
 }
 
 function loadGlyphs() {
@@ -1145,6 +1354,7 @@ async function boot() {
       return { speed: out[9], alpha: out[10], stride: out[11] || 1 };
     }
   });
+  loadDiary();
   remember("load");
   render();
   window.__bardoReady = true;
@@ -1216,9 +1426,21 @@ document.getElementById("follow").addEventListener("click", function () { choose
 document.getElementById("dont").addEventListener("click", function () { choose(false); });
 document.getElementById("again").addEventListener("click", function () { beginAgain(); });
 document.getElementById("auto").addEventListener("click", function () {
-  if (autoRunning) requestStop();
+  if (autoRunning || autoPrompt) requestStop();
   else startAuto();
 });
+document.getElementById("auto-end").addEventListener("click", function () {
+  requestStop();
+});
+document.getElementById("auto-keep").addEventListener("click", function () {
+  if (!autoRunning) return;
+  autoKeepGoing = true;
+  autoPrompt = false;
+  document.getElementById("auto-ask").hidden = true;
+  document.getElementById("auto-run").hidden = false;
+  requestAnimationFrame(autoFrameStep);
+});
+document.getElementById("diary-clear").addEventListener("click", clearDiary);
 document.getElementById("enter").addEventListener("click", function () {
   const more = document.getElementById("more");
   more.hidden = !more.hidden;
