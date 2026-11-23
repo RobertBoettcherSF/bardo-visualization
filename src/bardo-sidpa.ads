@@ -117,6 +117,30 @@ package Bardo.Sidpa is
      return Integer with
      Post => Womb_Path'Result in -1 .. 25;
 
+   --  Reading order. 0 is Jung (toward the Clear Light as the index grows
+   --  after the preface). 1 is the book (Clear Light first, womb last).
+   --  Screen codes are stable integers. Move returns the neighbour, or -1
+   --  when the step would leave the line. Follow_Move is the teaching
+   --  step: follow goes toward liberation, don't follow toward rebirth.
+   function Tour_Length (Direction : Direction_Kind) return Natural with
+     Post => Tour_Length'Result in 1 .. 32;
+   function Tour_Screen (Direction : Direction_Kind; Index : Integer) return Integer with
+     Post => Tour_Screen'Result >= -1;
+   function Tour_Move
+     (Direction : Direction_Kind; Code : Integer; Step : Integer) return Integer with
+     Post => Tour_Move'Result >= -1;
+   function Follow_Move
+     (Direction : Direction_Kind;
+      Code      : Integer;
+      Follow    : Integer;
+      Brightest : Integer;
+      Weight    : Integer) return Integer with
+     Post => Follow_Move'Result >= -1;
+   function Day_Screen (Day : Integer) return Integer with
+     Post => Day_Screen'Result >= -1;
+   function Screen_Day (Code : Integer) return Integer with
+     Post => Screen_Day'Result in -1 .. 49;
+
    function Wind_Force (Time : Milli_Time) return Thousandth;
 
    function Wander_X (Tick : Natural) return Thousandth;

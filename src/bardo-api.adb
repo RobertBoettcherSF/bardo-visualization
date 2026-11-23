@@ -177,4 +177,36 @@ package body Bardo.API is
      return Integer is
      (Bardo.Sidpa.Womb_Path (From, Choice, Brightest, Weight));
 
+   function Dir_Or_Fail (Direction : Integer) return Direction_Kind is
+     (if Direction = 0 then Jung_Reverse else Book_Order);
+
+   function Tour_Length_Host (Direction : Integer) return Integer is
+     (if Direction /= 0 and then Direction /= 1 then -1
+      else Bardo.Sidpa.Tour_Length (Dir_Or_Fail (Direction)));
+
+   function Tour_Screen_Host (Direction : Integer; Index : Integer) return Integer is
+     (if Direction /= 0 and then Direction /= 1 then -1
+      else Bardo.Sidpa.Tour_Screen (Dir_Or_Fail (Direction), Index));
+
+   function Tour_Move_Host
+     (Direction : Integer; Code : Integer; Step : Integer) return Integer is
+     (if Direction /= 0 and then Direction /= 1 then -1
+      else Bardo.Sidpa.Tour_Move (Dir_Or_Fail (Direction), Code, Step));
+
+   function Follow_Move_Host
+     (Direction : Integer;
+      Code      : Integer;
+      Follow    : Integer;
+      Brightest : Integer;
+      Weight    : Integer) return Integer is
+     (if Direction /= 0 and then Direction /= 1 then -1
+      else Bardo.Sidpa.Follow_Move
+        (Dir_Or_Fail (Direction), Code, Follow, Brightest, Weight));
+
+   function Day_Screen_Host (Day : Integer) return Integer is
+     (Bardo.Sidpa.Day_Screen (Day));
+
+   function Screen_Day_Host (Code : Integer) return Integer is
+     (Bardo.Sidpa.Screen_Day (Code));
+
 end Bardo.API;

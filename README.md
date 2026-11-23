@@ -2,7 +2,7 @@
 
 An interactive tour of the Bardo states. The clock, the curves and the mantra syllables are Plain Ada, compiled to WebAssembly. The page draws, and nothing else.
 
-The tour is in UK English. Other languages can be overlaid later. Jung’s reverse order is the default. The opening is followed by his frame, then the clock, then the six bardos. A life starts at the womb and can Follow through the Chonyid to the Clear Light. Remaining in the primary light is the end of the tour. A coda follows the endings.
+The tour is in UK English. Other languages can be overlaid later. Jung’s reverse order is the default. The book-order toggle runs the same screens from the Clear Light toward the womb. Follow moves toward liberation and Don’t follow moves toward rebirth, in either order. The day scrubber jumps to the screen for that day. A life starts at the womb in Jung’s order and at the primary Clear Light in book order. A coda follows every ending and returns to the opening.
 
 ## Screen IDs
 

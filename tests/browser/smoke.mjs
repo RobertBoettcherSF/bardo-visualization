@@ -211,7 +211,7 @@ try {
     assert(book === "0", name + " book order day " + book);
     await page.click("#dir-jung");
     const jung = await page.$eval("#state", (el) => el.dataset.day);
-    assert(jung === "49", name + " jung day " + jung);
+    assert(jung === "0", name + " order toggle keeps the day " + jung);
     await page.click("#sound");
     const soundOn = await page.$eval("#sound", (el) => el.getAttribute("aria-pressed"));
     assert(soundOn === "true", name + " sound did not switch on");
@@ -324,12 +324,16 @@ try {
       await page.keyboard.press("F9");
       const during = await page.$eval("#auto", (el) => el.textContent.trim());
       assert(during === "Stop", name + " F9 stopped auto");
-      await page.waitForFunction(() => !document.getElementById("auto-ask").hidden, { timeout: 90000 });
+      await page.waitForFunction(() => !document.getElementById("auto-ask").hidden, { timeout: 120000 });
       await page.click("#auto-end");
       const run = await readReport("bardo-run.json");
       assert(run.schema === "bardo-run", name + " run schema");
       assert(run.complete === true, name + " run not complete " + JSON.stringify(run.coverage) + " " + JSON.stringify(run.unreached));
-      assert(run.coverage.screens === "39/39", name + " screens " + run.coverage.screens);
+      assert(run.coverage.jung && run.coverage.jung.screens === "39/39", name + " jung " + JSON.stringify(run.coverage.jung));
+      assert(run.coverage.book && run.coverage.book.screens === "39/39", name + " book " + JSON.stringify(run.coverage.book));
+      assert(run.coverage.jung.complete && run.coverage.book.complete, name + " orders");
+      assert(Array.isArray(run.noOps) && run.noOps.length === 0, name + " no-ops " + run.noOps.join(","));
+      assert(Array.isArray(run.loops) && run.loops.length === 0, name + " loops " + run.loops.join(","));
       assert(JSON.stringify(run).includes("J05-B14") && JSON.stringify(run).includes("J11-B08"), name + " wrathful ids");
       assert(JSON.stringify(run).includes("J12-B07") && JSON.stringify(run).includes("J18-B01"), name + " peaceful ids");
       assert(JSON.stringify(run).includes("J00-F1") && JSON.stringify(run).includes("J04-B15") && JSON.stringify(run).includes("J00-C1"), name + " canon ids");
@@ -398,18 +402,18 @@ try {
     await page.waitForFunction(() => {
       const ask = document.getElementById("auto-ask");
       const stats = document.getElementById("auto-stats");
-      return ask.hidden && stats && /Screens \d+\//.test(stats.textContent) && !stats.textContent.includes("39/39");
+      return ask.hidden && stats && /Jung/.test(stats.textContent) && window.__coverageComplete !== true;
     });
     await page.screenshot({ path: join(outDir, "auto-running-" + label + ".png") });
     await page.evaluate(() => { window.__autoBatch = 400; });
-    await page.waitForFunction(() => !document.getElementById("auto-ask").hidden, { timeout: 90000 });
+    await page.waitForFunction(() => !document.getElementById("auto-ask").hidden, { timeout: 120000 });
     const ms = Date.now() - started;
     await page.screenshot({ path: join(outDir, "auto-done-" + label + ".png") });
     await rm(join(outDir, "bardo-run.json"), { force: true });
     await page.click("#auto-end");
     const run = await readReport("bardo-run.json");
     assert(run.complete === true, label + " coverage " + JSON.stringify(run.coverage));
-    console.log(label + " finished in " + ms + " ms " + run.coverage.screens + " " + run.coverage.links);
+    console.log(label + " finished in " + ms + " ms jung " + run.coverage.jung.screens + " " + run.coverage.jung.links + " book " + run.coverage.book.screens + " " + run.coverage.book.links);
     if (label === "1920") {
       await copyFile(join(outDir, "bardo-run.json"), join("/opt/cursor/artifacts", "bardo-run.json"));
     }

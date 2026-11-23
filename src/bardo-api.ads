@@ -111,5 +111,29 @@ package Bardo.API is
      return Integer with
      Export, Convention => C, External_Name => "bardo_womb_path",
      Post => Womb_Path_Host'Result in -1 .. 25;
+   function Tour_Length_Host (Direction : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_tour_length",
+     Post => Tour_Length_Host'Result in -1 .. 32;
+   function Tour_Screen_Host (Direction : Integer; Index : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_tour_screen",
+     Post => Tour_Screen_Host'Result >= -1;
+   function Tour_Move_Host
+     (Direction : Integer; Code : Integer; Step : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_tour_move",
+     Post => Tour_Move_Host'Result >= -1;
+   function Follow_Move_Host
+     (Direction : Integer;
+      Code      : Integer;
+      Follow    : Integer;
+      Brightest : Integer;
+      Weight    : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_follow_move",
+     Post => Follow_Move_Host'Result >= -1;
+   function Day_Screen_Host (Day : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_day_screen",
+     Post => Day_Screen_Host'Result >= -1;
+   function Screen_Day_Host (Code : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_screen_day",
+     Post => Screen_Day_Host'Result in -1 .. 49;
 
 end Bardo.API;
