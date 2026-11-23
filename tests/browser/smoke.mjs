@@ -258,11 +258,7 @@ try {
       await page.click("#start");
       await page.click("#follow");
       now = await page.$eval("#state", (el) => el.dataset.screen);
-      assert(now === "good", name + " follow screen " + now);
-      const goodLine = await page.$eval("#enter", (el) => el.textContent);
-      assert(/closed|precious/i.test(goodLine), name + " good line " + goodLine);
-      assert(await onScreen("#again"), name + " begin again missing");
-      await shot("good");
+      assert(now === "lights", name + " follow climbs " + now);
       await page.click("#start");
       await page.click("#dont");
       now = await page.$eval("#state", (el) => el.dataset.screen);
@@ -270,10 +266,24 @@ try {
       const line = await page.$eval("#quote", (el) => el.textContent);
       assert(line.toLowerCase().includes("yellow"), name + " realm line " + line);
       await page.click("#again");
-      now = await page.$eval("#state", (el) => ({ screen: el.dataset.screen, day: el.dataset.day }));
-      assert(now.screen === "wish" && now.day === "22", name + " new life " + now.screen + " " + now.day);
-      await page.click("#dont");
-      await page.click("#dont");
+      now = await page.$eval("#state", (el) => ({ screen: el.dataset.screen, id: el.dataset.id, day: el.dataset.day }));
+      assert(now.screen === "womb" && now.id === "J01-B49" && now.day === "49", name + " new life " + JSON.stringify(now));
+      for (let i = 0; i < 4; i++) await page.click("#follow");
+      now = await page.$eval("#state", (el) => el.dataset.id);
+      assert(now === "J05-B14", name + " first wrathful " + now);
+      await shot("wrath14");
+      await page.click("#follow");
+      now = await page.$eval("#state", (el) => el.dataset.id);
+      assert(now === "J06-B13", name + " second wrathful " + now);
+      await shot("wrath13");
+      const fig = await page.evaluate(() => window.__regions.find((r) => r.action === 20));
+      await page.mouse.click(fig.clientX, fig.clientY);
+      const named = await page.$eval("#enter", (el) => el.textContent);
+      assert(/Kerima/i.test(named), name + " figure " + named);
+      await shot("wrath-tap");
+      await page.click("#start");
+      for (let i = 0; i < 4; i++) await page.click("#follow");
+      for (let i = 0; i < 3; i++) await page.click("#dont");
       const hell = await page.evaluate(() => window.__regions.find((r) => r.action === 4 && r.arg === 5));
       await page.mouse.click(hell.clientX, hell.clientY);
       await page.mouse.click(hell.clientX, hell.clientY);
@@ -311,14 +321,15 @@ try {
       const run = await readReport("bardo-run.json");
       assert(run.schema === "bardo-run", name + " run schema");
       assert(run.complete === true, name + " run not complete " + JSON.stringify(run.coverage) + " " + JSON.stringify(run.unreached));
-      assert(run.coverage.screens === "11/11", name + " screens " + run.coverage.screens);
+      assert(run.coverage.screens === "18/18", name + " screens " + run.coverage.screens);
+      assert(JSON.stringify(run).includes("J05-B14") && JSON.stringify(run).includes("J11-B08"), name + " wrathful ids");
       assert(run.unreached.screens.length === 0, name + " screens left " + run.unreached.screens.join(","));
       assert(run.unreached.links.length === 0, name + " links left " + run.unreached.links.map((l) => l.from + ">" + l.button).join(","));
       ["deva", "asura", "human", "animal", "preta", "hell"].forEach((realm) => {
         assert(run.lives.some((life) => life.ended === realm) || run.totals.rebirths[realm] > 0, name + " missing realm " + realm);
       });
       assert(run.lives.some((life) => life.steps.some((step) => typeof step.karma === "number")), name + " karma not logged");
-      assert(run.deadEnds && run.deadEnds[0].onward === "chonyid", name + " dead end");
+      assert(run.deadEnds && run.deadEnds[0].onward === "peaceful", name + " dead end");
       await copyFile(join(outDir, "bardo-run.json"), join("/opt/cursor/artifacts", "bardo-run.json"));
     }
     assert(logs.length === 0, name + " console " + logs.join(" | "));
@@ -343,8 +354,8 @@ try {
   const report = await readReport("bardo-report.json");
   assert(report.stamp === stamp, "report stamp");
   assert(report.note === "expected the Sidpa end", "report note");
-  assert(report.screen === "good", "report screen " + report.screen);
-  assert(Array.isArray(report.path) && report.path.some((step) => step.screen === "good" && step.button === "follow"), "report path");
+  assert(report.screen === "J02-B42", "report screen " + report.screen);
+  assert(Array.isArray(report.path) && report.path.some((step) => step.id === "J02-B42" && step.button === "follow"), "report path");
   assert(report.viewport && report.viewport.width === 1280 && report.viewport.height === 800, "report viewport");
   assert(typeof report.devicePixelRatio === "number", "report dpr");
   assert(typeof report.userAgent === "string" && report.userAgent.length > 8, "report agent");
@@ -358,7 +369,7 @@ try {
   assert(reportPage.logs.length === 0, "report console");
   await reportPage.page.close();
   await mkdir("/opt/cursor/artifacts", { recursive: true });
-  for (const name of ["karma-390.png", "karma-1366.png", "rebirth-390.png", "rebirth-1366.png", "complete-390.png", "complete-1366.png"]) {
+  for (const name of ["wrath14-390.png", "wrath14-1366.png", "wrath13-390.png", "wrath13-1366.png", "wrath-tap-390.png", "wrath-tap-1366.png", "karma-390.png", "karma-1366.png"]) {
     await copyFile(join(outDir, name), join("/opt/cursor/artifacts", name));
   }
   console.log("browser smoke ok", stamp);

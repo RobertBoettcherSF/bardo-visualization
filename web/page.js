@@ -106,7 +106,60 @@ function compute() {
 
 const SCENE_ID = { 1: "womb", 2: "lights", 3: "judge", 4: "wish" };
 const SCENE_CODE = { womb: 1, lights: 2, judge: 3, wish: 4 };
-const ANCHOR = { womb: 49, lights: 39, judge: 32, wish: 22 };
+const ANCHOR = { womb: 49, lights: 42, judge: 35, wish: 28 };
+const CLIMB = ["womb", "lights", "judge", "wish", "w14", "w13", "w12", "w11", "w10", "w09", "w08"];
+const SCREEN = {
+  opening: { code: "OPEN" },
+  clock: { code: "CLOCK" },
+  womb: { code: "J01-B49" },
+  lights: { code: "J02-B42" },
+  judge: { code: "J03-B35" },
+  wish: { code: "J04-B28" },
+  w14: { code: "J05-B14", cal: 17, info: "infoW14", kind: "row", flame: "#e0c36a", figures: [
+    { key: "door-tiger", line: "tapDoorTiger", detail: "detailDoor", colour: "#f4f1e6" },
+    { key: "door-sow", line: "tapDoorSow", detail: "detailDoor", colour: "#c4a24a" },
+    { key: "door-lion", line: "tapDoorLion", detail: "detailDoor", colour: "#a33b32" },
+    { key: "door-serpent", line: "tapDoorSerpent", detail: "detailDoor", colour: "#3f6b48" }
+  ]},
+  w13: { code: "J06-B13", cal: 16, info: "infoW13", kind: "row", flame: "#a33b32", figures: [
+    { key: "kerima", line: "tapKerima", detail: "detailKerima", colour: "#f4f1e6" },
+    { key: "lion", line: "tapLionHead", detail: "detailAnimal", colour: "#5c3a2e" },
+    { key: "tiger", line: "tapTigerHead", detail: "detailAnimal", colour: "#a33b32" },
+    { key: "fox", line: "tapFoxHead", detail: "detailAnimal", colour: "#1c1c1c" },
+    { key: "wolf", line: "tapWolfHead", detail: "detailAnimal", colour: "#3a4a72" }
+  ]},
+  w12: { code: "J07-B12", cal: 15, info: "infoW12", kind: "pair", body: "#1e4a3a", faces: ["#f7f4ea", "#1e4a3a", "#a33b32"], consort: "#2f6a52", flame: "#6e8f62", figures: [
+    { key: "heruka", line: "tapKarmaH", detail: "detailKarmaH" },
+    { key: "consort", line: "tapKarmaK", detail: "detailKarmaK" }
+  ]},
+  w11: { code: "J08-B11", cal: 14, info: "infoW11", kind: "pair", body: "#6e2430", faces: ["#f7f4ea", "#6e2430", "#3a4a72"], consort: "#8e3a48", flame: "#a33b32", figures: [
+    { key: "heruka", line: "tapPadmaH", detail: "detailPadmaH" },
+    { key: "consort", line: "tapPadmaK", detail: "detailPadmaK" }
+  ]},
+  w10: { code: "J09-B10", cal: 13, info: "infoW10", kind: "pair", body: "#a8842a", faces: ["#f7f4ea", "#8a6a22", "#a33b32"], consort: "#c4a24a", flame: "#e0c36a", figures: [
+    { key: "heruka", line: "tapRatnaH", detail: "detailRatnaH" },
+    { key: "consort", line: "tapRatnaK", detail: "detailRatnaK" }
+  ]},
+  w09: { code: "J10-B09", cal: 12, info: "infoW09", kind: "pair", body: "#2a3a6a", faces: ["#f7f4ea", "#2a3a6a", "#a33b32"], consort: "#3a4a82", flame: "#6a7f92", figures: [
+    { key: "heruka", line: "tapVajraH", detail: "detailVajraH" },
+    { key: "consort", line: "tapVajraK", detail: "detailVajraK" }
+  ]},
+  w08: { code: "J11-B08", cal: 11, info: "infoW08", kind: "pair", body: "#5c3a2e", faces: ["#f7f4ea", "#5c3a2e", "#a33b32"], consort: "#6e4a3a", flame: "#c47a3a", figures: [
+    { key: "heruka", line: "tapBuddhaH", detail: "detailBuddhaH" },
+    { key: "consort", line: "tapBuddhaK", detail: "detailBuddhaK" }
+  ]},
+  good: { code: "J01-B49/good" },
+  deva: { code: "J01-B49/deva" },
+  asura: { code: "J01-B49/asura" },
+  human: { code: "J01-B49/human" },
+  animal: { code: "J01-B49/animal" },
+  preta: { code: "J01-B49/preta" },
+  hell: { code: "J01-B49/hell" }
+};
+
+function codeOf(id) {
+  return (SCREEN[id] && SCREEN[id].code) || id;
+}
 const REALMS = ["deva", "asura", "human", "animal", "preta", "hell"];
 const REALM_INFO = {
   deva: "infoDeva", asura: "infoAsura", human: "infoHuman",
@@ -137,7 +190,7 @@ const CHOICE_LINKS = [
 
 function tourList() {
   const teach = direction === 0
-    ? ["womb", "lights", "judge", "wish"]
+    ? CLIMB.slice()
     : ["wish", "judge", "lights", "womb"];
   return teach.concat(["good"]).concat(REALMS);
 }
@@ -151,7 +204,7 @@ function screenFromScene(scene) {
 }
 
 function remember(button, extra) {
-  const entry = { screen: screenId, button: button, t: Date.now() };
+  const entry = { screen: screenId, id: codeOf(screenId), button: button, t: Date.now() };
   if (extra) {
     Object.keys(extra).forEach(function (key) { entry[key] = extra[key]; });
   }
@@ -186,6 +239,7 @@ function infoKey(scene) {
   if (viewMode === "opening" || screenId === "opening") return "title";
   if (screenId === "good") return "infoGood";
   if (REALM_INFO[screenId]) return REALM_INFO[screenId];
+  if (SCREEN[screenId] && SCREEN[screenId].info) return SCREEN[screenId].info;
   if (screenId === "wish" && turned) return "infoWishTurn";
   if (scene === 1 || screenId === "womb") return "infoWomb";
   if (scene === 2 || screenId === "lights") return "infoLights";
@@ -205,9 +259,14 @@ function updateChrome(out) {
   state.dataset.intensity = String(out[5]);
   state.dataset.complexity = String(out[6]);
   state.dataset.mantra = String(out[8]);
-  if (viewMode !== "opening" && !endingLocked) screenId = screenFromScene(side[0]);
+  if (viewMode !== "opening" && !endingLocked && !(SCREEN[screenId] && SCREEN[screenId].cal)) {
+    screenId = screenFromScene(side[0]);
+  }
   state.dataset.scene = String(side[0]);
   state.dataset.screen = screenId;
+  state.dataset.id = codeOf(screenId);
+  const sid = document.getElementById("sid");
+  if (sid) sid.textContent = codeOf(screenId);
   state.dataset.brightest = String(side[3]);
   state.dataset.outcome = String(side[1]);
   state.dataset.methods = String(side[2]);
@@ -233,7 +292,7 @@ function updateChrome(out) {
   const sound = document.getElementById("sound");
   sound.textContent = soundEnabled() ? t("soundOn") : t("soundOff");
   sound.setAttribute("aria-pressed", String(soundEnabled()));
-  const teaching = SCENE_CODE[screenId] !== undefined;
+  const teaching = CLIMB.indexOf(screenId) >= 0;
   const ending = viewMode === "ending";
   document.body.classList.toggle("is-opening", viewMode === "opening");
   document.body.classList.toggle("is-ending", ending);
@@ -321,7 +380,8 @@ function modelNow() {
     bright: side[3],
     x: side[8],
     y: side[9],
-    curves: curves
+    curves: curves,
+    wrath: SCREEN[screenId] && SCREEN[screenId].figures ? SCREEN[screenId] : null
   };
 }
 
@@ -417,11 +477,12 @@ function showScreen(id, button, extra) {
     viewMode = "opening";
     endingLocked = false;
     turned = false;
-  } else if (ANCHOR[id]) {
+  } else if (ANCHOR[id] || (SCREEN[id] && SCREEN[id].cal)) {
     viewMode = "tour";
     endingLocked = false;
     if (id !== "wish") turned = false;
-    milli = ada.exports.bardo_milli_of_day(ANCHOR[id]);
+    const day = ANCHOR[id] || SCREEN[id].cal;
+    milli = ada.exports.bardo_milli_of_day(day);
   } else {
     viewMode = "ending";
     endingLocked = true;
@@ -483,50 +544,32 @@ function goPrev() {
 
 function choose(follow, via) {
   if (via !== "auto") playClick();
-  if (!SCENE_CODE[screenId]) return;
   const from = screenId;
+  const at = CLIMB.indexOf(from);
+  if (at < 0) return;
   const karmaBefore = karma;
   karma = follow
     ? ada.exports.bardo_karma_lighten(karma)
     : ada.exports.bardo_karma_heavy(karma);
-  if (follow && from === "wish") {
-    turned = true;
-    lineKey = "infoWishTurn";
-    detailKey = "bodyWish";
+  if (follow && from === "w08") {
+    lineKey = "infoPeaceOnward";
+    detailKey = "infoPeaceOnward";
     arrivalKey = "";
-    remember("follow", { onward: "chonyid" });
-    if (via === "auto") noteStep("follow", from, "wish", { karmaBefore: karmaBefore });
+    remember("follow", { onward: "peaceful" });
+    if (via === "auto") noteStep("follow", from, from, { karmaBefore: karmaBefore, onward: "peaceful" });
     render();
     return;
   }
-  if (follow && from === "womb") {
-    const chance = ada.exports.bardo_karma_chance(karma);
-    const roll = Math.floor(Math.random() * 1000);
-    const natural = roll < chance;
-    const ok = via === "auto" ? true : natural;
-    if (!ok) {
-      lineKey = pullKey();
-      detailKey = "detailFail";
-      arrivalKey = "";
-      render();
-      return;
-    }
-    showScreen("good", "follow");
-    if (via === "auto") {
-      noteStep("follow", from, "good", {
-        karmaBefore: karmaBefore, chance: chance, roll: roll, forced: !natural
-      });
-    }
-    return;
-  }
-  const next = follow
-    ? (from === "lights" ? "judge" : "wish")
-    : (from === "wish" ? "judge" : from === "judge" ? "lights" : from === "lights" ? "womb" : rebirthId());
+  const next = follow ? CLIMB[at + 1] : (at === 0 ? rebirthId() : CLIMB[at - 1]);
   showScreen(next, follow ? "follow" : "dont");
   if (via === "auto") noteStep(follow ? "follow" : "dont", from, screenId, { karmaBefore: karmaBefore });
 }
 
 function explainOf(action, arg) {
+  if (action === 20 && SCREEN[screenId] && SCREEN[screenId].figures && SCREEN[screenId].figures[arg]) {
+    const fig = SCREEN[screenId].figures[arg];
+    return { line: fig.line, detail: fig.detail };
+  }
   if (action === 1 && arg >= 1 && arg <= 5) {
     return { line: "tapPetal" + arg, detail: "detailPetal" + arg };
   }
@@ -566,11 +609,26 @@ function onHit(region, via) {
   if (selectedKey === key && acts) {
     const from = screenId;
     const before = methodsDone;
+    if (region.action === 1 && from === "womb" && before === 4 && region.arg === 5) {
+      const chance = ada.exports.bardo_karma_chance(karma);
+      const roll = Math.floor(Math.random() * 1000);
+      const natural = roll < chance;
+      const ok = via === "auto" ? true : natural;
+      if (!ok) {
+        lineKey = pullKey();
+        detailKey = "detailFail";
+        arrivalKey = "";
+        if (via !== "auto") playClick();
+        render();
+        return;
+      }
+    }
     applyAction(region.action, region.arg);
     if (via !== "auto") playClick();
     if (region.action === 1 && from === "womb" && methodsDone >= 5) {
+      const forced = via === "auto" && ada.exports.bardo_karma_chance(karma) < 1000;
       showScreen("good", "petals");
-      if (via === "auto") noteStep("petals", from, "good");
+      if (via === "auto") noteStep("petals", from, "good", { forced: forced });
       return;
     }
     const outcome = sidpa()[1];
@@ -604,7 +662,15 @@ function noteStep(action, from, led, extra) {
   seenScreens[led] = true;
   seenLinks[from + ">" + action] = true;
   if (!life) life = { steps: [], karma: karma };
-  const step = { screen: from, action: action, led: led, t: Date.now(), karma: karma };
+  const step = {
+    screen: from,
+    id: codeOf(from),
+    ledId: codeOf(led),
+    action: action,
+    led: led,
+    t: Date.now(),
+    karma: karma
+  };
   if (extra) {
     Object.keys(extra).forEach(function (key) { step[key] = extra[key]; });
   }
@@ -619,7 +685,7 @@ function noteStep(action, from, led, extra) {
   publishCoverage();
 }
 
-const LIFE_SCREENS = ["wish", "judge", "lights", "womb", "good"].concat(REALMS);
+const LIFE_SCREENS = CLIMB.concat(["good"]).concat(REALMS);
 
 function actionsFor(screen) {
   if (screen === "wish") {
@@ -660,6 +726,16 @@ function actionsFor(screen) {
   if (screen === "good" || REALMS.indexOf(screen) >= 0) {
     return [{ id: "again", kind: "again" }];
   }
+  if (SCREEN[screen] && SCREEN[screen].figures) {
+    const list = [
+      { id: "follow", kind: "follow" },
+      { id: "dont", kind: "dont" }
+    ];
+    SCREEN[screen].figures.forEach(function (fig, index) {
+      list.push({ id: fig.key, kind: "figure", arg: index });
+    });
+    return list;
+  }
   return [];
 }
 
@@ -699,6 +775,7 @@ function publishCoverage() {
   const now = coverageNow();
   window.__coverage = now.screens + " " + now.links;
   window.__coverageComplete = now.complete;
+  window.__gaps = unreachedNow();
 }
 
 function coverageComplete() {
@@ -733,10 +810,10 @@ function runFile() {
     totals: totals,
     unreached: unreachedNow(),
     deadEnds: [{
-      from: "wish",
+      from: "J11-B08",
       button: "follow",
-      onward: "chonyid",
-      note: "Following here would open Chönyid, which is not in this part of the tour."
+      onward: "peaceful",
+      note: "Following here would open the peaceful days, which are not in this part of the tour."
     }]
   };
 }
@@ -776,7 +853,13 @@ function scheduleAuto() {
 function autoStep() {
   autoTimer = 0;
   if (!autoRunning) return;
-  performAutoAction();
+  try {
+    performAutoAction();
+  } catch (err) {
+    showError(String(err && err.message ? err.message : err));
+    finishAuto();
+    return;
+  }
   if (autoStopRequested || coverageComplete()) {
     finishAuto();
     return;
@@ -794,16 +877,22 @@ function beginAgain(via) {
   poisonSeen = -1;
   wanderTick = 0;
   pendingAction = 0;
-  showScreen("wish", "again");
-  if (via === "auto") noteStep("again", from, "wish", { karmaBefore: karmaBefore });
+  showScreen("womb", "again");
+  if (via === "auto") noteStep("again", from, "womb", { karmaBefore: karmaBefore });
 }
 
 function actionHelps(action) {
   const link = screenId + ">" + action.id;
   if (!seenLinks[link]) return true;
   if (action.kind === "light" && !seenScreens[REALMS[action.arg]]) return true;
+  if (action.kind === "figure" && !seenLinks[link]) return true;
   if (action.kind === "petal" && action.arg === methodsDone + 1 && !seenLinks["womb>petals"]) return true;
-  if (action.kind === "follow" && screenId === "womb" && !seenScreens.good) return true;
+  if (action.kind === "follow" && screenId === "wish" && !seenScreens.w14) return true;
+  if (action.kind === "follow" && SCREEN[screenId] && SCREEN[screenId].cal) {
+    const at = CLIMB.indexOf(screenId);
+    const nxt = CLIMB[at + 1];
+    if (nxt && !seenScreens[nxt]) return true;
+  }
   if (action.kind === "dont" && screenId === "womb") {
     const realm = destination >= 0 && destination <= 5
       ? REALMS[destination]
@@ -838,7 +927,9 @@ function pickAction() {
 }
 
 function autoApply(action) {
-  const key = screenId + ">" + action.id;
+  const from = screenId;
+  const karmaBefore = karma;
+  const key = from + ">" + action.id;
   tries[key] = (tries[key] || 0) + 1;
   if (action.kind === "follow") {
     choose(true, "auto");
@@ -852,8 +943,15 @@ function autoApply(action) {
     beginAgain("auto");
     return;
   }
-  const from = screenId;
-  const karmaBefore = karma;
+  if (action.kind === "figure") {
+    const fig = SCREEN[from].figures[action.arg];
+    lineKey = fig.line;
+    detailKey = fig.detail;
+    arrivalKey = "";
+    noteStep(action.id, from, from, { karmaBefore: karmaBefore });
+    render();
+    return;
+  }
   if (action.kind === "light") {
     destination = action.arg;
     applyAction(4, action.arg);
@@ -914,7 +1012,7 @@ function startAuto() {
   seenLinks = {};
   tries = {};
   window.__autoLives = 0;
-  if (screenId === "opening" || screenId === "clock") showScreen("wish", "auto");
+  if (screenId === "opening" || screenId === "clock") showScreen("womb", "auto");
   seenScreens[screenId] = true;
   publishCoverage();
   scheduleAuto();
@@ -959,7 +1057,8 @@ function report() {
       rainPaused: rain ? rain.isPaused() : true,
       reducedMotion: rain ? rain.prefersReduced() : matchMedia("(prefers-reduced-motion: reduce)").matches
     },
-    screen: screenId,
+    screen: codeOf(screenId),
+    screenKey: screenId,
     viewport: { width: window.innerWidth, height: window.innerHeight },
     devicePixelRatio: window.devicePixelRatio || 1,
     userAgent: navigator.userAgent,
@@ -1063,6 +1162,7 @@ function setDirection(next) {
   detailKey = "";
   arrivalKey = "";
   selectedKey = "";
+  if (viewMode !== "opening") screenId = "clock";
   cardsKey = "";
   if (viewMode !== "opening") viewMode = "tour";
   render();
@@ -1103,6 +1203,7 @@ document.getElementById("day").addEventListener("input", function (event) {
   detailKey = "";
   arrivalKey = "";
   selectedKey = "";
+  screenId = "clock";
   milli = ada.exports.bardo_milli_of_day(Number(event.target.value));
   if (viewMode === "opening") viewMode = "tour";
   cardsKey = "";

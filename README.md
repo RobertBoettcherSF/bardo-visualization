@@ -2,7 +2,23 @@
 
 An interactive tour of the Bardo states. The clock, the curves and the mantra syllables are Plain Ada, compiled to WebAssembly. The page draws, and nothing else.
 
-The tour is in UK English. Other languages can be overlaid later. Jung’s reverse order is the default. Item 2 adds the four Sidpa scenes (womb, six lights, judgement, wish-body), a fixed Previous / Start / Next bar, and a browser-generated soundscape that stays off until Sound is tapped. Wrathful days, peaceful days, and the Clear Light scenes are not in this build.
+The tour is in UK English. Other languages can be overlaid later. Jung’s reverse order is the default. Lives start in Sidpa and can Follow into the seven wrathful days. The peaceful days and the Clear Light are not in this build.
+
+## Screen IDs
+
+Every life-wheel screen is `J##-B##`: Jung’s tour position, then the book day. Jung walks toward the Clear Light, so the numbers climb as the book days fall.
+
+| ID | Screen |
+| --- | --- |
+| J01-B49 | Womb door |
+| J02-B42 | Six realm lights |
+| J03-B35 | Mirror of karma |
+| J04-B28 | Wish-body |
+| J05-B14 … J11-B08 | Wrathful days 14 down to 8 |
+
+`B` for a Sidpa screen is the last day of that stretch, the day the reverse walk enters it. `B` for a wrathful screen is the book’s own day (8–14), not the calendar day the model uses (11–17).
+
+Endings hang off the womb with a suffix: `J01-B49/good` and `J01-B49/deva`, `asura`, `human`, `animal`, `preta`, `hell`. The opening is `OPEN`. The clock before day 22 is `CLOCK`.
 
 ## Build
 

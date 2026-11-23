@@ -335,6 +335,66 @@ function drawRealmLight(ctx, w, h, screen) {
   ctx.stroke();
 }
 
+function drawWrathful(ctx, w, h, spec) {
+  const flame = spec.flame || "#c47a3a";
+  ctx.strokeStyle = flame;
+  ctx.globalAlpha = 0.85;
+  ctx.lineWidth = Math.max(4, w * 0.02);
+  for (let i = 0; i < 3; i++) {
+    ctx.beginPath();
+    ctx.arc(w / 2, h * 0.42, Math.min(w, h) * (0.28 + i * 0.06), Math.PI * 1.05, Math.PI * 1.95);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  if (spec.kind === "row") {
+    const n = spec.figures.length;
+    spec.figures.forEach(function (fig, i) {
+      const x = w * (0.18 + (0.64 * i) / Math.max(1, n - 1));
+      const y = h * 0.46;
+      ctx.fillStyle = fig.colour;
+      ctx.beginPath();
+      ctx.ellipse(x, y + 18, 16, 26, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x, y - 16, 14, 0, Math.PI * 2);
+      ctx.fill();
+      addDisc(20, i, x, y, 26);
+    });
+    return;
+  }
+  const cx = w * 0.46;
+  const cy = h * 0.48;
+  ctx.fillStyle = spec.body;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + 10, w * 0.16, h * 0.16, 0, 0, Math.PI * 2);
+  ctx.fill();
+  const faces = spec.faces;
+  [[-22, faces[0]], [0, faces[1]], [22, faces[2]]].forEach(function (face) {
+    ctx.fillStyle = face[1];
+    ctx.beginPath();
+    ctx.arc(cx + face[0], cy - h * 0.16, 16, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.strokeStyle = spec.body;
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.moveTo(cx - 30, cy);
+  ctx.lineTo(cx - 58, cy - 20);
+  ctx.moveTo(cx + 30, cy);
+  ctx.lineTo(cx + 58, cy - 16);
+  ctx.stroke();
+  addDisc(20, 0, cx, cy, Math.min(w, h) * 0.16);
+  const kx = w * 0.68;
+  ctx.fillStyle = spec.consort;
+  ctx.beginPath();
+  ctx.ellipse(kx, cy + 16, w * 0.09, h * 0.12, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(kx, cy - h * 0.08, 12, 0, Math.PI * 2);
+  ctx.fill();
+  addDisc(20, 1, kx, cy, 28);
+}
+
 function drawWishBody(ctx, w, h, model) {
   const colours = ["#f4f1e6", "#1c1c1c", "#a33b32"];
   const yA = h * 0.72;
@@ -420,6 +480,8 @@ function paintAll(time, model) {
     drawPetals(ctx, box.w / 2, box.h * 0.42, radius, 5, t);
   } else if (REALM_WASH[model.screen]) {
     drawRealmLight(ctx, box.w, box.h, model.screen);
+  } else if (model.wrath) {
+    drawWrathful(ctx, box.w, box.h, model.wrath);
   } else if (model.scene === 0) {
     paintAxesLocal(ctx, box.w, box.h, model);
   } else if (model.scene === 1) {

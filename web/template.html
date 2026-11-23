@@ -30,6 +30,15 @@ button { min-height: 44px; min-width: 44px; }
   font: 700 11px/1.2 ui-sans-serif, system-ui, sans-serif;
   padding: 4px 6px; pointer-events: none; white-space: nowrap;
 }
+.sid {
+  position: fixed; z-index: 8;
+  top: calc(env(safe-area-inset-top) + 54px);
+  left: max(8px, env(safe-area-inset-left));
+  margin: 0;
+  color: #c8c2b4;
+  font: 600 11px/1.2 ui-sans-serif, system-ui, sans-serif;
+  pointer-events: none;
+}
 #menu {
   position: fixed; z-index: 8;
   top: calc(env(safe-area-inset-top) + 6px);
@@ -133,6 +142,7 @@ body.has-choice #choices { display: flex; }
 <canvas id="rain" aria-hidden="true"></canvas>
 <canvas id="viz"></canvas>
 <p id="stamp" class="stamp" data-dbg>__STAMP__</p>
+<p id="sid" class="sid"></p>
 <button type="button" id="menu" aria-expanded="false" aria-controls="menu-panel"></button>
 <div id="menu-panel" hidden>
   <div class="row">
