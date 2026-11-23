@@ -160,6 +160,16 @@ package body Bardo.Sidpa is
    function Rebirth_Realm (Brightest : Integer; Weight : Integer) return Integer is
      (if Brightest in 0 .. 5 then Brightest else Fallback_Realm (Weight));
 
+   function Dull_Realm (Book_Day : Integer) return Integer is
+     (case Book_Day is
+        when 7 => 3,
+        when 5 => 1,
+        when 4 => 4,
+        when 3 => 2,
+        when 2 => 5,
+        when 1 => 0,
+        when others => -1);
+
    function Wind_Force (Time : Milli_Time) return Thousandth is
       Day : constant Day_Number := Bardo.Calendar.Calendar_Day (Time);
    begin

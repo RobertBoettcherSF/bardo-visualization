@@ -1,0 +1,4995 @@
+{
+  "meta": {
+    "title": "Bardo visualization — iconography tables",
+    "source_note": "Names, colours and attributes follow the Evans-Wentz root text. Where that text is silent, the field says so. Hex values are a working palette, not printed in the book.",
+    "calendar_note": "Calendar day numbers follow DESIGN.md §5.1: one 49-day clock, a model, not a claim that the book prints these exact calendar numbers. Chonyid day 1 begins about three to four days after death (source lines 525–527).",
+    "hex_colours": "The source names colours in words only. These subdued hex values are a working palette for later Ada/UI tables. They are not in the text.",
+    "naming": "Public English names follow the design (Vairocana, Chikhai, Chonyid, Sidpa). Source German forms are kept in name_source_de.",
+    "rule": "Where the source is silent or ambiguous, fields are null or listed under silences. Nothing is filled from general knowledge unless labelled ‘outside source’.",
+    "order": "Entries follow Jung’s reverse order for Western readers: Sidpa (steps 1–2), wrathful book days 14–8 (steps 3–9), peaceful book days 7–1 (steps 10–16), Chikhai secondary then primary Clear Light (steps 17–18). Book day numbers are unchanged. This is a reading order, not a change to the 49-day clock.",
+    "jung_step": "Integer 1–18. Sidpa is split into two steps only for this reading order (lights/realms, then continent and womb signs); the source presents them in one Sidpa book.",
+    "outside_source_fills": {
+      "date": "22 November 2026, evening, Europe/Berlin",
+      "rule": "The root text wins wherever it speaks. Fields under outside_source are from public pages or cards, and are not merged into the source fields.",
+      "pages": {
+        "peaceful": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+        "zhi_ba": "https://rywiki.tsadra.org/index.php/zhi_ba%27i_lha_zhe_gnyis",
+        "fathers": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-015-zhi_khro_sngags_gso_rigs_lnga_yab_lnga.jpg",
+        "mothers": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-016-zhi_khro_sngags_gso_rigs_lnga_yum_lnga.jpg",
+        "samantabhadra": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-001-zhi_khro_sngags_gso_bum_tsak_kun_bzang_yab_yum.jpg",
+        "munis": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-019-zhi_khro_sngags_gso_thub_drug.jpg",
+        "bodhi_m": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-017-zhi_khro_sngags_gso_sems_dpa%27_brgyad.jpg",
+        "bodhi_f": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-018-zhi_khro_sngags_gso_sems_ma_brgyad.jpg",
+        "doors_m": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-020-zhi_khro_sngags_gso_sgo_ba_bzhi.jpg",
+        "herukas": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-023-zhi_khro_sngags_gso_khrag_%27thung_yab_lnga.jpg",
+        "heruka_yum": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-024-zhi_khro_sngags_gso_khrag_%27thung_yum_lnga.jpg",
+        "ishvaris": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-028-zhi_khro_sngags_gso_dbang_phyug_nyer_brgyad.jpg",
+        "wangchugma": "https://rywiki.tsadra.org/index.php/dbang_phyug_ma_nyer_brgyad",
+        "wangchugma_list": "https://rywiki.tsadra.org/index.php/dbang_phyug_nyi_shu_brgyad",
+        "khrag": "https://rywiki.tsadra.org/index.php/khrag_%27thung_lnga_brgyad",
+        "gauri": "https://rywiki.tsadra.org/index.php/ke%27u_ri_brgyad",
+        "wrathful58": "https://rywiki.tsadra.org/index.php/58_wrathful_buddhas",
+        "dudjom": "https://dudjom.tsadra.org/index.php/Zhi_khro_sngags_gso",
+        "rtz": "https://rtz.tsadra.org/",
+        "rtz_cycle": "https://rtz.tsadra.org/index.php/Zab_chos_zhi_khro_dgongs_pa_rang_grol"
+      },
+      "filled": [
+        "Day-6 list of all 42 peaceful names from RY Wiki Peaceful Deities (prefer this over zhi ba'i lha zhe gnyis, which omits bodhisattva Samantabhadra and totals 41).",
+        "Sanskrit correspondences for door-keepers and six munis from the same RY list.",
+        "One face and two arms, and some emblem hands, for the five Buddhas and five Mothers, from Dudjom tsaglis.",
+        "Consort colours: Mother of Space white; Māmakī blue; Sangyay-Tschanma / Buddhalocanā yellow; Gökarmo / Pāṇḍaravāsinī red; Tārā / Samayatārā green.",
+        "Samantabhadra and Samantabhadri both deep blue, naked, no emblems, yab-yum, from Dudjom card 01-001.",
+        "Six munis colours and emblems, tentatively mapped by emblem, from Dudjom card 01-019.",
+        "Wangchugma identified as the 28 Īśvarīs (dbang phyug ma nyer brgyad).",
+        "Standard Karma-Krodheśvarī prefix noted as implied by 'respective Krodhishvaris'; source on day 12 still says only Krotishaurima.",
+        "Days 8–12 Herukas: Dudjom five-fathers card confirms three faces and six arms in family colours, with conflicts noted."
+      ],
+      "remaining_gaps": [
+        "Day 9 Vajra-Heruka face colours still not in the source and not clearly readable on the group card.",
+        "White bear-headed eastern goddess and northern snake-headed door-Yoginī still have no items in the source.",
+        "Schneeköpfige Jungfrau still unidentified on Tsadra/RY pages and on the uncaptioned 28-Īśvarī card.",
+        "Wrathful days have no wisdom / dull light pairs in the source.",
+        "Day 8 ornaments not restated later in the source.",
+        "Individual colours for each of the 16 bodhisattvas, and a clean colour-to-name map for the four male door-keepers, cannot be read with certainty from the uncaptioned cards (the male door-keeper card has no white figure).",
+        "Peaceful leg posture beyond seated is not specified in the source."
+      ],
+      "conflicts": [
+        "Five-fathers and five-mothers tsaglis show the Buddhas and Mothers separately, not in Father-Mother union as the German source states.",
+        "Buddha-Heruka is dark brown in the source; the Dudjom five-herukas card centre is maroon-red, and the figures have wings never mentioned in the source.",
+        "Dudjom cards illustrate Zhi khro sngags gso, a related but distinct Dudjom cycle, not a page-by-page illustration of the Evans-Wentz / German text.",
+        "Male door-keepers appear fully wrathful, three-eyed, in yellow / red / pink-red / green, with no white figure; the day-6 source lists them among the peaceful 42 without colours or a wrathful description.",
+        "Samantabhadri is deep blue on the Dudjom card; some other traditions paint her white. The source is silent."
+      ]
+    }
+  },
+  "palette": {
+    "label": "outside source: our own choice",
+    "note": "The source names colours in words only. These subdued hex values are a working palette for later Ada/UI tables. They are not in the text.",
+    "colours": {
+      "white": "#E6E0D4",
+      "brilliant_white": "#F4F1E6",
+      "dull_white": "#C9C3B5",
+      "blue": "#2C4A6E",
+      "wisdom_blue": "#2F5F8A",
+      "deep_blue_sky": "#1B3354",
+      "dark_blue": "#1A2A44",
+      "dull_blue": "#3A4A62",
+      "yellow": "#C4A24A",
+      "wisdom_yellow": "#D8BC55",
+      "dull_yellow": "#A89A55",
+      "bluish_yellow": "#8F9A5C",
+      "yellowish_white": "#E0D3B0",
+      "yellowish_black": "#3A3420",
+      "red": "#8E3A3A",
+      "wisdom_red": "#C24A4A",
+      "dull_red": "#7A4548",
+      "dark_red": "#6B2428",
+      "reddish_black": "#3A1518",
+      "reddish_yellow": "#C47A3A",
+      "green": "#3A6B48",
+      "wisdom_green": "#4A8A5A",
+      "dull_green": "#4A5E48",
+      "dark_green": "#1A3328",
+      "greenish_black": "#1E2E24",
+      "dark_brown": "#4A3228",
+      "black": "#1C1C1C",
+      "smoky": "#5C5550",
+      "grey_twilight": "#6E6A64",
+      "clear_light": "#F7F4EA"
+    }
+  },
+  "calendar": [
+    {
+      "calendar_days": "0 (hours)",
+      "phase": "Chikhai: primary Clear Light",
+      "chonyid_day": null
+    },
+    {
+      "calendar_days": "0–3.5",
+      "phase": "Chikhai: secondary Clear Light / unconsciousness",
+      "chonyid_day": null
+    },
+    {
+      "calendar_days": "4",
+      "phase": "Chonyid peaceful",
+      "chonyid_day": 1
+    },
+    {
+      "calendar_days": "5",
+      "phase": "Chonyid peaceful",
+      "chonyid_day": 2
+    },
+    {
+      "calendar_days": "6",
+      "phase": "Chonyid peaceful",
+      "chonyid_day": 3
+    },
+    {
+      "calendar_days": "7",
+      "phase": "Chonyid peaceful",
+      "chonyid_day": 4
+    },
+    {
+      "calendar_days": "8",
+      "phase": "Chonyid peaceful",
+      "chonyid_day": 5
+    },
+    {
+      "calendar_days": "9",
+      "phase": "Chonyid peaceful",
+      "chonyid_day": 6
+    },
+    {
+      "calendar_days": "10",
+      "phase": "Chonyid peaceful",
+      "chonyid_day": 7
+    },
+    {
+      "calendar_days": "11",
+      "phase": "Chonyid wrathful",
+      "chonyid_day": 8
+    },
+    {
+      "calendar_days": "12",
+      "phase": "Chonyid wrathful",
+      "chonyid_day": 9
+    },
+    {
+      "calendar_days": "13",
+      "phase": "Chonyid wrathful",
+      "chonyid_day": 10
+    },
+    {
+      "calendar_days": "14",
+      "phase": "Chonyid wrathful",
+      "chonyid_day": 11
+    },
+    {
+      "calendar_days": "15",
+      "phase": "Chonyid wrathful",
+      "chonyid_day": 12
+    },
+    {
+      "calendar_days": "16",
+      "phase": "Chonyid wrathful",
+      "chonyid_day": 13
+    },
+    {
+      "calendar_days": "17",
+      "phase": "Chonyid wrathful",
+      "chonyid_day": 14
+    },
+    {
+      "calendar_days": "18–21",
+      "phase": "Post-wrathful unconsciousness (~3.5 days)",
+      "chonyid_day": null
+    },
+    {
+      "calendar_days": "22–49",
+      "phase": "Sidpa (remaining days; source usually 22, karma-dependent)",
+      "chonyid_day": null
+    }
+  ],
+  "entries": [
+    {
+      "id": "sidpa_lights_and_realms",
+      "kind": "sidpa",
+      "jung_step": 1,
+      "title_en": "Step 1 — Sidpa: six lights and realms",
+      "calendar_days": "22–49 (after ~3.5 days of unconsciousness, model clock 18–21; source: usually 22 days of Sidpa suffering, up to 49, karma-dependent, line 935)",
+      "source_lines": [
+        901,
+        1022,
+        935,
+        938,
+        956,
+        962,
+        1021
+      ],
+      "grey_twilight": {
+        "colour_source": "a grey, twilit light, by day and by night, at all times (ein graues, dämmerhaftes Licht)",
+        "colour_hex": {
+          "value": "#6E6A64",
+          "label": "outside source: our own choice",
+          "palette_key": "grey_twilight"
+        },
+        "source_lines": [
+          935
+        ]
+      },
+      "wish_body": "A radiant body like the former body, a thought-form called the wish-body (Wunschkörper). If one is destined for a realm, visions of that realm appear (lines 901–909). The Sidpa body takes on, through karma, the colour of the light of the place of rebirth (line 1022).",
+      "six_lights": [
+        {
+          "realm_en": "Devas (gods)",
+          "realm_de": "Götterwelt / Devas",
+          "colour_source": "dull white",
+          "colour_hex": {
+            "value": "#C9C3B5",
+            "label": "outside source: our own choice",
+            "palette_key": "dull_white"
+          },
+          "also_on": [
+            "day 1",
+            "day 6"
+          ],
+          "womb_sign": "splendid temples or palaces of precious materials — the text allows entry (line 1116)",
+          "preferred_path": "Go the path of the white light of the Devas (line 1164)"
+        },
+        {
+          "realm_en": "Asuras",
+          "realm_de": "Asurawelt",
+          "colour_source": "dull green",
+          "colour_hex": {
+            "value": "#4A5E48",
+            "label": "outside source: our own choice",
+            "palette_key": "dull_green"
+          },
+          "also_on": [
+            "day 5",
+            "day 6"
+          ],
+          "womb_sign": "either a fair forest, or fires circling in opposite directions — do not enter (line 1117)"
+        },
+        {
+          "realm_en": "humans",
+          "realm_de": "Menschenwelt",
+          "colour_source": "dull yellow (day 3: dull bluish-yellow)",
+          "colour_hex": {
+            "value": "#A89A55",
+            "label": "outside source: our own choice",
+            "palette_key": "dull_yellow"
+          },
+          "also_on": [
+            "day 3",
+            "day 6"
+          ],
+          "womb_sign": "southern continent Jambu: large, appealing dwellings — if a womb must be taken, go in there (line 1112)",
+          "preferred_path": "or the path of the yellow light of humans; enter the splendid halls of precious metals and the glorious gardens (line 1164)"
+        },
+        {
+          "realm_en": "animals",
+          "realm_de": "Tierwelt",
+          "colour_source": "dull blue",
+          "colour_hex": {
+            "value": "#3A4A62",
+            "label": "outside source: our own choice",
+            "palette_key": "dull_blue"
+          },
+          "also_on": [
+            "day 7",
+            "day 6"
+          ],
+          "womb_sign": "rock caves, deep chasms, or fog — do not enter (line 1118)"
+        },
+        {
+          "realm_en": "Pretas (hungry ghosts)",
+          "realm_de": "Pretawelt",
+          "colour_source": "dull red (day 6: dull reddish)",
+          "colour_hex": {
+            "value": "#7A4548",
+            "label": "outside source: our own choice",
+            "palette_key": "dull_red"
+          },
+          "also_on": [
+            "day 4",
+            "day 6"
+          ],
+          "womb_sign": "bare, treeless plains, shallow caves, clearings or dense thickets — do not enter (line 1119)"
+        },
+        {
+          "realm_en": "hells",
+          "realm_de": "Höllenwelt / Höllenwesen",
+          "colour_source": "smoky (rauchfarbenes Licht); day 2: smoky light from ‘states of suffering’, without the word hell",
+          "colour_hex": {
+            "value": "#5C5550",
+            "label": "outside source: our own choice",
+            "palette_key": "smoky"
+          },
+          "also_on": [
+            "day 2 (smoky ‘states of suffering’)",
+            "day 6"
+          ],
+          "womb_sign": "wailing sounds, a feeling of being drawn; dark landscapes, black and white houses, black fissures in the earth, and dark roads — do not enter (line 1120)"
+        }
+      ],
+      "other_visuals": [
+        {
+          "en": "Three dreadful abysses, white, black and red, appear to block the way; they are in truth anger, desire and ignorance (line 938).",
+          "source_lines": [
+            938
+          ]
+        },
+        {
+          "en": "Judgement: the Good Genius born with one counts good deeds with white pebbles; the Evil Genius counts bad deeds with black. The Lord of Death consults the Mirror of Karma, in which all deeds appear (lines 960–962).",
+          "source_lines": [
+            956,
+            962
+          ]
+        },
+        {
+          "en": "The light of the place of rebirth shines most brightly among the six (line 1021).",
+          "source_lines": [
+            1021
+          ]
+        }
+      ],
+      "deities": [],
+      "silences": [
+        "Sidpa has no day-by-day deity mandala comparable to Chonyid days 1–14.",
+        "The wish-body’s colour is not a fixed hue; it takes the colour of the destined realm light.",
+        "No head/arm counts for Yama or the two Geniuses."
+      ]
+    },
+    {
+      "id": "sidpa_continents_and_wombs",
+      "kind": "sidpa",
+      "jung_step": 2,
+      "title_en": "Step 2 — Sidpa: continent and womb signs",
+      "calendar_days": "22–49 (after ~3.5 days of unconsciousness, model clock 18–21; source: usually 22 days of Sidpa suffering, up to 49, karma-dependent, line 935)",
+      "source_lines": [
+        1111,
+        1164
+      ],
+      "continents": [
+        {
+          "name_en": "eastern continent Lüpah",
+          "name_de": "östlicher Kontinent Lüpah",
+          "sign": "a lake adorned with swans, male and female — do not go; the teaching is not spread there (line 1111)"
+        },
+        {
+          "name_en": "southern continent Jambu",
+          "name_de": "südlicher Kontinent Jambu",
+          "sign": "great and appealing dwellings — if already about to enter a womb, go in there (line 1112)"
+        },
+        {
+          "name_en": "western continent Balang-Tschöd",
+          "name_de": "westlicher Kontinent Balang-Tschöd",
+          "sign": "a lake adorned with horses, stallions and mares grazing on its banks — do not go; wealth is there but the teaching does not prevail (line 1113)"
+        },
+        {
+          "name_en": "northern continent Daminyan",
+          "name_de": "nördlicher Kontinent Daminyan",
+          "sign": "a lake adorned with cattle, male and female, or surrounded by trees — long life and merit, but without the teaching; do not go (line 1114)"
+        }
+      ],
+      "preferred_paths_note": "If a path must be taken, line 1164: go the path of the white light of the Devas or the path of the yellow light of the humans; enter the splendid halls of precious metals and the glorious gardens.",
+      "womb_signs_from_six_lights": [
+        {
+          "realm_en": "Devas (gods)",
+          "realm_de": "Götterwelt / Devas",
+          "womb_sign": "splendid temples or palaces of precious materials — the text allows entry (line 1116)"
+        },
+        {
+          "realm_en": "Asuras",
+          "realm_de": "Asurawelt",
+          "womb_sign": "either a fair forest, or fires circling in opposite directions — do not enter (line 1117)"
+        },
+        {
+          "realm_en": "humans",
+          "realm_de": "Menschenwelt",
+          "womb_sign": "southern continent Jambu: large, appealing dwellings — if a womb must be taken, go in there (line 1112)"
+        },
+        {
+          "realm_en": "animals",
+          "realm_de": "Tierwelt",
+          "womb_sign": "rock caves, deep chasms, or fog — do not enter (line 1118)"
+        },
+        {
+          "realm_en": "Pretas (hungry ghosts)",
+          "realm_de": "Pretawelt",
+          "womb_sign": "bare, treeless plains, shallow caves, clearings or dense thickets — do not enter (line 1119)"
+        },
+        {
+          "realm_en": "hells",
+          "realm_de": "Höllenwelt / Höllenwesen",
+          "womb_sign": "wailing sounds, a feeling of being drawn; dark landscapes, black and white houses, black fissures in the earth, and dark roads — do not enter (line 1120)"
+        }
+      ],
+      "deities": [],
+      "silences": [
+        "Sidpa has no day-by-day deity mandala comparable to Chonyid days 1–14.",
+        "The wish-body’s colour is not a fixed hue; it takes the colour of the destined realm light.",
+        "No head/arm counts for Yama or the two Geniuses."
+      ]
+    },
+    {
+      "id": "chonyid_day_14",
+      "kind": "chonyid_day",
+      "chonyid_day": 14,
+      "calendar_day": 17,
+      "phase": "wrathful",
+      "title_en": "Step 3 — Book day 14 — four female door-keepers and twenty-eight goddesses",
+      "source_lines": [
+        828,
+        864
+      ],
+      "direction": "the four quarters, then the outer circle",
+      "count_note": "Line 835: ‘the outer circle of these thirty wrathful deities’, in which the Herukas and twenty-eight powerful goddesses appear. Five Heruka couples (10) + 8 Kerimas + 8 Htamenmas + 4 door-keepers = 30; plus 28 = 58 (lines 732, 843). Line 841: these twenty-eight arise from the powers of Ratnasambhava. Line 842: peaceful deities arise from the emptiness of the Dharmakaya, wrathful from its radiant energy.",
+      "deities": [
+        {
+          "role": "female_door_keeper",
+          "name_en": "tiger-headed door-keeper",
+          "name_source_de": "weiße, tigerköpfige Göttin",
+          "direction": "east",
+          "body_colour_source": "white",
+          "animal_head": "tiger (tigerköpfige)",
+          "items": [
+            {
+              "hand": "unspecified (title)",
+              "item_en": "goad / prod (Stachelstock)",
+              "item_de": "Stachelstock"
+            },
+            {
+              "hand": "left",
+              "item_en": "blood-filled skull",
+              "item_de": "mit Blut gefüllter Schädel"
+            }
+          ],
+          "source_lines": [
+            830
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#E6E0D4",
+            "label": "outside source: our own choice",
+            "palette_key": "white"
+          }
+        },
+        {
+          "role": "female_door_keeper",
+          "name_en": "sow-headed door-keeper",
+          "name_source_de": "gelbe, sauköpfige Göttin",
+          "direction": "south",
+          "body_colour_source": "yellow",
+          "animal_head": "sow (sauköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "noose",
+              "item_de": "Schlinge"
+            }
+          ],
+          "source_lines": [
+            831
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#C4A24A",
+            "label": "outside source: our own choice",
+            "palette_key": "yellow"
+          }
+        },
+        {
+          "role": "female_door_keeper",
+          "name_en": "lion-headed door-keeper",
+          "name_source_de": "rote, löwenköpfige Göttin",
+          "direction": "west",
+          "body_colour_source": "red",
+          "animal_head": "lion (löwenköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "iron chains",
+              "item_de": "eiserne Ketten"
+            }
+          ],
+          "source_lines": [
+            832
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          }
+        },
+        {
+          "role": "female_door_keeper",
+          "name_en": "snake-headed door-keeper",
+          "name_source_de": "grüne, schlangenköpfige Göttin",
+          "direction": "north",
+          "body_colour_source": "green",
+          "animal_head": "snake (schlangenköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "a bell",
+              "item_de": "eine Glocke"
+            }
+          ],
+          "source_lines": [
+            833
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#3A6B48",
+            "label": "outside source: our own choice",
+            "palette_key": "green"
+          }
+        },
+        {
+          "role": "goddess_east",
+          "name_en": "yak-headed goddess",
+          "name_source_de": "yak (yakköpfige)",
+          "direction": "east",
+          "body_colour_source": "dark brown",
+          "animal_head": "yak (yakköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "vajra",
+              "item_de": "Vajra"
+            },
+            {
+              "hand": "unspecified",
+              "item_en": "skull",
+              "item_de": "Schädel"
+            }
+          ],
+          "source_lines": [
+            836
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#4A3228",
+            "label": "outside source: our own choice",
+            "palette_key": "dark_brown"
+          }
+        },
+        {
+          "role": "goddess_east",
+          "name_en": "snake-headed goddess",
+          "name_source_de": "snake (schlangenköpfige)",
+          "direction": "east",
+          "body_colour_source": "reddish-yellow",
+          "animal_head": "snake (schlangenköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "lotus",
+              "item_de": "Lotus"
+            }
+          ],
+          "source_lines": [
+            836
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#C47A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "reddish_yellow"
+          }
+        },
+        {
+          "role": "goddess_east",
+          "name_en": "leopard-headed goddess",
+          "name_source_de": "leopard (leopardenköpfige)",
+          "direction": "east",
+          "body_colour_source": "greenish-black",
+          "animal_head": "leopard (leopardenköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "trident",
+              "item_de": "Dreizack"
+            }
+          ],
+          "source_lines": [
+            836
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#1E2E24",
+            "label": "outside source: our own choice",
+            "palette_key": "greenish_black"
+          }
+        },
+        {
+          "role": "goddess_east",
+          "name_en": "monkey-headed goddess",
+          "name_source_de": "monkey (affenköpfige)",
+          "direction": "east",
+          "body_colour_source": "blue",
+          "animal_head": "monkey (affenköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "wheel",
+              "item_de": "Rad"
+            }
+          ],
+          "source_lines": [
+            836
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#2C4A6E",
+            "label": "outside source: our own choice",
+            "palette_key": "blue"
+          }
+        },
+        {
+          "role": "goddess_east",
+          "name_en": "snow-headed maiden-headed goddess",
+          "name_source_de": "snow-headed maiden (schneeköpfige Jungfrau)",
+          "direction": "east",
+          "body_colour_source": "red",
+          "animal_head": "snow-headed maiden (schneeköpfige Jungfrau)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "spear",
+              "item_de": "Speer"
+            }
+          ],
+          "source_lines": [
+            836
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          }
+        },
+        {
+          "role": "goddess_east",
+          "name_en": "bear-headed goddess",
+          "name_source_de": "bear (bärenköpfige)",
+          "direction": "east",
+          "body_colour_source": "white",
+          "animal_head": "bear (bärenköpfige)",
+          "items": [],
+          "source_lines": [
+            836
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#E6E0D4",
+            "label": "outside source: our own choice",
+            "palette_key": "white"
+          }
+        },
+        {
+          "role": "yogini_south",
+          "name_en": "bat-headed goddess",
+          "name_source_de": "bat (fledermausköpfige)",
+          "direction": "south",
+          "body_colour_source": "yellow",
+          "animal_head": "bat (fledermausköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "knife",
+              "item_de": "Messer"
+            }
+          ],
+          "source_lines": [
+            837
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#C4A24A",
+            "label": "outside source: our own choice",
+            "palette_key": "yellow"
+          }
+        },
+        {
+          "role": "yogini_south",
+          "name_en": "makara-headed goddess",
+          "name_source_de": "makara (makaraköpfige)",
+          "direction": "south",
+          "body_colour_source": "red",
+          "animal_head": "makara (makaraköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "urn",
+              "item_de": "Urne"
+            }
+          ],
+          "source_lines": [
+            837
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          }
+        },
+        {
+          "role": "yogini_south",
+          "name_en": "scorpion-headed goddess",
+          "name_source_de": "scorpion (skorpionköpfige)",
+          "direction": "south",
+          "body_colour_source": "red",
+          "animal_head": "scorpion (skorpionköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "lotus",
+              "item_de": "Lotus"
+            }
+          ],
+          "source_lines": [
+            837
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          }
+        },
+        {
+          "role": "yogini_south",
+          "name_en": "bird-headed moon-goddess-headed goddess",
+          "name_source_de": "bird-headed moon-goddess (vogelköpfige Mondgöttin)",
+          "direction": "south",
+          "body_colour_source": "white",
+          "animal_head": "bird-headed moon-goddess (vogelköpfige Mondgöttin)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "vajra",
+              "item_de": "Vajra"
+            }
+          ],
+          "source_lines": [
+            837
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#E6E0D4",
+            "label": "outside source: our own choice",
+            "palette_key": "white"
+          }
+        },
+        {
+          "role": "yogini_south",
+          "name_en": "fox-headed goddess",
+          "name_source_de": "fox (fuchsköpfige)",
+          "direction": "south",
+          "body_colour_source": "dark green",
+          "animal_head": "fox (fuchsköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "club",
+              "item_de": "Keule"
+            }
+          ],
+          "source_lines": [
+            837
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#1A3328",
+            "label": "outside source: our own choice",
+            "palette_key": "dark_green"
+          }
+        },
+        {
+          "role": "yogini_south",
+          "name_en": "tiger-headed goddess",
+          "name_source_de": "tiger (tigerköpfige)",
+          "direction": "south",
+          "body_colour_source": "yellowish-black",
+          "animal_head": "tiger (tigerköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "skull",
+              "item_de": "Schädel"
+            }
+          ],
+          "source_lines": [
+            837
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#3A3420",
+            "label": "outside source: our own choice",
+            "palette_key": "yellowish_black"
+          }
+        },
+        {
+          "role": "yogini_west",
+          "name_en": "vulture-headed goddess",
+          "name_source_de": "vulture (geierköpfige)",
+          "direction": "west",
+          "body_colour_source": "greenish-black",
+          "animal_head": "vulture (geierköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "staff",
+              "item_de": "Stab"
+            }
+          ],
+          "source_lines": [
+            838
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#1E2E24",
+            "label": "outside source: our own choice",
+            "palette_key": "greenish_black"
+          }
+        },
+        {
+          "role": "yogini_west",
+          "name_en": "horse-headed goddess",
+          "name_source_de": "horse (pferdeköpfige)",
+          "direction": "west",
+          "body_colour_source": "red",
+          "animal_head": "horse (pferdeköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "corpse",
+              "item_de": "Leichnam"
+            }
+          ],
+          "source_lines": [
+            838
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          }
+        },
+        {
+          "role": "yogini_west",
+          "name_en": "eagle-headed goddess",
+          "name_source_de": "eagle (adlerköpfige)",
+          "direction": "west",
+          "body_colour_source": "white",
+          "animal_head": "eagle (adlerköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "club",
+              "item_de": "Keule"
+            }
+          ],
+          "source_lines": [
+            838
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#E6E0D4",
+            "label": "outside source: our own choice",
+            "palette_key": "white"
+          }
+        },
+        {
+          "role": "yogini_west",
+          "name_en": "dog-headed goddess",
+          "name_source_de": "dog (hundsköpfige)",
+          "direction": "west",
+          "body_colour_source": "yellow",
+          "animal_head": "dog (hundsköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "vajra",
+              "item_de": "Vajra"
+            },
+            {
+              "hand": "unspecified",
+              "item_en": "knife",
+              "item_de": "Messer"
+            }
+          ],
+          "source_lines": [
+            838
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#C4A24A",
+            "label": "outside source: our own choice",
+            "palette_key": "yellow"
+          }
+        },
+        {
+          "role": "yogini_west",
+          "name_en": "bird-headed goddess",
+          "name_source_de": "bird (vogelköpfige)",
+          "direction": "west",
+          "body_colour_source": "red",
+          "animal_head": "bird (vogelköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "bow and arrow",
+              "item_de": "Bogen und Pfeil"
+            }
+          ],
+          "source_lines": [
+            838
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          }
+        },
+        {
+          "role": "yogini_west",
+          "name_en": "deer-headed goddess",
+          "name_source_de": "deer (hirschköpfige)",
+          "direction": "west",
+          "body_colour_source": "green",
+          "animal_head": "deer (hirschköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "urn",
+              "item_de": "Urne"
+            }
+          ],
+          "source_lines": [
+            838
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#3A6B48",
+            "label": "outside source: our own choice",
+            "palette_key": "green"
+          }
+        },
+        {
+          "role": "yogini_north",
+          "name_en": "wolf-headed goddess",
+          "name_source_de": "wolf (wolfsköpfige)",
+          "direction": "north",
+          "body_colour_source": "blue",
+          "animal_head": "wolf (wolfsköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "banner",
+              "item_de": "Banner"
+            }
+          ],
+          "source_lines": [
+            839
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#2C4A6E",
+            "label": "outside source: our own choice",
+            "palette_key": "blue"
+          }
+        },
+        {
+          "role": "yogini_north",
+          "name_en": "goat-headed goddess",
+          "name_source_de": "goat (ziegenköpfige)",
+          "direction": "north",
+          "body_colour_source": "red",
+          "animal_head": "goat (ziegenköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "stake",
+              "item_de": "Pfahl"
+            }
+          ],
+          "source_lines": [
+            839
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          }
+        },
+        {
+          "role": "yogini_north",
+          "name_en": "sow-headed goddess",
+          "name_source_de": "sow (sauköpfige)",
+          "direction": "north",
+          "body_colour_source": "black",
+          "animal_head": "sow (sauköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "noose",
+              "item_de": "Schlinge"
+            }
+          ],
+          "source_lines": [
+            839
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#1C1C1C",
+            "label": "outside source: our own choice",
+            "palette_key": "black"
+          }
+        },
+        {
+          "role": "yogini_north",
+          "name_en": "crow-headed goddess",
+          "name_source_de": "crow (krähenköpfige)",
+          "direction": "north",
+          "body_colour_source": "red",
+          "animal_head": "crow (krähenköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "corpse",
+              "item_de": "Leichnam"
+            }
+          ],
+          "source_lines": [
+            839
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          }
+        },
+        {
+          "role": "yogini_north",
+          "name_en": "elephant-headed goddess",
+          "name_source_de": "elephant (elefantenköpfige)",
+          "direction": "north",
+          "body_colour_source": "greenish-black",
+          "animal_head": "elephant (elefantenköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "skull",
+              "item_de": "Schädel"
+            }
+          ],
+          "source_lines": [
+            839
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#1E2E24",
+            "label": "outside source: our own choice",
+            "palette_key": "greenish_black"
+          }
+        },
+        {
+          "role": "yogini_north",
+          "name_en": "snake-headed goddess",
+          "name_source_de": "snake (schlangenköpfige)",
+          "direction": "north",
+          "body_colour_source": "blue",
+          "animal_head": "snake (schlangenköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "noose",
+              "item_de": "Schlinge"
+            }
+          ],
+          "source_lines": [
+            839
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#2C4A6E",
+            "label": "outside source: our own choice",
+            "palette_key": "blue"
+          }
+        },
+        {
+          "role": "door_yogini",
+          "name_en": "cuckoo-headed goddess",
+          "name_source_de": "cuckoo (kuckuckköpfige)",
+          "direction": "east",
+          "body_colour_source": "black",
+          "animal_head": "cuckoo (kuckuckköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "hook",
+              "item_de": "Haken"
+            }
+          ],
+          "source_lines": [
+            840
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#1C1C1C",
+            "label": "outside source: our own choice",
+            "palette_key": "black"
+          }
+        },
+        {
+          "role": "door_yogini",
+          "name_en": "goat-headed goddess",
+          "name_source_de": "goat (ziegenköpfige)",
+          "direction": "south",
+          "body_colour_source": "yellow",
+          "animal_head": "goat (ziegenköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "noose",
+              "item_de": "Schlinge"
+            }
+          ],
+          "source_lines": [
+            840
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#C4A24A",
+            "label": "outside source: our own choice",
+            "palette_key": "yellow"
+          }
+        },
+        {
+          "role": "door_yogini",
+          "name_en": "lion-headed goddess",
+          "name_source_de": "lion (löwenköpfige)",
+          "direction": "west",
+          "body_colour_source": "red",
+          "animal_head": "lion (löwenköpfige)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "chain",
+              "item_de": "Kette"
+            }
+          ],
+          "source_lines": [
+            840
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          }
+        },
+        {
+          "role": "door_yogini",
+          "name_en": "snake-headed goddess",
+          "name_source_de": "snake (schlangenköpfige)",
+          "direction": "north",
+          "body_colour_source": "greenish-black",
+          "animal_head": "snake (schlangenköpfige)",
+          "items": [],
+          "source_lines": [
+            840
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#1E2E24",
+            "label": "outside source: our own choice",
+            "palette_key": "greenish_black"
+          }
+        }
+      ],
+      "lights": [],
+      "silences": [
+        "The white, bear-headed goddess in the east (line 836) has no held item stated. The Dudjom 28-Īśvarī card is uncaptioned and too crowded to assign an item to her with certainty.",
+        "The northern door-Yoginī (greenish-black, snake-headed, line 840) has no held item stated. The other three hold hook, noose and chain. Do not fill in a bell from outside the source.",
+        "‘Snow-headed maiden’ (schneeköpfige Jungfrau) is ambiguous: the German compound does not name a clear animal. Recorded literally. The Tsadra / RY pages consulted do not identify her; the 28-Īśvarī tsagli has no English or Sanskrit captions. Gap remains.",
+        "The eastern six are called Göttinnen, not Yoginīs; south, west and north groups are six Yoginīs each; the last four are Tor-Yoginis.",
+        "Wangchugma is not named again on this day in the source. Outside the source she is identified as this group of twenty-eight Īśvarīs (see outside_source_wangchugma).",
+        "No wisdom / dull light pair.",
+        "The RY page dbang phyug nyi shu brgyad begins a list with ‘east — yak-headed Rakṣasī’ (matching the first eastern goddess in the German source) and then breaks off; it does not provide the remaining twenty-seven Sanskrit names."
+      ],
+      "special_name_notes": {
+        "schneekopfige_jungfrau": "Line 836: ‘eine rote, schneeköpfige Jungfrau mit Speer’. Translated literally as ‘a red, snow-headed maiden with a spear’. Ambiguous.",
+        "mondgottin": "Line 837: ‘eine weiße, vogelköpfige Mondgöttin mit Vajra’ — a white, bird-headed moon-goddess with a vajra."
+      },
+      "jung_step": 3,
+      "outside_source_wangchugma": {
+        "label": "outside the source",
+        "identification": "Wangchugma = dbang phyug ma nyer brgyad, the twenty-eight Īśvarīs / Shvara goddesses, wrathful emanations of the four female gate-keepers, seven for each of the four activities, counted among the fifty-eight wrathful deities.",
+        "urls": [
+          "https://rywiki.tsadra.org/index.php/dbang_phyug_ma_nyer_brgyad",
+          "https://rywiki.tsadra.org/index.php/58_wrathful_buddhas",
+          "https://rywiki.tsadra.org/index.php/khrag_%27thung_lnga_brgyad",
+          "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-028-zhi_khro_sngags_gso_dbang_phyug_nyer_brgyad.jpg"
+        ]
+      }
+    },
+    {
+      "id": "chonyid_day_13",
+      "kind": "chonyid_day",
+      "chonyid_day": 13,
+      "calendar_day": 16,
+      "phase": "wrathful",
+      "title_en": "Step 4 — Book day 13 — eight Kerimas and eight Htamenmas",
+      "source_lines": [
+        803,
+        827
+      ],
+      "direction": "the eight regions (E, S, W, N, SE, SW, NW, NE)",
+      "opening": "The eight wrathful Kerimas and the Htamenmas with various animal heads arise from one’s own mind (line 804). Line 806 says the eight Kerimas appear from the eastern region of the mind and then lists them by the eight directions. They appear surrounded by the five blood-drinking father-deities (line 816). The eight Htamenmas appear in the outer circle, likewise surrounded by blood-drinking father-deities (lines 817, 826).",
+      "name_note": "The source does not use the names Gauri or Piśācī.",
+      "deities": [
+        {
+          "role": "kerima",
+          "name_en": "Kerima",
+          "name_source_de": "Kerima",
+          "direction": "east",
+          "body_colour_source": "white",
+          "items": [
+            {
+              "hand": "right",
+              "item_en": "a human corpse held like a club",
+              "item_de": "Menschenleichnam wie eine Keule"
+            },
+            {
+              "hand": "left",
+              "item_en": "blood-filled skull",
+              "item_de": "mit Blut gefüllter Schädel"
+            }
+          ],
+          "source_lines": [
+            808
+          ],
+          "group_note": "The source uses Kerimas, not the name Gauri.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#E6E0D4",
+            "label": "outside source: our own choice",
+            "palette_key": "white"
+          }
+        },
+        {
+          "role": "kerima",
+          "name_en": "Tseurima",
+          "name_source_de": "Tseurima",
+          "direction": "south",
+          "body_colour_source": "yellow",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "bow and arrow, ready to shoot",
+              "item_de": "Bogen und Pfeil zum Schuss bereit"
+            }
+          ],
+          "source_lines": [
+            809
+          ],
+          "group_note": "The source uses Kerimas, not the name Gauri.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#C4A24A",
+            "label": "outside source: our own choice",
+            "palette_key": "yellow"
+          }
+        },
+        {
+          "role": "kerima",
+          "name_en": "Pramoha",
+          "name_source_de": "Pramoha",
+          "direction": "west",
+          "body_colour_source": "red",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "a makara banner",
+              "item_de": "Makara-Banner"
+            }
+          ],
+          "source_lines": [
+            810
+          ],
+          "group_note": "The source uses Kerimas, not the name Gauri.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          }
+        },
+        {
+          "role": "kerima",
+          "name_en": "Petali",
+          "name_source_de": "Petali",
+          "direction": "north",
+          "body_colour_source": "black",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "vajra",
+              "item_de": "Vajra"
+            },
+            {
+              "hand": "unspecified",
+              "item_en": "blood-filled skull",
+              "item_de": "blutgefüllter Schädel"
+            }
+          ],
+          "source_lines": [
+            811
+          ],
+          "group_note": "The source uses Kerimas, not the name Gauri.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#1C1C1C",
+            "label": "outside source: our own choice",
+            "palette_key": "black"
+          }
+        },
+        {
+          "role": "kerima",
+          "name_en": "Pukkase",
+          "name_source_de": "Pukkase",
+          "direction": "south-east",
+          "body_colour_source": "red",
+          "items": [
+            {
+              "hand": "right",
+              "item_en": "intestines",
+              "item_de": "Därme"
+            },
+            {
+              "hand": "left",
+              "item_en": "brings the intestines to the mouth",
+              "item_de": "führt sie mit der linken zum Mund"
+            }
+          ],
+          "source_lines": [
+            812
+          ],
+          "group_note": "The source uses Kerimas, not the name Gauri.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          }
+        },
+        {
+          "role": "kerima",
+          "name_en": "Ghasmari",
+          "name_source_de": "Ghasmari",
+          "direction": "south-west",
+          "body_colour_source": "dark green",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "blood-filled skull, stirring in it with a vajra and eating from it",
+              "item_de": "blutgefüllter Schädel, mit einem Vajra darin rührt und davon isst"
+            }
+          ],
+          "source_lines": [
+            813
+          ],
+          "group_note": "The source uses Kerimas, not the name Gauri.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#1A3328",
+            "label": "outside source: our own choice",
+            "palette_key": "dark_green"
+          }
+        },
+        {
+          "role": "kerima",
+          "name_en": "Tsandhali",
+          "name_source_de": "Tsandhali",
+          "direction": "north-west",
+          "body_colour_source": "yellowish-white",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "tears the head from a corpse, holds a heart, and consumes the body",
+              "item_de": "einem Leichnam den Kopf abreißt, ein Herz hält und den Körper verzehrt"
+            }
+          ],
+          "source_lines": [
+            814
+          ],
+          "group_note": "The source uses Kerimas, not the name Gauri.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#E0D3B0",
+            "label": "outside source: our own choice",
+            "palette_key": "yellowish_white"
+          }
+        },
+        {
+          "role": "kerima",
+          "name_en": "Smascha",
+          "name_source_de": "Smascha",
+          "direction": "north-east",
+          "body_colour_source": "dark blue",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "also tears off a head and eats from it",
+              "item_de": "ebenfalls einen Kopf abreißt und davon isst"
+            }
+          ],
+          "source_lines": [
+            815
+          ],
+          "group_note": "The source uses Kerimas, not the name Gauri.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#1A2A44",
+            "label": "outside source: our own choice",
+            "palette_key": "dark_blue"
+          }
+        },
+        {
+          "role": "htamenma",
+          "name_en": "lion-headed Htamenma",
+          "name_source_de": "lion (löwenköpfige)",
+          "direction": "east",
+          "body_colour_source": "dark brown",
+          "items": [],
+          "animal_head": "lion (löwenköpfige)",
+          "source_lines": [
+            818
+          ],
+          "group_note": "The source uses Htamenmas, not the name Piśācī. They are not individually named.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#4A3228",
+            "label": "outside source: our own choice",
+            "palette_key": "dark_brown"
+          },
+          "posture": "arms crossed before the breast, a corpse in the mouth, shaking her mane"
+        },
+        {
+          "role": "htamenma",
+          "name_en": "tiger-headed Htamenma",
+          "name_source_de": "tiger (tigerköpfige)",
+          "direction": "south",
+          "body_colour_source": "red",
+          "items": [],
+          "animal_head": "tiger (tigerköpfige)",
+          "source_lines": [
+            819
+          ],
+          "group_note": "The source uses Htamenmas, not the name Piśācī. They are not individually named.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          },
+          "posture": "arms lowered, grinning and showing fangs"
+        },
+        {
+          "role": "htamenma",
+          "name_en": "fox-headed Htamenma",
+          "name_source_de": "fox (fuchsköpfige)",
+          "direction": "west",
+          "body_colour_source": "black",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "knife",
+              "item_de": "Messer"
+            },
+            {
+              "hand": "unspecified",
+              "item_en": "an intestine, from which she drinks blood",
+              "item_de": "Darm, daraus Blut trinkt"
+            }
+          ],
+          "animal_head": "fox (fuchsköpfige)",
+          "source_lines": [
+            820
+          ],
+          "group_note": "The source uses Htamenmas, not the name Piśācī. They are not individually named.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#1C1C1C",
+            "label": "outside source: our own choice",
+            "palette_key": "black"
+          }
+        },
+        {
+          "role": "htamenma",
+          "name_en": "wolf-headed Htamenma",
+          "name_source_de": "wolf (wolfsköpfige)",
+          "direction": "north",
+          "body_colour_source": "dark blue",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "tearing a corpse",
+              "item_de": "einen Leichnam zerreißt"
+            }
+          ],
+          "animal_head": "wolf (wolfsköpfige)",
+          "source_lines": [
+            821
+          ],
+          "group_note": "The source uses Htamenmas, not the name Piśācī. They are not individually named.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#1A2A44",
+            "label": "outside source: our own choice",
+            "palette_key": "dark_blue"
+          }
+        },
+        {
+          "role": "htamenma",
+          "name_en": "vulture-headed Htamenma",
+          "name_source_de": "vulture (geierköpfige)",
+          "direction": "south-east",
+          "body_colour_source": "yellowish-white",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "a large corpse on the shoulder",
+              "item_de": "großen Leichnam auf der Schulter"
+            },
+            {
+              "hand": "unspecified",
+              "item_en": "a skeleton in the hand",
+              "item_de": "Skelett in der Hand"
+            }
+          ],
+          "animal_head": "vulture (geierköpfige)",
+          "source_lines": [
+            822
+          ],
+          "group_note": "The source uses Htamenmas, not the name Piśācī. They are not individually named.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#E0D3B0",
+            "label": "outside source: our own choice",
+            "palette_key": "yellowish_white"
+          }
+        },
+        {
+          "role": "htamenma",
+          "name_en": "cemetery-bird-headed Htamenma",
+          "name_source_de": "cemetery-bird (friedhofsvogelköpfige)",
+          "direction": "south-west",
+          "body_colour_source": "dark red",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "also carries a large corpse",
+              "item_de": "ebenfalls einen großen Leichnam trägt"
+            }
+          ],
+          "animal_head": "cemetery-bird (friedhofsvogelköpfige)",
+          "source_lines": [
+            823
+          ],
+          "group_note": "The source uses Htamenmas, not the name Piśācī. They are not individually named.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#6B2428",
+            "label": "outside source: our own choice",
+            "palette_key": "dark_red"
+          }
+        },
+        {
+          "role": "htamenma",
+          "name_en": "crow-headed Htamenma",
+          "name_source_de": "crow (krähenköpfige)",
+          "direction": "north-west",
+          "body_colour_source": "black",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "skull",
+              "item_de": "Schädel"
+            },
+            {
+              "hand": "unspecified",
+              "item_en": "sword",
+              "item_de": "Schwert"
+            }
+          ],
+          "animal_head": "crow (krähenköpfige)",
+          "source_lines": [
+            824
+          ],
+          "group_note": "The source uses Htamenmas, not the name Piśācī. They are not individually named.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#1C1C1C",
+            "label": "outside source: our own choice",
+            "palette_key": "black"
+          },
+          "posture": "consumes heart and lungs"
+        },
+        {
+          "role": "htamenma",
+          "name_en": "owl-headed Htamenma",
+          "name_source_de": "owl (eulenköpfige)",
+          "direction": "north-east",
+          "body_colour_source": "dark blue",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "vajra",
+              "item_de": "Vajra"
+            },
+            {
+              "hand": "unspecified",
+              "item_en": "sword",
+              "item_de": "Schwert"
+            }
+          ],
+          "animal_head": "owl (eulenköpfige)",
+          "source_lines": [
+            825
+          ],
+          "group_note": "The source uses Htamenmas, not the name Piśācī. They are not individually named.",
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#1A2A44",
+            "label": "outside source: our own choice",
+            "palette_key": "dark_blue"
+          },
+          "posture": "and eats"
+        }
+      ],
+      "lights": [],
+      "silences": [
+        "Head/arm/leg counts for Kerimas and Htamenmas are not stated (beyond animal heads, and implied two hands where left/right are mentioned).",
+        "Southern and south-western Htamenmas have no held emblems stated, only posture or a carried corpse.",
+        "‘Cemetery-bird’ (Friedhofsvogel) is not a more specific species.",
+        "No wisdom / dull light pair."
+      ],
+      "jung_step": 4
+    },
+    {
+      "id": "chonyid_day_12",
+      "kind": "chonyid_day",
+      "chonyid_day": 12,
+      "calendar_day": 15,
+      "phase": "wrathful",
+      "title_en": "Step 5 — Book day 12 — Karma-Heruka",
+      "source_lines": [
+        788,
+        802
+      ],
+      "direction": "north (from the northern region of one’s mind)",
+      "family": "Karma order (Karma-Ordnung)",
+      "peaceful_identity": "Bhagavan Amoghasiddhi in the union of Father and Mother (line 796)",
+      "deities": [
+        {
+          "role": "heruka",
+          "name_en": "Karma-Heruka",
+          "name_source_de": "Karma-Heruka",
+          "body_colour_source": "dark green (dunkelgrüner Farbe); middle face dark green; appearance described as majestic",
+          "faces": 3,
+          "face_colours": {
+            "right": "white",
+            "left": "red",
+            "middle": "dark green"
+          },
+          "arms": 6,
+          "legs": "four firmly planted feet",
+          "items": [
+            {
+              "hand": "right",
+              "item_en": "sword",
+              "item_de": "Schwert"
+            },
+            {
+              "hand": "right",
+              "item_en": "trident-staff",
+              "item_de": "Dreizackstab"
+            },
+            {
+              "hand": "right",
+              "item_en": "club",
+              "item_de": "Keule"
+            },
+            {
+              "hand": "left",
+              "item_en": "bell",
+              "item_de": "Glocke"
+            },
+            {
+              "hand": "left",
+              "item_en": "human skull",
+              "item_de": "Menschenschädel"
+            },
+            {
+              "hand": "left",
+              "item_en": "ploughshare",
+              "item_de": "Pflugschar"
+            }
+          ],
+          "note_items": "Right and left lists are given, but not first/middle/last order.",
+          "source_lines": [
+            791,
+            792
+          ],
+          "heads": null,
+          "body_colour_hex": {
+            "value": "#1A3328",
+            "label": "outside source: our own choice",
+            "palette_key": "dark_green"
+          },
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-023-zhi_khro_sngags_gso_khrag_%27thung_yab_lnga.jpg",
+            "card_note": "Dudjom five blood-drinking fathers tsagli: each has three faces and six arms, in family colours (dark blue, yellow, red, dark green, and a central maroon-red figure). The figures have wings, which the German source never mentions. The card shows the five without consorts; the source has Father-Mother union. The central figure is maroon-red, not the source’s dark brown for Buddha-Heruka — the source wins for colour.",
+            "related_pages": [
+              "https://rywiki.tsadra.org/index.php/khrag_%27thung_lnga_brgyad",
+              "https://rywiki.tsadra.org/index.php/58_wrathful_buddhas",
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-024-zhi_khro_sngags_gso_khrag_%27thung_yum_lnga.jpg"
+            ]
+          }
+        },
+        {
+          "role": "consort",
+          "name_en": "Krotishaurima",
+          "name_source_de": "Mutter Krotishaurima",
+          "body_colour_source": null,
+          "items": [
+            {
+              "hand": "left",
+              "item_en": "a red, blood-filled bowl",
+              "item_de": "a red, blood-filled bowl"
+            }
+          ],
+          "posture": "Right hand clasps his neck; left holds the blood-filled bowl to his mouth. They appear in union (Father and Mother).",
+          "source_lines": [
+            793
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "note": "The source says only ‘Krotishaurima’ here, not ‘Karma-Krotishaurima’. Father and Mother appear in union.",
+          "outside_source": {
+            "label": "outside the source",
+            "standard_name": "Karma-Krodheśvarī / Karma-Krotishaurima",
+            "url": "https://rywiki.tsadra.org/index.php/khrag_%27thung_lnga_brgyad",
+            "note": "RY Wiki speaks of the five herukas and ‘their respective Krodhishvaris’. The German source on day 12 says only Krotishaurima. Source wording wins on the tour; the prefixed form is a lookup name only."
+          }
+        }
+      ],
+      "lights": [],
+      "silences": [
+        "Consort’s family prefix is not given in the German source (unlike days 8–11). A standard Karma-Krodheśvarī form is recorded only under outside_source.",
+        "Kerima, Htamenma and Wangchugma are named but not described on this day. Wangchugma is identified under outside_source as the twenty-eight Īśvarīs; their descriptions belong to day 14.",
+        "No mount or nine-eye description restated.",
+        "No wisdom / dull light pair."
+      ],
+      "accompanying_named_but_undescribed": "Kerima, Htamenma and Wangchugma are named as accompanying the Karma-order deities (line 789). Their colours, heads and items are not given on this day. The source does not explicitly equate Wangchugma with the day-14 goddesses.",
+      "jung_step": 5,
+      "outside_source_note": "Dudjom five blood-drinking fathers tsagli: each has three faces and six arms, in family colours (dark blue, yellow, red, dark green, and a central maroon-red figure). The figures have wings, which the German source never mentions. The card shows the five without consorts; the source has Father-Mother union. The central figure is maroon-red, not the source’s dark brown for Buddha-Heruka — the source wins for colour.",
+      "outside_source_wangchugma": {
+        "label": "outside the source",
+        "identification": "Wangchugma = dbang phyug ma nyer brgyad, the twenty-eight Īśvarīs / Shvara goddesses, wrathful emanations of the four female gate-keepers, seven for each of the four activities, counted among the fifty-eight wrathful deities.",
+        "urls": [
+          "https://rywiki.tsadra.org/index.php/dbang_phyug_ma_nyer_brgyad",
+          "https://rywiki.tsadra.org/index.php/58_wrathful_buddhas",
+          "https://rywiki.tsadra.org/index.php/khrag_%27thung_lnga_brgyad",
+          "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-028-zhi_khro_sngags_gso_dbang_phyug_nyer_brgyad.jpg"
+        ]
+      }
+    },
+    {
+      "id": "chonyid_day_11",
+      "kind": "chonyid_day",
+      "chonyid_day": 11,
+      "calendar_day": 14,
+      "phase": "wrathful",
+      "title_en": "Step 6 — Book day 11 — Padma-Heruka",
+      "source_lines": [
+        778,
+        787
+      ],
+      "direction": "west (from the western region of one’s mind)",
+      "family": "Lotus order (Lotus-Ordnung)",
+      "peaceful_identity": "Bhagavan Amitābha in the union of Father and Mother (line 786)",
+      "deities": [
+        {
+          "role": "heruka",
+          "name_en": "Padma-Heruka",
+          "name_source_de": "Bhagavan Padma-Heruka",
+          "body_colour_source": "reddish-black (rötlich-schwarzer Farbe); middle face dark red",
+          "faces": 3,
+          "face_colours": {
+            "right": "white",
+            "left": "blue",
+            "middle": "dark red"
+          },
+          "arms": 6,
+          "legs": "four firmly planted feet",
+          "items": [
+            {
+              "hand": "right",
+              "item_en": "lotus",
+              "item_de": "Lotus"
+            },
+            {
+              "hand": "right",
+              "item_en": "trident-staff",
+              "item_de": "Dreizackstab"
+            },
+            {
+              "hand": "right",
+              "item_en": "club",
+              "item_de": "Keule"
+            },
+            {
+              "hand": "left",
+              "item_en": "bell",
+              "item_de": "Glocke"
+            },
+            {
+              "hand": "left",
+              "item_en": "human skull filled with blood",
+              "item_de": "mit Blut gefüllter Menschenschädel"
+            },
+            {
+              "hand": "left",
+              "item_en": "small drum",
+              "item_de": "kleine Trommel"
+            }
+          ],
+          "note_items": "Right and left lists are given, but not first/middle/last order.",
+          "source_lines": [
+            781,
+            782
+          ],
+          "heads": null,
+          "body_colour_hex": {
+            "value": "#3A1518",
+            "label": "outside source: our own choice",
+            "palette_key": "reddish_black"
+          },
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-023-zhi_khro_sngags_gso_khrag_%27thung_yab_lnga.jpg",
+            "card_note": "Dudjom five blood-drinking fathers tsagli: each has three faces and six arms, in family colours (dark blue, yellow, red, dark green, and a central maroon-red figure). The figures have wings, which the German source never mentions. The card shows the five without consorts; the source has Father-Mother union. The central figure is maroon-red, not the source’s dark brown for Buddha-Heruka — the source wins for colour.",
+            "related_pages": [
+              "https://rywiki.tsadra.org/index.php/khrag_%27thung_lnga_brgyad",
+              "https://rywiki.tsadra.org/index.php/58_wrathful_buddhas",
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-024-zhi_khro_sngags_gso_khrag_%27thung_yum_lnga.jpg"
+            ]
+          }
+        },
+        {
+          "role": "consort",
+          "name_en": "Padma-Krotishaurima",
+          "name_source_de": "Mutter Padma-Krotishaurima",
+          "body_colour_source": null,
+          "items": [
+            {
+              "hand": "left",
+              "item_en": "a red, blood-filled bowl",
+              "item_de": "a red, blood-filled bowl"
+            }
+          ],
+          "posture": "Right hand clasps his neck; left holds the blood-filled bowl to his mouth. They appear in union (Father and Mother).",
+          "source_lines": [
+            783
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "note": "Father and Mother appear in union (explicitly restated)."
+        }
+      ],
+      "lights": [],
+      "silences": [
+        "No mount or nine-eye description restated.",
+        "Hand order of the six emblems is not numbered.",
+        "No wisdom / dull light pair."
+      ],
+      "jung_step": 6,
+      "outside_source_note": "Dudjom five blood-drinking fathers tsagli: each has three faces and six arms, in family colours (dark blue, yellow, red, dark green, and a central maroon-red figure). The figures have wings, which the German source never mentions. The card shows the five without consorts; the source has Father-Mother union. The central figure is maroon-red, not the source’s dark brown for Buddha-Heruka — the source wins for colour."
+    },
+    {
+      "id": "chonyid_day_10",
+      "kind": "chonyid_day",
+      "chonyid_day": 10,
+      "calendar_day": 13,
+      "phase": "wrathful",
+      "title_en": "Step 7 — Book day 10 — Ratna-Heruka",
+      "source_lines": [
+        768,
+        777
+      ],
+      "direction": "south (from the southern region of one’s mind)",
+      "family": "Jewel order (Juwelen-Ordnung)",
+      "peaceful_identity": "Bhagavan Ratnasambhava in the union of Father and Mother (line 776)",
+      "deities": [
+        {
+          "role": "heruka",
+          "name_en": "Ratna-Heruka",
+          "name_source_de": "Ratna-Heruka",
+          "body_colour_source": "yellow (von gelber Farbe); middle face dark yellow",
+          "faces": 3,
+          "face_colours": {
+            "right": "white",
+            "left": "red",
+            "middle": "dark yellow"
+          },
+          "arms": 6,
+          "legs": "four firmly planted feet",
+          "ornaments": "Body surrounded by flames (sein Körper ist von Flammen umgeben).",
+          "items": [
+            {
+              "hand": "right",
+              "item_en": "a jewel / precious stone",
+              "item_de": "Edelstein"
+            },
+            {
+              "hand": "right",
+              "item_en": "trident-staff",
+              "item_de": "Dreizackstab"
+            },
+            {
+              "hand": "right",
+              "item_en": "baton",
+              "item_de": "Taktstock"
+            },
+            {
+              "hand": "left",
+              "item_en": "bell",
+              "item_de": "Glocke"
+            },
+            {
+              "hand": "left",
+              "item_en": "human skull",
+              "item_de": "Menschenschädel"
+            },
+            {
+              "hand": "left",
+              "item_en": "trident-staff",
+              "item_de": "Dreizackstab"
+            }
+          ],
+          "note_items": "Right and left lists are given, but not first/middle/last order.",
+          "source_lines": [
+            771,
+            772
+          ],
+          "heads": null,
+          "body_colour_hex": {
+            "value": "#C4A24A",
+            "label": "outside source: our own choice",
+            "palette_key": "yellow"
+          },
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-023-zhi_khro_sngags_gso_khrag_%27thung_yab_lnga.jpg",
+            "card_note": "Dudjom five blood-drinking fathers tsagli: each has three faces and six arms, in family colours (dark blue, yellow, red, dark green, and a central maroon-red figure). The figures have wings, which the German source never mentions. The card shows the five without consorts; the source has Father-Mother union. The central figure is maroon-red, not the source’s dark brown for Buddha-Heruka — the source wins for colour.",
+            "related_pages": [
+              "https://rywiki.tsadra.org/index.php/khrag_%27thung_lnga_brgyad",
+              "https://rywiki.tsadra.org/index.php/58_wrathful_buddhas",
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-024-zhi_khro_sngags_gso_khrag_%27thung_yum_lnga.jpg"
+            ]
+          }
+        },
+        {
+          "role": "consort",
+          "name_en": "Ratna-Krotishaurima",
+          "name_source_de": "Mutter Ratna-Krotishaurima",
+          "body_colour_source": null,
+          "items": [
+            {
+              "hand": "left",
+              "item_en": "a red, blood-filled bowl",
+              "item_de": "a red, blood-filled bowl"
+            }
+          ],
+          "posture": "Right hand clasps his neck; left holds the blood-filled bowl to his mouth. They appear in union (Father and Mother).",
+          "source_lines": [
+            773
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null
+        }
+      ],
+      "lights": [],
+      "silences": [
+        "No mount or nine-eye description restated.",
+        "Hand order of the six emblems is not numbered.",
+        "No wisdom / dull light pair."
+      ],
+      "jung_step": 7,
+      "outside_source_note": "Dudjom five blood-drinking fathers tsagli: each has three faces and six arms, in family colours (dark blue, yellow, red, dark green, and a central maroon-red figure). The figures have wings, which the German source never mentions. The card shows the five without consorts; the source has Father-Mother union. The central figure is maroon-red, not the source’s dark brown for Buddha-Heruka — the source wins for colour."
+    },
+    {
+      "id": "chonyid_day_09",
+      "kind": "chonyid_day",
+      "chonyid_day": 9,
+      "calendar_day": 12,
+      "phase": "wrathful",
+      "title_en": "Step 8 — Book day 9 — Vajra-Heruka",
+      "source_lines": [
+        759,
+        767
+      ],
+      "direction": "east (from the eastern region of one’s mind)",
+      "family": "Vajra order (Vajra-Ordnung)",
+      "peaceful_identity": "Bhagavan Vajrasattva in the union of Father and Mother (line 766)",
+      "deities": [
+        {
+          "role": "heruka",
+          "name_en": "Vajra-Heruka",
+          "name_source_de": "Bhagavan Vajra-Heruka",
+          "body_colour_source": "dark blue (dunkelblau an Farbe)",
+          "faces": 3,
+          "face_colours": null,
+          "arms": 6,
+          "legs": "four firmly planted feet",
+          "items": [
+            {
+              "hand": "first right",
+              "item_en": "vajra",
+              "item_de": "Vajra"
+            },
+            {
+              "hand": "middle right",
+              "item_en": "human skull",
+              "item_de": "Menschenschädel"
+            },
+            {
+              "hand": "last right",
+              "item_en": "battle-axe",
+              "item_de": "Streitaxt"
+            },
+            {
+              "hand": "first left",
+              "item_en": "bell",
+              "item_de": "Glocke"
+            },
+            {
+              "hand": "middle left",
+              "item_en": "human skull",
+              "item_de": "Menschenschädel"
+            },
+            {
+              "hand": "last left",
+              "item_en": "ploughshare",
+              "item_de": "Pflugschar"
+            }
+          ],
+          "source_lines": [
+            762
+          ],
+          "heads": null,
+          "body_colour_hex": {
+            "value": "#1A2A44",
+            "label": "outside source: our own choice",
+            "palette_key": "dark_blue"
+          },
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-023-zhi_khro_sngags_gso_khrag_%27thung_yab_lnga.jpg",
+            "card_note": "Dudjom five blood-drinking fathers tsagli: each has three faces and six arms, in family colours (dark blue, yellow, red, dark green, and a central maroon-red figure). The figures have wings, which the German source never mentions. The card shows the five without consorts; the source has Father-Mother union. The central figure is maroon-red, not the source’s dark brown for Buddha-Heruka — the source wins for colour.",
+            "related_pages": [
+              "https://rywiki.tsadra.org/index.php/khrag_%27thung_lnga_brgyad",
+              "https://rywiki.tsadra.org/index.php/58_wrathful_buddhas",
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-024-zhi_khro_sngags_gso_khrag_%27thung_yum_lnga.jpg"
+            ],
+            "face_colours": null,
+            "face_colours_note": "Side-face colours of the dark-blue Vajra-Heruka are not clearly readable on this group card. Gap remains."
+          }
+        },
+        {
+          "role": "consort",
+          "name_en": "Vajra-Krotishaurima",
+          "name_source_de": "Mutter Vajra-Krotishaurima",
+          "body_colour_source": null,
+          "items": [
+            {
+              "hand": "left",
+              "item_en": "a red, blood-filled bowl (blutgefüllte rote Schale)",
+              "item_de": "a red, blood-filled bowl (blutgefüllte rote Schale)"
+            }
+          ],
+          "posture": "Right hand clasps his neck; left holds the blood-filled bowl to his mouth. They appear in union (Father and Mother).",
+          "source_lines": [
+            763
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null
+        }
+      ],
+      "lights": [],
+      "silences": [
+        "Face colours are not given (unlike days 8, 10, 11 and 12).",
+        "No nine eyes, hair, ornaments, flames, mount or posture restated.",
+        "Counted as three faces, not three heads as on day 8.",
+        "No wisdom / dull light pair."
+      ],
+      "jung_step": 8,
+      "outside_source_note": "Dudjom five blood-drinking fathers tsagli: each has three faces and six arms, in family colours (dark blue, yellow, red, dark green, and a central maroon-red figure). The figures have wings, which the German source never mentions. The card shows the five without consorts; the source has Father-Mother union. The central figure is maroon-red, not the source’s dark brown for Buddha-Heruka — the source wins for colour."
+    },
+    {
+      "id": "chonyid_day_08",
+      "kind": "chonyid_day",
+      "chonyid_day": 8,
+      "calendar_day": 11,
+      "phase": "wrathful",
+      "title_en": "Step 9 — Book day 8 — Buddha-Heruka",
+      "source_lines": [
+        749,
+        758
+      ],
+      "direction": null,
+      "direction_note": "A quarter is not named (unlike days 9–12). Peaceful identity is Vairocana (centre).",
+      "peaceful_identity": "Bhagavan Vairocana in the union of Father and Mother (line 757)",
+      "general_wrathful_note": "Introduction (lines 726–732): fifty-eight flame-clad, wrathful, blood-drinking deities. In essence the same as the peaceful deities, but in reversed appearance, manifested according to the centres of the Bardo-body.",
+      "deities": [
+        {
+          "role": "heruka",
+          "name_en": "Buddha-Heruka (the great glorious Buddha Heruka)",
+          "name_source_de": "der große glorreiche Buddha Heruka",
+          "body_colour_source": "dark brown (dunkelbrauner Farbe)",
+          "heads": 3,
+          "faces": 3,
+          "face_colours": {
+            "right": "white",
+            "left": "red",
+            "middle": "dark brown"
+          },
+          "eyes": "nine wide-open eyes with a fearsome gaze; eyebrows twitch like lightning; shining protruding teeth are set one upon another",
+          "arms": 6,
+          "legs": "four firmly planted feet (vier feststehenden Füßen)",
+          "items": [
+            {
+              "hand": "right (one of three)",
+              "item_en": "wheel",
+              "item_de": "Rad"
+            },
+            {
+              "hand": "right",
+              "item_en": "sword",
+              "item_de": "Schwert"
+            },
+            {
+              "hand": "right",
+              "item_en": "battle-axe",
+              "item_de": "Streitaxt"
+            },
+            {
+              "hand": "left",
+              "item_en": "bell",
+              "item_de": "Glocke"
+            },
+            {
+              "hand": "left",
+              "item_en": "human scalp",
+              "item_de": "Menschenskalp"
+            },
+            {
+              "hand": "left",
+              "item_en": "ploughshare",
+              "item_de": "Pflugschar"
+            }
+          ],
+          "note_items": "Three right-hand and three left-hand items are listed but not ordered as first/middle/last (unlike day 9).",
+          "ornaments": "Reddish-yellow hair standing on end and radiating light. Heads adorned with dried human skulls and the symbols of sun and moon. A garland of black snakes and raw heads. Body surrounded by flames of radiant energy. Flames of wisdom from every pore, a vajra in each flame. Sounds such as ‘A la la’, ‘Ha ha’, and whistling tones.",
+          "posture": "Dynamic stance, one leg bent, the other extended, on a podium carried by a horned eagle (gehörnter Adler). The same sentence also gives four firmly planted feet.",
+          "mount_or_throne": {
+            "en": "a podium carried by a horned eagle",
+            "de": "Podest, das von einem gehörnten Adler getragen wird"
+          },
+          "source_lines": [
+            752,
+            756
+          ],
+          "body_colour_hex": {
+            "value": "#4A3228",
+            "label": "outside source: our own choice",
+            "palette_key": "dark_brown"
+          },
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-023-zhi_khro_sngags_gso_khrag_%27thung_yab_lnga.jpg",
+            "card_note": "Dudjom five blood-drinking fathers tsagli: each has three faces and six arms, in family colours (dark blue, yellow, red, dark green, and a central maroon-red figure). The figures have wings, which the German source never mentions. The card shows the five without consorts; the source has Father-Mother union. The central figure is maroon-red, not the source’s dark brown for Buddha-Heruka — the source wins for colour.",
+            "related_pages": [
+              "https://rywiki.tsadra.org/index.php/khrag_%27thung_lnga_brgyad",
+              "https://rywiki.tsadra.org/index.php/58_wrathful_buddhas",
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-024-zhi_khro_sngags_gso_khrag_%27thung_yum_lnga.jpg"
+            ]
+          }
+        },
+        {
+          "role": "consort",
+          "name_en": "Buddha-Krotishaurima",
+          "name_source_de": "Mutter Buddha-Krotishaurima",
+          "body_colour_source": null,
+          "items": [
+            {
+              "hand": "left",
+              "item_en": "a blood-filled bowl (blutgefüllte Schale) — ‘red’ is not said on this day",
+              "item_de": "a blood-filled bowl (blutgefüllte Schale) — ‘red’ is not said on this day"
+            }
+          ],
+          "posture": "Right hand clasps his neck; left holds the blood-filled bowl to his mouth. They appear in union (Father and Mother).",
+          "source_lines": [
+            755
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "note": "From the bowl come sounds like crackling, clashing and thunder. Her own body colour, heads and arms are not stated."
+        }
+      ],
+      "lights": [],
+      "silences": [
+        "No paired wisdom / dull realm lights on the wrathful days.",
+        "No quarter named for Buddha-Heruka.",
+        "Consort’s colour, heads and arms not stated.",
+        "Which of the three right or left hands holds which emblem is not ordered.",
+        "‘Horned eagle’ is not named Garuda in this sentence.",
+        "Four firmly planted feet and ‘one leg bent, the other extended’ are both stated."
+      ],
+      "jung_step": 9,
+      "outside_source_note": "Dudjom five blood-drinking fathers tsagli: each has three faces and six arms, in family colours (dark blue, yellow, red, dark green, and a central maroon-red figure). The figures have wings, which the German source never mentions. The card shows the five without consorts; the source has Father-Mother union. The central figure is maroon-red, not the source’s dark brown for Buddha-Heruka — the source wins for colour."
+    },
+    {
+      "id": "chonyid_day_07",
+      "kind": "chonyid_day",
+      "chonyid_day": 7,
+      "calendar_day": 10,
+      "phase": "peaceful",
+      "title_en": "Step 10 — Book day 7 — knowledge-holders and ḍākinīs",
+      "source_lines": [
+        697,
+        725
+      ],
+      "direction": "centre and the four quarters of the knowledge-holder maṇḍala",
+      "buddha_realm": {
+        "en": "from the pure paradise realms",
+        "de": "reine Paradiesreiche"
+      },
+      "deities": [
+        {
+          "role": "knowledge_holder",
+          "name_en": "the supreme knowledge-holder, the Lotus God of the Dance, who ripens karmic fruits",
+          "name_source_de": "der höchste Wissenshalter, der Lotus-Gott des Tanzes, der die karmischen Früchte reifen lässt",
+          "direction": "centre",
+          "body_colour_source": "radiant in all five colours",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "crescent knife",
+              "item_de": "sichelförmiges Messer"
+            },
+            {
+              "hand": "unspecified",
+              "item_en": "skull-cup full of blood",
+              "item_de": "Schädelschale voller Blut"
+            }
+          ],
+          "posture": "dances and performs the enchanting mudrā by raising the right hand; surrounded by rainbow light",
+          "source_lines": [
+            702
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null
+        },
+        {
+          "role": "consort_dakini",
+          "name_en": "red ḍākinī",
+          "name_source_de": "rote Dakini",
+          "direction": "centre",
+          "body_colour_source": "red",
+          "items": [],
+          "note": "Embraces the central knowledge-holder. Held items not stated.",
+          "source_lines": [
+            702
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          }
+        },
+        {
+          "role": "knowledge_holder",
+          "name_en": "the earth-dwelling knowledge-holder",
+          "name_source_de": "„auf Erden weilende Wissenshalter“",
+          "direction": "east",
+          "body_colour_source": "white",
+          "face": "smiling countenance (lächelndes Antlitz)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "knife",
+              "item_de": "Messer"
+            },
+            {
+              "hand": "unspecified",
+              "item_en": "skull-cup",
+              "item_de": "Schädelschale"
+            }
+          ],
+          "posture": "dances and performs the mudrā",
+          "source_lines": [
+            703
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#E6E0D4",
+            "label": "outside source: our own choice",
+            "palette_key": "white"
+          }
+        },
+        {
+          "role": "consort_dakini",
+          "name_en": "white ḍākinī",
+          "name_source_de": "weiße Dakini",
+          "direction": "east",
+          "body_colour_source": "white",
+          "source_lines": [
+            703
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "body_colour_hex": {
+            "value": "#E6E0D4",
+            "label": "outside source: our own choice",
+            "palette_key": "white"
+          }
+        },
+        {
+          "role": "knowledge_holder",
+          "name_en": "knowledge-holder ‘Lord of Life-span’",
+          "name_source_de": "Wissenshalter „Herr der Lebensdauer“",
+          "direction": "south",
+          "body_colour_source": "yellow",
+          "items": [],
+          "posture": "in the same posture (in gleicher Haltung) — taken as the dance and mudrā of the eastern figure; knife and skull-cup are not named again",
+          "source_lines": [
+            704
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#C4A24A",
+            "label": "outside source: our own choice",
+            "palette_key": "yellow"
+          }
+        },
+        {
+          "role": "consort_dakini",
+          "name_en": "yellow ḍākinī",
+          "name_source_de": "gelbe Dakini",
+          "direction": "south",
+          "body_colour_source": "yellow",
+          "source_lines": [
+            704
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "body_colour_hex": {
+            "value": "#C4A24A",
+            "label": "outside source: our own choice",
+            "palette_key": "yellow"
+          }
+        },
+        {
+          "role": "knowledge_holder",
+          "name_en": "knowledge-holder of the Great Symbol",
+          "name_source_de": "Wissenshalter des großen Symbols",
+          "direction": "west",
+          "body_colour_source": "red",
+          "items": [],
+          "note": "Held items and posture are not restated for the west.",
+          "source_lines": [
+            705
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          }
+        },
+        {
+          "role": "consort_dakini",
+          "name_en": "red ḍākinī",
+          "name_source_de": "rote Dakini",
+          "direction": "west",
+          "body_colour_source": "red",
+          "source_lines": [
+            705
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          }
+        },
+        {
+          "role": "knowledge_holder",
+          "name_en": "the self-unfolded knowledge-holder",
+          "name_source_de": "„selbstentfaltete Wissenshalter“",
+          "direction": "north",
+          "body_colour_source": "green",
+          "face": "half wrathful, half smiling (halb zornigem, halb lächelndem Antlitz)",
+          "items": [],
+          "note": "Held items and posture are not restated for the north.",
+          "source_lines": [
+            706
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#3A6B48",
+            "label": "outside source: our own choice",
+            "palette_key": "green"
+          }
+        },
+        {
+          "role": "consort_dakini",
+          "name_en": "green ḍākinī",
+          "name_source_de": "grüne Dakini",
+          "direction": "north",
+          "body_colour_source": "green",
+          "source_lines": [
+            706
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "body_colour_hex": {
+            "value": "#3A6B48",
+            "label": "outside source: our own choice",
+            "palette_key": "green"
+          }
+        },
+        {
+          "role": "hosts",
+          "name_en": "hosts of ḍākinīs, heroes and heroines, heavenly warriors and protective deities, male and female",
+          "name_source_de": "Scharen von Dakinis (acht Verbrennungsplätze, vier Klassen, drei Stätten, dreißig heilige Orte und vierundzwanzig Pilgerstätten); Helden und Heldinnen, himmlische Krieger und schützende Gottheiten",
+          "ornaments": "the six bone ornaments",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "drums",
+              "item_de": "drums"
+            },
+            {
+              "hand": "unspecified",
+              "item_en": "bone trumpets (Knochentrompeten)",
+              "item_de": "bone trumpets (Knochentrompeten)"
+            },
+            {
+              "hand": "unspecified",
+              "item_en": "skull drums (Schädeltrommeln)",
+              "item_de": "skull drums (Schädeltrommeln)"
+            },
+            {
+              "hand": "unspecified",
+              "item_en": "banners of skin (Banner aus Haut)",
+              "item_de": "banners of skin (Banner aus Haut)"
+            },
+            {
+              "hand": "unspecified",
+              "item_en": "other fearsome insignia",
+              "item_de": "other fearsome insignia"
+            }
+          ],
+          "note": "Their sounds fill the worlds. Individual colours and head-counts are not given.",
+          "source_lines": [
+            707
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null
+        }
+      ],
+      "lights": [
+        {
+          "kind": "wisdom",
+          "colour_source": "five-coloured, trembling and clear as fine threads of light, almost too bright to bear; also the many-coloured radiation of purified inclinations",
+          "colour_hex": null,
+          "name_en": "simultaneously born wisdom",
+          "name_de": "gleichzeitig geborene Weisheit",
+          "from": "the hearts of the five chief deities, striking the heart",
+          "sound": "the natural sound of truth like a thousand thunders; mighty sounds and shaking mantras",
+          "source_lines": [
+            700,
+            708,
+            710
+          ]
+        },
+        {
+          "kind": "dull_realm",
+          "colour_source": "dull blue",
+          "colour_hex": {
+            "value": "#3A4A62",
+            "label": "outside source: our own choice",
+            "palette_key": "dull_blue"
+          },
+          "realm_en": "animal world",
+          "realm_de": "Tierwelt",
+          "poison": "passion and ignorance (verdunkelnde Leidenschaft und Unwissenheit)",
+          "if_followed": "one falls into the animal world and suffers ignorance, dependence and dull misery",
+          "source_lines": [
+            698,
+            709,
+            711
+          ]
+        }
+      ],
+      "silences": [
+        "Head, arm and leg counts are not stated.",
+        "Which hand holds knife or skull-cup is not stated (except the raised right hand of the central mudrā).",
+        "West and north knowledge-holders: items not restated.",
+        "Ḍākinī consorts: no held items."
+      ],
+      "jung_step": 10
+    },
+    {
+      "id": "chonyid_day_06",
+      "kind": "chonyid_day",
+      "chonyid_day": 6,
+      "calendar_day": 9,
+      "phase": "peaceful",
+      "title_en": "Step 11 — Book day 6 — the forty-two peaceful deities together",
+      "source_lines": [
+        658,
+        695
+      ],
+      "direction": "all five at once (centre, east, south, west, north)",
+      "buddha_realm": {
+        "en": "All five realms at once: centre, spreading of the seed; east, realm of highest bliss; south, splendidly appointed realm; west, blissful realm of the lotus-gathering; north, realm of accomplished good deeds. All in a circle of rainbow light.",
+        "de": "zentralen Reich der Ausbreitung des Samens; östlichen Reich höchsten Glücks; südlichen, prachtvoll ausgestatteten Reich; glückseligen westlichen Reich der Lotusansammlung; nördlichen Reich vollbrachter guter Taten (line 665)."
+      },
+      "element": "the four colours of the primal state of the four elements — water, earth, fire and air — appear together (line 665). Space is not named as an element-colour here.",
+      "deities": [
+        {
+          "role": "main_couple",
+          "name_en": "Vairocana, divine Father-Mother, with retinue",
+          "name_source_de": "Vairocana",
+          "direction": "centre",
+          "note": "Attributes as on day 1; not restated.",
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "consort_sanskrit": "Ākāśadhātvīśvarī",
+            "consort_colour": "white, holding a wheel",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "emblem_hands": "Both hands hold the eight-spoked wheel at the lap.",
+            "urls": [
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-015-zhi_khro_sngags_gso_rigs_lnga_yab_lnga.jpg",
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-016-zhi_khro_sngags_gso_rigs_lnga_yum_lnga.jpg"
+            ],
+            "composition_conflict": "The Dudjom cards show Father and Mother as separate figures; the German source has them in union. The source wins for composition."
+          }
+        },
+        {
+          "role": "main_couple",
+          "name_en": "Vajrasattva, divine Father-Mother, with retinue",
+          "name_source_de": "Vajrasattva",
+          "direction": "east",
+          "note": "Attributes as on day 2; not restated. Here called Buddha Vajrasattva, not ‘Akshobhya in the form of Vajrasattva’.",
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "consort_sanskrit": "Māmakī",
+            "consort_colour": "blue",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "emblem_hands": "Right hand on the right knee, left hand in the lap.",
+            "urls": [
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-015-zhi_khro_sngags_gso_rigs_lnga_yab_lnga.jpg",
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-016-zhi_khro_sngags_gso_rigs_lnga_yum_lnga.jpg"
+            ],
+            "composition_conflict": "The Dudjom cards show Father and Mother as separate figures; the German source has them in union. The source wins for composition."
+          }
+        },
+        {
+          "role": "main_couple",
+          "name_en": "Ratnasambhava, divine Father-Mother, with retinue",
+          "name_source_de": "Ratnasambhava",
+          "direction": "south",
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "consort_sanskrit": "Buddhalocanā",
+            "consort_colour": "yellow",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "urls": [
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-015-zhi_khro_sngags_gso_rigs_lnga_yab_lnga.jpg",
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-016-zhi_khro_sngags_gso_rigs_lnga_yum_lnga.jpg"
+            ],
+            "composition_conflict": "The Dudjom cards show Father and Mother as separate figures; the German source has them in union. The source wins for composition."
+          }
+        },
+        {
+          "role": "main_couple",
+          "name_en": "Amitābha, divine Father-Mother, with retinue",
+          "name_source_de": "Amitabha",
+          "direction": "west",
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "consort_sanskrit": "Pāṇḍaravāsinī",
+            "consort_colour": "red, holding a lotus",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "urls": [
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-015-zhi_khro_sngags_gso_rigs_lnga_yab_lnga.jpg",
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-016-zhi_khro_sngags_gso_rigs_lnga_yum_lnga.jpg"
+            ],
+            "composition_conflict": "The Dudjom cards show Father and Mother as separate figures; the German source has them in union. The source wins for composition."
+          }
+        },
+        {
+          "role": "main_couple",
+          "name_en": "Amoghasiddhi, divine Father-Mother, with retinue",
+          "name_source_de": "Amoghasiddhi",
+          "direction": "north",
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "consort_sanskrit": "Samayatārā",
+            "consort_colour": "green, holding a flower",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "urls": [
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-015-zhi_khro_sngags_gso_rigs_lnga_yab_lnga.jpg",
+              "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-016-zhi_khro_sngags_gso_rigs_lnga_yum_lnga.jpg"
+            ],
+            "composition_conflict": "The Dudjom cards show Father and Mother as separate figures; the German source has them in union. The source wins for composition."
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Kṣitigarbha",
+          "name_source_de": "Kshitigarbha",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 2,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Kṣitigarbha",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-017-zhi_khro_sngags_gso_sems_dpa%27_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here."
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Maitreya",
+          "name_source_de": "Maitreya",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 2,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Maitreya",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-017-zhi_khro_sngags_gso_sems_dpa%27_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here."
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Ākāśagarbha",
+          "name_source_de": "Akasagarbha",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 3,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Ākāśagarbha",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-017-zhi_khro_sngags_gso_sems_dpa%27_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here."
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Samantabhadra (bodhisattva)",
+          "name_source_de": "Samantabhadra",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 3,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Samantabhadra",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-017-zhi_khro_sngags_gso_sems_dpa%27_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here."
+          },
+          "note": "The bodhisattva, not the primordial Buddha."
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Avalokiteśvara",
+          "name_source_de": "Tschenrazie",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 4,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Avalokiteśvara",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-017-zhi_khro_sngags_gso_sems_dpa%27_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here."
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Mañjuśrī",
+          "name_source_de": "Jampal",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 4,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Mañjuśrī",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-017-zhi_khro_sngags_gso_sems_dpa%27_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here; a reddish figure with a sword on a lotus is almost certainly Mañjuśrī."
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Vajrapāṇi",
+          "name_source_de": "Tschag-na-Dorje",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 5,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Vajrapāṇi",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-017-zhi_khro_sngags_gso_sems_dpa%27_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here."
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Nivaraṇaviṣkambhin",
+          "name_source_de": "Dibpanamsel",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 5,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Nivaraṇaviṣkambhin",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-017-zhi_khro_sngags_gso_sems_dpa%27_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here."
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Lāsyā",
+          "name_source_de": "Lasema",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 2,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Lāsyā",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-018-zhi_khro_sngags_gso_sems_ma_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here."
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Puṣpā",
+          "name_source_de": "Pushpema",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 2,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Puṣpā",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-018-zhi_khro_sngags_gso_sems_ma_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here."
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Mālyā",
+          "name_source_de": "Mālima",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 3,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Mālyā",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-018-zhi_khro_sngags_gso_sems_ma_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here."
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Dhūpā",
+          "name_source_de": "Dhupema",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 3,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Dhūpā",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-018-zhi_khro_sngags_gso_sems_ma_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here."
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Gītā",
+          "name_source_de": "Ghirdhima",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 4,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Gītā",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-018-zhi_khro_sngags_gso_sems_ma_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here; a lute marks Gītā."
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Ālokā",
+          "name_source_de": "Aloka",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 4,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Ālokā",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-018-zhi_khro_sngags_gso_sems_ma_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here."
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Gandhā",
+          "name_source_de": "Gandhema",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 5,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Gandhā",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-018-zhi_khro_sngags_gso_sems_ma_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here."
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Nartī",
+          "name_source_de": "Nidhema",
+          "body_colour_source": null,
+          "source_lines": [
+            665
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "appears_on_book_day": 5,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Nartī",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-018-zhi_khro_sngags_gso_sems_ma_brgyad.jpg",
+            "note": "One face, two arms, mixed family colours (white, yellow, red, green, some pink) on the uncaptioned Dudjom eight-bodhisattva cards. Individual name-to-colour mapping is not certain enough to assign here."
+          },
+          "note": "RY Wiki writes ‘Nirti’."
+        },
+        {
+          "role": "door_keeper_male",
+          "name_en": "the Victorious",
+          "name_source_de": "der Siegreiche",
+          "body_colour_source": null,
+          "source_lines": [
+            666
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Mahābala",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "card_note": "The Dudjom male door-keeper tsagli shows four wrathful, three-eyed, two-armed figures in yellow, red, pink-red and green, in flames; there is no white figure, so they cannot be mapped cleanly onto east=white. The German source does not call the day-6 door-keepers wrathful or give colours.",
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-020-zhi_khro_sngags_gso_sgo_ba_bzhi.jpg"
+          }
+        },
+        {
+          "role": "door_keeper_male",
+          "name_en": "the Conqueror of the Death Lord",
+          "name_source_de": "der Bezwinger des Todesgottes",
+          "body_colour_source": null,
+          "source_lines": [
+            666
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Yamāntaka",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "card_note": "The Dudjom male door-keeper tsagli shows four wrathful, three-eyed, two-armed figures in yellow, red, pink-red and green, in flames; there is no white figure, so they cannot be mapped cleanly onto east=white. The German source does not call the day-6 door-keepers wrathful or give colours.",
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-020-zhi_khro_sngags_gso_sgo_ba_bzhi.jpg"
+          }
+        },
+        {
+          "role": "door_keeper_male",
+          "name_en": "the Horse-necked King",
+          "name_source_de": "der Pferdehalsige König",
+          "body_colour_source": null,
+          "note": "Horse-neck is in the name only.",
+          "source_lines": [
+            666
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Hayagrīva",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "card_note": "The Dudjom male door-keeper tsagli shows four wrathful, three-eyed, two-armed figures in yellow, red, pink-red and green, in flames; there is no white figure, so they cannot be mapped cleanly onto east=white. The German source does not call the day-6 door-keepers wrathful or give colours.",
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-020-zhi_khro_sngags_gso_sgo_ba_bzhi.jpg"
+          }
+        },
+        {
+          "role": "door_keeper_male",
+          "name_en": "the Bearer of the Nectar Vase",
+          "name_source_de": "der Träger der Nektarurne",
+          "body_colour_source": null,
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "nectar vase (named in the title)",
+              "item_de": "Nektarurne"
+            }
+          ],
+          "source_lines": [
+            666
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Amṛtakuṇḍalin",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "card_note": "The Dudjom male door-keeper tsagli shows four wrathful, three-eyed, two-armed figures in yellow, red, pink-red and green, in flames; there is no white figure, so they cannot be mapped cleanly onto east=white. The German source does not call the day-6 door-keepers wrathful or give colours.",
+            "card_url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-020-zhi_khro_sngags_gso_sgo_ba_bzhi.jpg"
+          }
+        },
+        {
+          "role": "door_keeper_female",
+          "name_en": "the Goad-bearer",
+          "name_source_de": "die Stachelträgerin",
+          "body_colour_source": null,
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "goad / prod",
+              "item_de": "Stachel"
+            }
+          ],
+          "source_lines": [
+            666
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Aṅkuśā",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities"
+          }
+        },
+        {
+          "role": "door_keeper_female",
+          "name_en": "the Noose-bearer",
+          "name_source_de": "die Schlingenträgerin",
+          "body_colour_source": null,
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "noose",
+              "item_de": "Schlinge"
+            }
+          ],
+          "source_lines": [
+            666
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Pāśā",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities"
+          }
+        },
+        {
+          "role": "door_keeper_female",
+          "name_en": "the Chain-bearer",
+          "name_source_de": "die Kettenträgerin",
+          "body_colour_source": null,
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "chain",
+              "item_de": "Kette"
+            }
+          ],
+          "source_lines": [
+            666
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Sphoṭā (RY writes Sphota)",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities"
+          }
+        },
+        {
+          "role": "door_keeper_female",
+          "name_en": "the Bell-bearer",
+          "name_source_de": "die Glockenträgerin",
+          "body_colour_source": null,
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "bell",
+              "item_de": "Glocke"
+            }
+          ],
+          "source_lines": [
+            666
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Ghaṇṭā (RY writes Gantha)",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities"
+          }
+        },
+        {
+          "role": "realm_teacher",
+          "name_en": "Buddha of the Devas, ‘He of highest power’",
+          "name_source_de": "Buddha der Devas, „Der von höchster Macht“",
+          "body_colour_source": null,
+          "source_lines": [
+            666
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Munīndra",
+            "body_colour": "golden / pale",
+            "items": "playing a lute",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-019-zhi_khro_sngags_gso_thub_drug.jpg",
+            "note": "Tentative mapping by emblem on the uncaptioned six-munis tsagli."
+          }
+        },
+        {
+          "role": "realm_teacher",
+          "name_en": "Buddha of the Asuras, ‘He of strong nature’",
+          "name_source_de": "Buddha der Asuras, „Der von starker Natur“",
+          "body_colour_source": null,
+          "source_lines": [
+            666
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Vemacitra",
+            "body_colour": "green",
+            "items": "sword and a hanging suit of armour",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-019-zhi_khro_sngags_gso_thub_drug.jpg",
+            "note": "Tentative mapping by emblem on the uncaptioned six-munis tsagli."
+          }
+        },
+        {
+          "role": "realm_teacher",
+          "name_en": "Buddha of humans, ‘the Lion of the Śākyas’",
+          "name_source_de": "Buddha der Menschen, „Der Löwe der Sakyas“",
+          "body_colour_source": null,
+          "source_lines": [
+            666
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Śākyamuni",
+            "body_colour": "golden",
+            "items": "monk’s staff and alms-bowl",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-019-zhi_khro_sngags_gso_thub_drug.jpg",
+            "note": "Tentative mapping by emblem on the uncaptioned six-munis tsagli."
+          }
+        },
+        {
+          "role": "realm_teacher",
+          "name_en": "Buddha of animals, ‘the Unshakeable Lion’",
+          "name_source_de": "Buddha der Tiere, „Der Unerschütterliche Löwe“",
+          "body_colour_source": null,
+          "source_lines": [
+            666
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Siṃha",
+            "body_colour": "blue",
+            "items": "holding a book",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-019-zhi_khro_sngags_gso_thub_drug.jpg",
+            "note": "Tentative mapping by emblem on the uncaptioned six-munis tsagli."
+          }
+        },
+        {
+          "role": "realm_teacher",
+          "name_en": "Buddha of the Pretas, ‘He with flaming mouth’",
+          "name_source_de": "Buddha der Pretas, „Der mit flammendem Mund“",
+          "body_colour_source": null,
+          "source_lines": [
+            666
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Jvālamukha",
+            "body_colour": "ash-grey",
+            "items": "a flame in the right hand and a bowl in the left",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-019-zhi_khro_sngags_gso_thub_drug.jpg",
+            "note": "Tentative mapping by emblem on the uncaptioned six-munis tsagli."
+          }
+        },
+        {
+          "role": "realm_teacher",
+          "name_en": "Buddha of the underworld, ‘the King of Truth’",
+          "name_source_de": "Buddha der Unterwelt, „Der König der Wahrheit“",
+          "body_colour_source": null,
+          "source_lines": [
+            666
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Yamarāja",
+            "body_colour": "golden-orange",
+            "items": "a flask held in both hands",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-019-zhi_khro_sngags_gso_thub_drug.jpg",
+            "note": "Tentative mapping by emblem on the uncaptioned six-munis tsagli; this identification is the least certain of the six."
+          }
+        },
+        {
+          "role": "primordial",
+          "name_en": "Samantabhadra",
+          "name_source_de": "Samantabhadra; der Allgütige Vater",
+          "body_colour_source": null,
+          "note": "Great primordial father of all Buddhas. Colour, throne and items not stated.",
+          "source_lines": [
+            667
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "body_colour": "deep blue (both Samantabhadra and Samantabhadri)",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "items": "none; both naked and unornamented, in union on a lotus",
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-001-zhi_khro_sngags_gso_bum_tsak_kun_bzang_yab_yum.jpg",
+            "note": "Some other traditions paint Samantabhadri white; this card has both blue. The source is silent on colour."
+          }
+        },
+        {
+          "role": "primordial",
+          "name_en": "Samantabhadri",
+          "name_source_de": "Samantabhadri; die Allgütige Mutter",
+          "body_colour_source": null,
+          "note": "Great primordial mother of all Buddhas. Colour, throne and items not stated.",
+          "source_lines": [
+            667
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "body_colour": "deep blue (both Samantabhadra and Samantabhadri)",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "items": "none; both naked and unornamented, in union on a lotus",
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-001-zhi_khro_sngags_gso_bum_tsak_kun_bzang_yab_yum.jpg",
+            "note": "Some other traditions paint Samantabhadri white; this card has both blue. The source is silent on colour."
+          }
+        }
+      ],
+      "assembly_note": "These forty-two fully appointed deities arise from one’s own heart (line 668). They have their ornaments, colours, postures, thrones and emblems (line 670), but those attributes are not itemised again here. Groups of five couples, each surrounded by a fivefold circle of radiations (line 671). They appear from the four regions of the heart together with the centre (line 669).",
+      "lights": [
+        {
+          "kind": "wisdom",
+          "colour_source": "blue light-worlds, like inverted turquoise chalices",
+          "colour_hex": {
+            "value": "#2F5F8A",
+            "label": "outside source: our own choice",
+            "palette_key": "wisdom_blue"
+          },
+          "name_en": "Dharma-Dhātu wisdom",
+          "from": "hearts of the five Father-Mother figures",
+          "source_lines": [
+            672
+          ],
+          "note": "The four wisdom paths appear simultaneously and strike the heart (line 663)."
+        },
+        {
+          "kind": "wisdom",
+          "colour_source": "white, clear and radiant, light-worlds like inverted mirrors",
+          "colour_hex": {
+            "value": "#F4F1E6",
+            "label": "outside source: our own choice",
+            "palette_key": "brilliant_white"
+          },
+          "name_en": "mirror-like wisdom",
+          "from": "Vajrasattva’s heart",
+          "source_lines": [
+            673
+          ]
+        },
+        {
+          "kind": "wisdom",
+          "colour_source": "yellow, light-worlds like inverted golden chalices",
+          "colour_hex": {
+            "value": "#D8BC55",
+            "label": "outside source: our own choice",
+            "palette_key": "wisdom_yellow"
+          },
+          "name_en": "wisdom of equality",
+          "from": "Ratnasambhava’s heart",
+          "source_lines": [
+            674
+          ]
+        },
+        {
+          "kind": "wisdom",
+          "colour_source": "red, luminous and clear, light-worlds like inverted coral chalices",
+          "colour_hex": {
+            "value": "#C24A4A",
+            "label": "outside source: our own choice",
+            "palette_key": "wisdom_red"
+          },
+          "name_en": "discriminating wisdom",
+          "from": "Amitābha’s heart",
+          "source_lines": [
+            675
+          ]
+        },
+        {
+          "kind": "wisdom_withheld",
+          "colour_source": "green (does not appear)",
+          "colour_hex": {
+            "value": "#4A8A5A",
+            "label": "outside source: our own choice",
+            "palette_key": "wisdom_green"
+          },
+          "name_en": "all-accomplishing wisdom — withheld",
+          "name_de": "grüner Lichtpfad der alles vollbringenden Weisheit erscheint dir nicht",
+          "note": "It does not appear, because this wisdom-faculty is not yet fully developed (line 678).",
+          "source_lines": [
+            678
+          ]
+        },
+        {
+          "kind": "dull_realm",
+          "colour_source": "dull white",
+          "colour_hex": {
+            "value": "#C9C3B5",
+            "label": "outside source: our own choice",
+            "palette_key": "dull_white"
+          },
+          "realm_en": "Devas",
+          "source_lines": [
+            682
+          ]
+        },
+        {
+          "kind": "dull_realm",
+          "colour_source": "dull green",
+          "colour_hex": {
+            "value": "#4A5E48",
+            "label": "outside source: our own choice",
+            "palette_key": "dull_green"
+          },
+          "realm_en": "Asuras",
+          "source_lines": [
+            682
+          ]
+        },
+        {
+          "kind": "dull_realm",
+          "colour_source": "dull yellow",
+          "colour_hex": {
+            "value": "#A89A55",
+            "label": "outside source: our own choice",
+            "palette_key": "dull_yellow"
+          },
+          "realm_en": "humans",
+          "source_lines": [
+            682
+          ]
+        },
+        {
+          "kind": "dull_realm",
+          "colour_source": "dull blue",
+          "colour_hex": {
+            "value": "#3A4A62",
+            "label": "outside source: our own choice",
+            "palette_key": "dull_blue"
+          },
+          "realm_en": "animals",
+          "source_lines": [
+            682
+          ]
+        },
+        {
+          "kind": "dull_realm",
+          "colour_source": "dull reddish (trübes rötliches)",
+          "colour_hex": {
+            "value": "#7A4548",
+            "label": "outside source: our own choice",
+            "palette_key": "dull_red"
+          },
+          "realm_en": "Pretas",
+          "note": "Day 4 and Sidpa say dull red (rotes), not reddish.",
+          "source_lines": [
+            682
+          ]
+        },
+        {
+          "kind": "dull_realm",
+          "colour_source": "dull smoky (trübes rauchfarbenes)",
+          "colour_hex": {
+            "value": "#5C5550",
+            "label": "outside source: our own choice",
+            "palette_key": "smoky"
+          },
+          "realm_en": "hell-beings (Höllenwesen)",
+          "source_lines": [
+            682
+          ]
+        }
+      ],
+      "poison": "the five poisons (die fünf Gifte), not itemised again here (line 687).",
+      "silences": [
+        "The German source says forty-two deities but does not list all forty-two by name. Days 2–5 name only eight bodhisattvas. The remaining eight names, and the Sanskrit forms of the door-keepers and munis, are filled under outside_source from the RY Wiki Peaceful Deities page.",
+        "Door-keepers: no body colours, directions, animal heads, or arm/head counts in the source. Items implied only by female titles and the nectar-vase title. The Dudjom male door-keeper card is wrathful in appearance and has no white figure; colours are not mapped onto the four German names.",
+        "The six teachers and Samantabhadra / Samantabhadri: no colours, thrones or held items in the source. Visual fills are under outside_source, from Dudjom cards, with tentative emblem mapping for the munis.",
+        "Green all-accomplishing wisdom path is explicitly withheld, not omitted by silence.",
+        "Individual colours for each of the sixteen bodhisattvas cannot be assigned with certainty from the uncaptioned cards."
+      ],
+      "jung_step": 11,
+      "outside_source_note": "Complete 42-name list from https://rywiki.tsadra.org/index.php/Peaceful_Deities. Visual fills from Dudjom Zhi khro sngags gso tsaglis. Prefer Peaceful Deities over zhi ba'i lha zhe gnyis (the latter omits bodhisattva Samantabhadra and totals 41).",
+      "assembly_count_note": "The German source and the RY Peaceful Deities list both count forty-two. This entry stores five main_couple records (each Father-Mother pair counts as two figures) plus sixteen bodhisattvas, eight door-keepers, six munis and the primordial pair, totalling forty-two figures."
+    },
+    {
+      "id": "chonyid_day_05",
+      "kind": "chonyid_day",
+      "chonyid_day": 5,
+      "calendar_day": 8,
+      "phase": "peaceful",
+      "title_en": "Step 12 — Book day 5 — Amoghasiddhi",
+      "source_lines": [
+        639,
+        657
+      ],
+      "direction": "north",
+      "buddha_realm": {
+        "en": "the green northern realm of accomplished action",
+        "de": "grünes nördliches Reich der vollbrachten Handlungen; later also Reich der vollbrachten guten Taten (line 657)"
+      },
+      "element": "air, the green light as the primal form of the air element (Luft)",
+      "deities": [
+        {
+          "role": "main_buddha",
+          "name_en": "Amoghasiddhi",
+          "name_source_de": "Amoghasiddhi",
+          "epithet": "Bhagavan Buddha",
+          "body_colour_source": "green (von grüner Farbe)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "a crossed vajra",
+              "item_de": "gekreuzter Vajra"
+            }
+          ],
+          "mount_or_throne": {
+            "en": "sky-spanning Garuda throne",
+            "de": "himmelüberspannender Garudathron"
+          },
+          "source_lines": [
+            643
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#3A6B48",
+            "label": "outside source: our own choice",
+            "palette_key": "green"
+          },
+          "outside_source": {
+            "label": "outside the source",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-015-zhi_khro_sngags_gso_rigs_lnga_yab_lnga.jpg"
+          }
+        },
+        {
+          "role": "consort",
+          "name_en": "the faithful Tārā (Dölma)",
+          "name_source_de": "die getreue Dölma (line 643); in the prayer: die getreue Tara (line 654)",
+          "body_colour_source": null,
+          "items": [],
+          "note": "She embraces him. Colour and items not stated.",
+          "source_lines": [
+            643,
+            654
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Samayatārā",
+            "body_colour": "green",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "items": "Holds a flower.",
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-016-zhi_khro_sngags_gso_rigs_lnga_yum_lnga.jpg"
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Tschag-na-Dorje",
+          "name_source_de": "Tschag-na-Dorje",
+          "body_colour_source": null,
+          "source_lines": [
+            643
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Vajrapāṇi"
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Dibpanamsel",
+          "name_source_de": "Dibpanamsel",
+          "body_colour_source": null,
+          "source_lines": [
+            643
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Nivaraṇaviṣkambhin"
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Gandhema",
+          "name_source_de": "Gandhema",
+          "body_colour_source": null,
+          "source_lines": [
+            643
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Gandhā"
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Nidhema",
+          "name_source_de": "Nidhema",
+          "body_colour_source": null,
+          "source_lines": [
+            643
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Nartī (RY writes Nirti)"
+          }
+        }
+      ],
+      "assembly_note": "These six enlightened forms appear in a circle of rainbow light (line 643).",
+      "lights": [
+        {
+          "kind": "wisdom",
+          "colour_source": "radiant green, transparent and luminous, glorious and awe-inspiring, adorned with star-worlds and lesser stars",
+          "name_en": "all-accomplishing wisdom",
+          "name_de": "alles vollbringende Weisheit",
+          "source_lines": [
+            644,
+            652
+          ],
+          "colour_hex": {
+            "value": "#4A8A5A",
+            "label": "outside source: our own choice",
+            "palette_key": "wisdom_green"
+          },
+          "from": "the heart of the divine Father-Mother Amoghasiddhi, striking the heart"
+        },
+        {
+          "kind": "dull_realm",
+          "colour_source": "dull green",
+          "realm_en": "Asura world",
+          "poison": "jealousy (Eifersucht)",
+          "if_followed": "one falls into the Asura world and suffers strife and battle",
+          "source_lines": [
+            641,
+            645,
+            649
+          ],
+          "colour_hex": {
+            "value": "#4A5E48",
+            "label": "outside source: our own choice",
+            "palette_key": "dull_green"
+          }
+        }
+      ],
+      "silences": [
+        "Heads, arms and legs not stated.",
+        "Which hand holds the crossed vajra is not stated.",
+        "Consort and attendants: no body colours or held items."
+      ],
+      "jung_step": 12,
+      "outside_source_note": "Peaceful one-face two-arms and consort colours are from Dudjom tsagli cards; Sanskrit names for attendants from the RY Wiki Peaceful Deities list. The German source remains silent on these. Composition on the cards is separate figures, not yab-yum; the source has the Mother embracing the Buddha."
+    },
+    {
+      "id": "chonyid_day_04",
+      "kind": "chonyid_day",
+      "chonyid_day": 4,
+      "calendar_day": 7,
+      "phase": "peaceful",
+      "title_en": "Step 13 — Book day 4 — Amitābha",
+      "source_lines": [
+        622,
+        638
+      ],
+      "direction": "west",
+      "buddha_realm": {
+        "en": "the red western realm of bliss",
+        "de": "rotes westliches Reich des Glücks; day 6 also: glückseliges westliches Reich der Lotusansammlung (line 665)"
+      },
+      "element": "fire, the red light as the primal form of the fire element",
+      "deities": [
+        {
+          "role": "main_buddha",
+          "name_en": "Amitābha",
+          "name_source_de": "Amitabha",
+          "epithet": "Bhagavan Buddha",
+          "body_colour_source": "red (von roter Farbe)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "a lotus",
+              "item_de": "ein Lotus"
+            }
+          ],
+          "mount_or_throne": {
+            "en": "peacock throne",
+            "de": "Pfauenthron"
+          },
+          "source_lines": [
+            625
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#8E3A3A",
+            "label": "outside source: our own choice",
+            "palette_key": "red"
+          },
+          "outside_source": {
+            "label": "outside the source",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-015-zhi_khro_sngags_gso_rigs_lnga_yab_lnga.jpg"
+          }
+        },
+        {
+          "role": "consort",
+          "name_en": "Gökarmo (‘she with the white rein’)",
+          "name_source_de": "Gökarmo; in the prayer: „Sie mit dem weißen Zügel“ (line 635)",
+          "body_colour_source": null,
+          "items": [],
+          "note": "She embraces him. Body colour and held items not stated. The epithet names a white rein; the rein itself is not listed as an attribute in the appearance sentence.",
+          "source_lines": [
+            625,
+            635
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Pāṇḍaravāsinī",
+            "body_colour": "red",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "items": "Holds a lotus. The epithet ‘white rein’ is a name, not her body colour on this card.",
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-016-zhi_khro_sngags_gso_rigs_lnga_yum_lnga.jpg"
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Tschenrazie",
+          "name_source_de": "Tschenrazie",
+          "body_colour_source": null,
+          "source_lines": [
+            625
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Avalokiteśvara"
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Jampal",
+          "name_source_de": "Jampal",
+          "body_colour_source": null,
+          "source_lines": [
+            625
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Mañjuśrī"
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Ghirdhima",
+          "name_source_de": "Ghirdhima",
+          "body_colour_source": null,
+          "source_lines": [
+            625
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Gītā"
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Aloka",
+          "name_source_de": "Aloka",
+          "body_colour_source": null,
+          "source_lines": [
+            625
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Ālokā"
+          }
+        }
+      ],
+      "assembly_note": "The six bodies of enlightenment appear in a circle of rainbow light (line 625).",
+      "lights": [
+        {
+          "kind": "wisdom",
+          "colour_source": "radiant red, adorned with star-worlds and lesser stars, luminous, transparent, glorious and dazzling",
+          "name_en": "discriminating wisdom",
+          "name_de": "alles unterscheidende Weisheit / unterscheidende Weisheit",
+          "source_lines": [
+            626,
+            633
+          ],
+          "colour_hex": {
+            "value": "#C24A4A",
+            "label": "outside source: our own choice",
+            "palette_key": "wisdom_red"
+          },
+          "from": "the heart of the divine Father-Mother Amitābha, striking the heart"
+        },
+        {
+          "kind": "dull_realm",
+          "colour_source": "dull red",
+          "realm_en": "Preta world (hungry ghosts)",
+          "poison": "attachment, desire and avarice (Begehren, Geiz, Anhaftung)",
+          "if_followed": "one falls into the world of hungry ghosts and suffers hunger and thirst",
+          "source_lines": [
+            623,
+            627,
+            630
+          ],
+          "colour_hex": {
+            "value": "#7A4548",
+            "label": "outside source: our own choice",
+            "palette_key": "dull_red"
+          }
+        }
+      ],
+      "silences": [
+        "Heads, arms and legs not stated.",
+        "Which hand holds the lotus is not stated.",
+        "Consort and attendants: no body colours or held items."
+      ],
+      "jung_step": 13,
+      "outside_source_note": "Peaceful one-face two-arms and consort colours are from Dudjom tsagli cards; Sanskrit names for attendants from the RY Wiki Peaceful Deities list. The German source remains silent on these. Composition on the cards is separate figures, not yab-yum; the source has the Mother embracing the Buddha."
+    },
+    {
+      "id": "chonyid_day_03",
+      "kind": "chonyid_day",
+      "chonyid_day": 3,
+      "calendar_day": 6,
+      "phase": "peaceful",
+      "title_en": "Step 14 — Book day 3 — Ratnasambhava",
+      "source_lines": [
+        588,
+        621
+      ],
+      "direction": "south",
+      "buddha_realm": {
+        "en": "the southern, splendid realm",
+        "de": "südliches, prachtvolles Reich"
+      },
+      "element": "earth, appearing as yellow light",
+      "deities": [
+        {
+          "role": "main_buddha",
+          "name_en": "Ratnasambhava",
+          "name_source_de": "Ratnasambhava",
+          "epithet": "Bhagavan",
+          "body_colour_source": "yellow (von gelber Farbe)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "a jewel",
+              "item_de": "ein Juwel"
+            }
+          ],
+          "mount_or_throne": {
+            "en": "horse throne",
+            "de": "Pferdethron"
+          },
+          "source_lines": [
+            594
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#C4A24A",
+            "label": "outside source: our own choice",
+            "palette_key": "yellow"
+          },
+          "outside_source": {
+            "label": "outside the source",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-015-zhi_khro_sngags_gso_rigs_lnga_yab_lnga.jpg"
+          }
+        },
+        {
+          "role": "consort",
+          "name_en": "Sangyay-Tschanma",
+          "name_source_de": "Sangyay-Tschanma; the prayer (line 618) says only ‘the divine Mother’",
+          "body_colour_source": null,
+          "items": [],
+          "note": "She embraces him. Colour and items not stated.",
+          "source_lines": [
+            594,
+            618
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Buddhalocanā",
+            "body_colour": "yellow",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-016-zhi_khro_sngags_gso_rigs_lnga_yum_lnga.jpg"
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Ākāśagarbha",
+          "name_source_de": "Akasagarbha",
+          "body_colour_source": null,
+          "source_lines": [
+            595
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Ākāśagarbha"
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Samantabhadra",
+          "name_source_de": "Samantabhadra",
+          "body_colour_source": null,
+          "source_lines": [
+            595
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Samantabhadra (bodhisattva, not the primordial Buddha)"
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Mālima",
+          "name_source_de": "Mālima",
+          "body_colour_source": null,
+          "source_lines": [
+            595
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Mālyā"
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Dhupema",
+          "name_source_de": "Dhupema",
+          "body_colour_source": null,
+          "source_lines": [
+            595
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Dhūpā"
+          }
+        }
+      ],
+      "assembly_note": "Six divine appearances in a rainbow light (line 595).",
+      "lights": [
+        {
+          "kind": "wisdom",
+          "colour_source": "yellow, radiant, clear, of great luminosity",
+          "name_en": "wisdom of equality",
+          "name_de": "Weisheit der Gleichheit",
+          "source_lines": [
+            596
+          ],
+          "colour_hex": {
+            "value": "#D8BC55",
+            "label": "outside source: our own choice",
+            "palette_key": "wisdom_yellow"
+          },
+          "from": "pure sensibility appearing as this light"
+        },
+        {
+          "kind": "dull_realm",
+          "colour_source": "dull bluish-yellow (trübes, bläulich-gelbes Licht)",
+          "realm_en": "human world",
+          "poison": "pride / egoism (Egoismus); attachment is also named",
+          "if_followed": "the way of attachment, back into birth, age, sickness and death",
+          "note": "Day 6 (line 682) and Sidpa (line 1022) later call the human light dull yellow, without ‘bluish’.",
+          "source_lines": [
+            590,
+            597,
+            607,
+            615
+          ],
+          "colour_hex": {
+            "value": "#8F9A5C",
+            "label": "outside source: our own choice",
+            "palette_key": "bluish_yellow"
+          }
+        }
+      ],
+      "silences": [
+        "Heads, arms and legs not stated.",
+        "Which hand holds the jewel is not stated.",
+        "Consort and attendants: no colours or items."
+      ],
+      "jung_step": 14,
+      "outside_source_note": "Peaceful one-face two-arms and consort colours are from Dudjom tsagli cards; Sanskrit names for attendants from the RY Wiki Peaceful Deities list. The German source remains silent on these. Composition on the cards is separate figures, not yab-yum; the source has the Mother embracing the Buddha."
+    },
+    {
+      "id": "chonyid_day_02",
+      "kind": "chonyid_day",
+      "chonyid_day": 2,
+      "calendar_day": 5,
+      "phase": "peaceful",
+      "title_en": "Step 15 — Book day 2 — Akshobhya as Vajrasattva",
+      "source_lines": [
+        554,
+        587
+      ],
+      "direction": "east",
+      "buddha_realm": {
+        "en": "the eastern, deep-blue realm",
+        "de": "östliches, tiefblaues Reich"
+      },
+      "element": "water, appearing as white light",
+      "deities": [
+        {
+          "role": "main_buddha",
+          "name_en": "Akshobhya in the form of Vajrasattva",
+          "name_source_de": "Akshobhya in der Gestalt des Vajrasattva",
+          "epithet": "Bhagavan",
+          "body_colour_source": "blue (von blauer Farbe)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "five-pronged vajra",
+              "item_de": "fünfzackiger Vajra"
+            }
+          ],
+          "mount_or_throne": {
+            "en": "elephant throne",
+            "de": "Elefantenthron"
+          },
+          "note": "Jung’s commentary (lines 206–214) calls Vajrasattva white; the root text gives a blue body and a white wisdom light. Follow the root text for the mandala.",
+          "source_lines": [
+            559
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#2C4A6E",
+            "label": "outside source: our own choice",
+            "palette_key": "blue"
+          },
+          "outside_source": {
+            "label": "outside the source",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "emblem_hands": "Right hand on the right knee, left hand in the lap.",
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-015-zhi_khro_sngags_gso_rigs_lnga_yab_lnga.jpg"
+          }
+        },
+        {
+          "role": "consort",
+          "name_en": "Māmakī",
+          "name_source_de": "Mamaki; göttliche Mutter Mamaki (line 584)",
+          "body_colour_source": null,
+          "items": [],
+          "note": "She embraces him. Colour and items not stated.",
+          "source_lines": [
+            559,
+            584
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Māmakī",
+            "body_colour": "blue",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-016-zhi_khro_sngags_gso_rigs_lnga_yum_lnga.jpg"
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Kṣitigarbha",
+          "name_source_de": "Kshitigarbha",
+          "body_colour_source": null,
+          "source_lines": [
+            560
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Kṣitigarbha"
+          }
+        },
+        {
+          "role": "bodhisattva",
+          "name_en": "Maitreya",
+          "name_source_de": "Maitreya",
+          "body_colour_source": null,
+          "source_lines": [
+            560
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Maitreya"
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Lasema",
+          "name_source_de": "Lasema",
+          "body_colour_source": null,
+          "source_lines": [
+            560
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Lāsyā"
+          }
+        },
+        {
+          "role": "female_bodhisattva",
+          "name_en": "Pushpema",
+          "name_source_de": "Pushpema",
+          "body_colour_source": null,
+          "source_lines": [
+            560
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": [],
+          "outside_source": {
+            "label": "outside the source",
+            "url": "https://rywiki.tsadra.org/index.php/Peaceful_Deities",
+            "name_sanskrit": "Puṣpā"
+          }
+        }
+      ],
+      "assembly_note": "These six deities appear together (line 561).",
+      "lights": [
+        {
+          "kind": "wisdom",
+          "colour_source": "clear, luminous, dazzling white",
+          "name_en": "mirror-like wisdom",
+          "name_de": "spiegelgleiche Weisheit",
+          "source_lines": [
+            562
+          ],
+          "colour_hex": {
+            "value": "#F4F1E6",
+            "label": "outside source: our own choice",
+            "palette_key": "brilliant_white"
+          },
+          "from": "Vajrasattva’s heart; one’s own consciousness in its pure form"
+        },
+        {
+          "kind": "dull_realm",
+          "colour_source": "dull, smoky (trübes, rauchfarbenes Licht)",
+          "realm_en": "states of suffering (Bereiche der leidvollen Zustände)",
+          "poison": "anger (Zorn)",
+          "if_followed": "states of great suffering, from which escape is uncertain",
+          "note": "Day 2 does not use the word hell. Day 6 (line 682) and Sidpa (line 1022) name the hell-light smoky. Proposed link: same hell path, with a footnote.",
+          "source_lines": [
+            563,
+            573,
+            581
+          ],
+          "colour_hex": {
+            "value": "#5C5550",
+            "label": "outside source: our own choice",
+            "palette_key": "smoky"
+          }
+        }
+      ],
+      "silences": [
+        "Heads, arms and legs not stated.",
+        "Which hand holds the vajra is not stated.",
+        "Consort and four attendants: no colours or items."
+      ],
+      "jung_step": 15,
+      "outside_source_note": "Peaceful one-face two-arms and consort colours are from Dudjom tsagli cards; Sanskrit names for attendants from the RY Wiki Peaceful Deities list. The German source remains silent on these. Composition on the cards is separate figures, not yab-yum; the source has the Mother embracing the Buddha."
+    },
+    {
+      "id": "chonyid_day_01",
+      "kind": "chonyid_day",
+      "chonyid_day": 1,
+      "calendar_day": 4,
+      "phase": "peaceful",
+      "title_en": "Step 16 — Book day 1 — Vairocana",
+      "source_lines": [
+        528,
+        553
+      ],
+      "direction": "centre",
+      "buddha_realm": {
+        "en": "the central region called ‘scattering of the seed’",
+        "de": "zentraler Bereich, genannt „Ausstreuung des Samens“"
+      },
+      "element": null,
+      "deities": [
+        {
+          "role": "main_buddha",
+          "name_en": "Vairocana",
+          "name_source_de": "Vairochana",
+          "epithet": "Bhagavan",
+          "body_colour_source": "white (von weißer Farbe)",
+          "items": [
+            {
+              "hand": "unspecified",
+              "item_en": "eight-spoked wheel",
+              "item_de": "achtspeichiges Rad"
+            }
+          ],
+          "mount_or_throne": {
+            "en": "lion throne",
+            "de": "Löwenthron"
+          },
+          "source_lines": [
+            532
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "body_colour_hex": {
+            "value": "#E6E0D4",
+            "label": "outside source: our own choice",
+            "palette_key": "white"
+          },
+          "outside_source": {
+            "label": "outside the source",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "emblem_hands": "Both hands hold the eight-spoked wheel at the lap.",
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-015-zhi_khro_sngags_gso_rigs_lnga_yab_lnga.jpg"
+          }
+        },
+        {
+          "role": "consort",
+          "name_en": "Mother of Space",
+          "name_source_de": "Mutter des Himmelsraumes; also göttliche Mutter des unendlichen Raumes (line 550)",
+          "body_colour_source": null,
+          "items": [],
+          "note": "She embraces Vairocana. Colour, items, heads and arms are not stated.",
+          "source_lines": [
+            532,
+            550
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "outside_source": {
+            "label": "outside the source",
+            "name_sanskrit": "Ākāśadhātvīśvarī",
+            "body_colour": "white",
+            "heads": 1,
+            "faces": 1,
+            "arms": 2,
+            "items": "Holds a wheel (and a small implement in the raised hand).",
+            "url": "https://dudjom.tsadra.org/index.php/File:DJYD-KABUM-Tsagli-01-016-zhi_khro_sngags_gso_rigs_lnga_yum_lnga.jpg"
+          }
+        }
+      ],
+      "assembly_note": "No attendants named.",
+      "lights": [
+        {
+          "kind": "wisdom",
+          "colour_source": "blue",
+          "name_en": "Dharma-Dhātu wisdom",
+          "name_de": "Weisheit des Dharma-Dhatu",
+          "quality": "clear, luminous, overwhelming; the light of the Tathāgata",
+          "source_lines": [
+            533,
+            539,
+            541
+          ],
+          "colour_hex": {
+            "value": "#2F5F8A",
+            "label": "outside source: our own choice",
+            "palette_key": "wisdom_blue"
+          },
+          "from": "Vairocana’s heart"
+        },
+        {
+          "kind": "dull_realm",
+          "colour_source": "dull white",
+          "realm_en": "Devas",
+          "touches": "the forehead",
+          "poison": "ignorance (Unwissenheit)",
+          "if_followed": "one enters the Deva realms and the cycle of existence again",
+          "source_lines": [
+            535,
+            544,
+            547
+          ],
+          "colour_hex": {
+            "value": "#C9C3B5",
+            "label": "outside source: our own choice",
+            "palette_key": "dull_white"
+          }
+        }
+      ],
+      "silences": [
+        "Heads, arms and legs not stated.",
+        "Which hand holds the wheel is not stated.",
+        "No attendants.",
+        "Consort colour and items not stated."
+      ],
+      "field": "The whole sky appears deep blue.",
+      "field_hex": {
+        "value": "#1B3354",
+        "label": "outside source: our own choice",
+        "palette_key": "deep_blue_sky"
+      },
+      "jung_step": 16,
+      "outside_source_note": "Peaceful one-face two-arms and consort colours are from Dudjom tsagli cards; Sanskrit names for attendants from the RY Wiki Peaceful Deities list. The German source remains silent on these. Composition on the cards is separate figures, not yab-yum; the source has the Mother embracing the Buddha."
+    },
+    {
+      "id": "chikhai_secondary",
+      "kind": "chikhai",
+      "title_en": "Step 17 — Chikhai: secondary Clear Light",
+      "calendar_days": "0–3.5",
+      "source_lines": [
+        440,
+        478
+      ],
+      "appearance": "Dawns a short time after the out-breath has ceased. Mental clarity; the deceased does not know whether they are dead; they see relatives and hear lamentations. Karmic appearances and terrifying visions have not yet begun. Consciousness has an illusory body (Trugkörper) or thought-body (Gedankenkörper).",
+      "deities": [
+        {
+          "role": "optional_focus",
+          "name_en": "One’s protective deity, or ‘the great God of Compassion’",
+          "name_source_de": "Schutzgottheit; der große Gott des Mitgefühls",
+          "body_colour_source": null,
+          "note": "Visualisation: like the moon’s reflection in water (lines 449–453). For simple people: direct the mind to the great God of Compassion (line 456). No colour, heads, arms or items stated. Avalokiteśvara is not named here.",
+          "source_lines": [
+            449,
+            456
+          ],
+          "heads": null,
+          "faces": null,
+          "face_colours": null,
+          "arms": null,
+          "legs": null,
+          "items": []
+        }
+      ],
+      "colour_source": "No hue is named.",
+      "display_colour_hex": {
+        "value": "#F7F4EA",
+        "label": "outside source: our own choice",
+        "palette_key": "clear_light"
+      },
+      "silences": [
+        "Protective deity and ‘great God of Compassion’ have no iconographic attributes.",
+        "No hue for the light itself."
+      ],
+      "jung_step": 17
+    },
+    {
+      "id": "chikhai_primary",
+      "kind": "chikhai",
+      "title_en": "Step 18 — Chikhai: primary Clear Light",
+      "calendar_days": "0 (hours)",
+      "source_lines": [
+        384,
+        439
+      ],
+      "appearance": "The Clear Light of Reality, the unfailing mind of the Dharma-Kaya. All appearances are like a clear, cloudless sky; consciousness is empty, clear and boundless. This emptiness is not a nothing, but clear, living consciousness — the essence of the Buddha. Consciousness is at once empty and luminous, inseparably united.",
+      "deities": [],
+      "colour_source": "No hue is named.",
+      "display_colour_hex": {
+        "value": "#F7F4EA",
+        "label": "outside source: our own choice",
+        "palette_key": "clear_light"
+      },
+      "duration": "About one breath, or the time to take a meal; some traditions 3.5 days, or up to 4 days (lines 394, 415).",
+      "dissolution": "Only stage stated: the earth element dissolves in the water element (line 416).",
+      "outcome": "Recognition unites with the Dharma-Kaya (lines 387, 438–439).",
+      "silences": [
+        "Formless: no body colour, heads, arms, throne or items.",
+        "No paired dull realm light.",
+        "Dissolution beyond earth-into-water is not stated."
+      ],
+      "jung_step": 18
+    }
+  ]
+}

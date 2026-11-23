@@ -395,6 +395,219 @@ function drawWrathful(ctx, w, h, spec) {
   addDisc(20, 1, kx, cy, 28);
 }
 
+function drawMark(ctx, x, y, colour, rainbow, scale) {
+  const s = scale || 1;
+  if (rainbow) {
+    ["#E6E0D4", "#C4A24A", "#8E3A3A", "#3A6B48", "#2C4A6E"].forEach(function (band, i) {
+      ctx.fillStyle = band;
+      ctx.fillRect(x - 12 * s, y - 16 * s + i * 6 * s, 24 * s, 6 * s);
+    });
+    return;
+  }
+  ctx.fillStyle = colour;
+  ctx.beginPath();
+  ctx.ellipse(x, y + 6 * s, 12 * s, 16 * s, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(x, y - 14 * s, 9 * s, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "rgba(247, 244, 234, 0.35)";
+  ctx.beginPath();
+  ctx.arc(x - 3 * s, y - 16 * s, 2 * s, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawBeam(ctx, x, y, light, tall) {
+  const h = tall || 36;
+  ctx.globalAlpha = light.withheld ? 0.45 : light.dull ? 0.75 : 0.95;
+  if (light.rainbow) {
+    ["#E6E0D4", "#C4A24A", "#8E3A3A", "#3A6B48", "#2C4A6E"].forEach(function (band, i) {
+      ctx.fillStyle = band;
+      ctx.fillRect(x - 10 + i * 4, y, 4, h);
+    });
+  } else {
+    ctx.fillStyle = light.colour;
+    ctx.fillRect(x - 7, y, 14, h);
+  }
+  if (light.withheld) {
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = "#E0C36A";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x - 9, y, 18, h);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawEmblem(ctx, x, y, name, colour) {
+  const n = String(name || "").toLowerCase();
+  ctx.fillStyle = colour || "#E0C36A";
+  ctx.strokeStyle = "#F4F1E6";
+  ctx.lineWidth = 2;
+  if (/wheel/.test(n)) {
+    ctx.beginPath();
+    ctx.arc(x, y, 8, 0, Math.PI * 2);
+    ctx.stroke();
+    for (let i = 0; i < 8; i++) {
+      const a = (Math.PI * 2 * i) / 8;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + Math.cos(a) * 8, y + Math.sin(a) * 8);
+      ctx.stroke();
+    }
+  } else if (/vajra/.test(n)) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - 9);
+    ctx.lineTo(x - 4, y);
+    ctx.lineTo(x, y + 9);
+    ctx.lineTo(x + 4, y);
+    ctx.closePath();
+    ctx.fill();
+  } else if (/jewel/.test(n)) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - 8);
+    ctx.lineTo(x + 7, y);
+    ctx.lineTo(x, y + 8);
+    ctx.lineTo(x - 7, y);
+    ctx.closePath();
+    ctx.fill();
+  } else if (/lotus|flower/.test(n)) {
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI * 2 * i) / 6;
+      ctx.beginPath();
+      ctx.ellipse(x + Math.cos(a) * 4, y + Math.sin(a) * 4, 3, 5, a, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (/lion|elephant|horse|peacock|garuda|throne/.test(n)) {
+    ctx.beginPath();
+    ctx.ellipse(x, y + 2, 10, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + 8, y - 2, 4, 0, Math.PI * 2);
+    ctx.fill();
+  } else {
+    ctx.fillRect(x - 6, y - 6, 12, 12);
+  }
+}
+
+function drawPeace(ctx, w, h, spec) {
+  ctx.fillStyle = "#12140f";
+  ctx.fillRect(0, 0, w, h);
+  const glow = ctx.createRadialGradient(w / 2, h * 0.46, 10, w / 2, h * 0.46, Math.max(w, h) * 0.55);
+  glow.addColorStop(0, "#2c2818");
+  glow.addColorStop(1, "#12140f");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, w, h);
+  const lights = spec.lights || [];
+  const wisdom = [];
+  const dull = [];
+  lights.forEach(function (light, i) {
+    (light.dull ? dull : wisdom).push(i);
+  });
+  function placeRow(indexes, y, tall) {
+    indexes.forEach(function (index, n) {
+      const x = indexes.length === 1 ? w * 0.5 : w * (0.12 + (0.76 * n) / (indexes.length - 1));
+      const light = lights[index];
+      drawBeam(ctx, x, y, light, tall);
+      addDisc(22, index, x, y + tall / 2, Math.max(16, tall / 2));
+    });
+  }
+  if (wisdom.length <= 1 && dull.length <= 1) {
+    wisdom.forEach(function (index) {
+      drawBeam(ctx, w * 0.32, 16, lights[index], Math.min(110, h * 0.16));
+      addDisc(22, index, w * 0.32, 16 + h * 0.06, 24);
+    });
+    dull.forEach(function (index) {
+      drawBeam(ctx, w * 0.68, 16, lights[index], Math.min(110, h * 0.16));
+      addDisc(22, index, w * 0.68, 16 + h * 0.06, 24);
+    });
+  } else {
+    placeRow(wisdom, 8, 26);
+    placeRow(dull, 40, 22);
+  }
+  const figures = spec.figures || [];
+  const foot = h - 86;
+  const emblemCount = (spec.emblems || []).length;
+  const emblemPer = emblemCount > 8 && emblemCount <= 10 ? emblemCount : 8;
+  const emblemRows = Math.max(1, Math.ceil(emblemCount / emblemPer));
+  const emblemTop = foot - (emblemRows - 1) * 26;
+  const bandBot = emblemTop - 34;
+  const bandTop = Math.min(Math.max(120, h * 0.24), bandBot - 70);
+  function bandY(frac) {
+    return bandTop + (bandBot - bandTop) * frac;
+  }
+  if (spec.layout === "grid") {
+    const cols = 7;
+    const rows = Math.ceil(figures.length / cols);
+    const top = 86;
+    const bottom = foot - 28;
+    figures.forEach(function (fig, i) {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = w * (0.1 + (0.8 * col) / (cols - 1));
+      const y = top + ((bottom - top) * row) / Math.max(1, rows - 1);
+      drawMark(ctx, x, y, fig.colour, fig.rainbow, 0.72);
+      addDisc(21, i, x, y, 14);
+    });
+  } else if (spec.layout === "mandala") {
+    const pairAt = [
+      [0.42, 0.42, 0.58, 0.46],
+      [0.42, 0.08, 0.58, 0.08],
+      [0.78, 0.42, 0.78, 0.62],
+      [0.42, 0.78, 0.58, 0.78],
+      [0.22, 0.42, 0.22, 0.62]
+    ];
+    for (let p = 0; p < 5; p++) {
+      const spot = pairAt[p];
+      const a = p * 2;
+      const b = a + 1;
+      if (figures[a]) {
+        drawMark(ctx, w * spot[0], bandY(spot[1]), figures[a].colour, figures[a].rainbow, p === 0 ? 1.7 : 1.15);
+        addDisc(21, a, w * spot[0], bandY(spot[1]), p === 0 ? 28 : 20);
+      }
+      if (figures[b]) {
+        drawMark(ctx, w * spot[2], bandY(spot[3]), figures[b].colour, figures[b].rainbow, 0.95);
+        addDisc(21, b, w * spot[2], bandY(spot[3]), 16);
+      }
+    }
+    if (figures[10]) {
+      drawMark(ctx, w * 0.5, bandY(0.98), figures[10].colour, figures[10].rainbow, 0.8);
+      addDisc(21, 10, w * 0.5, bandY(0.98), 16);
+    }
+  } else {
+    const cx = w * 0.4;
+    const cy = h * 0.46;
+    if (figures[0]) {
+      drawMark(ctx, cx, cy, figures[0].colour, figures[0].rainbow, 2.1);
+      addDisc(21, 0, cx, cy, 36);
+    }
+    if (figures[1]) {
+      drawMark(ctx, w * 0.64, cy + 10, figures[1].colour, figures[1].rainbow, 1.45);
+      addDisc(21, 1, w * 0.64, cy + 10, 24);
+    }
+    for (let i = 2; i < figures.length; i++) {
+      const x = w * (0.16 + ((i - 2) % 4) * 0.22);
+      const y = h * 0.68;
+      drawMark(ctx, x, y, figures[i].colour, figures[i].rainbow, 0.95);
+      addDisc(21, i, x, y, 16);
+    }
+  }
+  const emblems = spec.emblems || [];
+  const per = emblemPer;
+  emblems.forEach(function (emblem, i) {
+    const row = Math.floor(i / per);
+    const col = i % per;
+    const n = Math.min(per, emblems.length - row * per);
+    const x = n === 1 ? w * 0.5 : w * (0.12 + (0.76 * col) / (n - 1));
+    const y = foot - row * 26;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(1.7, 1.7);
+    drawEmblem(ctx, 0, 0, emblem.name, emblem.colour);
+    ctx.restore();
+    addDisc(23, i, x, y, 16);
+  });
+}
+
 function drawWishBody(ctx, w, h, model) {
   const colours = ["#f4f1e6", "#1c1c1c", "#a33b32"];
   const yA = h * 0.72;
@@ -482,6 +695,8 @@ function paintAll(time, model) {
     drawRealmLight(ctx, box.w, box.h, model.screen);
   } else if (model.wrath) {
     drawWrathful(ctx, box.w, box.h, model.wrath);
+  } else if (model.peace) {
+    drawPeace(ctx, box.w, box.h, model.peace);
   } else if (model.scene === 0) {
     paintAxesLocal(ctx, box.w, box.h, model);
   } else if (model.scene === 1) {

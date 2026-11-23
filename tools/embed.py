@@ -9,7 +9,7 @@ wasm_path, stamp = sys.argv[1], sys.argv[2]
 asset = stamp.split()[-1].rstrip("+")
 js = "\n".join(
     (root / "web" / name).read_text()
-    for name in ("strings.js", "rain.js", "sound.js", "paint.js", "page.js")
+    for name in ("strings.js", "rain.js", "sound.js", "icons.js", "paint.js", "page.js")
 )
 js = 'const WASM_BASE64 = "%s";\n%s' % (base64.b64encode(pathlib.Path(wasm_path).read_bytes()).decode("ascii"), js)
 html = (root / "web" / "template.html").read_text()

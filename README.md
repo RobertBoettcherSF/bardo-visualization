@@ -2,7 +2,7 @@
 
 An interactive tour of the Bardo states. The clock, the curves and the mantra syllables are Plain Ada, compiled to WebAssembly. The page draws, and nothing else.
 
-The tour is in UK English. Other languages can be overlaid later. Jung’s reverse order is the default. Lives start in Sidpa and can Follow into the seven wrathful days. The peaceful days and the Clear Light are not in this build.
+The tour is in UK English. Other languages can be overlaid later. Jung’s reverse order is the default. Lives start in Sidpa and can Follow through the seven wrathful days into the seven peaceful days. Follow on the first peaceful day would open the Clear Light, which is not in this build.
 
 ## Screen IDs
 
@@ -15,8 +15,9 @@ Every life-wheel screen is `J##-B##`: Jung’s tour position, then the book day.
 | J03-B35 | Mirror of karma |
 | J04-B28 | Wish-body |
 | J05-B14 … J11-B08 | Wrathful days 14 down to 8 |
+| J12-B07 … J18-B01 | Peaceful days 7 down to 1 |
 
-`B` for a Sidpa screen is the last day of that stretch, the day the reverse walk enters it. `B` for a wrathful screen is the book’s own day (8–14), not the calendar day the model uses (11–17).
+`B` for a Sidpa screen is the last day of that stretch, the day the reverse walk enters it. `B` for a wrathful screen is the book’s own day (8–14), not the calendar day the model uses (11–17). `B` for a peaceful screen is the book’s own day (1–7); the model calendar days are 4–10. Colours come from `data/iconography.json`. Where that table marks a colour or a name uncertain, the detail panel says so. Buddha Heruka is painted maroon: the root text says dark brown, and the table’s outside note says maroon-red.
 
 Endings hang off the womb with a suffix: `J01-B49/good` and `J01-B49/deva`, `asura`, `human`, `animal`, `preta`, `hell`. The opening is `OPEN`. The clock before day 22 is `CLOCK`.
 

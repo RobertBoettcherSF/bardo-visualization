@@ -89,6 +89,11 @@ package Bardo.Sidpa is
    function Rebirth_Realm (Brightest : Integer; Weight : Integer) return Integer with
      Post => Rebirth_Realm'Result in 0 .. 5;
 
+   --  Dull light of a peaceful day. 7 animal, 5 asura, 4 preta, 3 human,
+   --  2 hell, 1 deva. Day 6 is chosen by karma, so the result is -1.
+   function Dull_Realm (Book_Day : Integer) return Integer with
+     Post => Dull_Realm'Result in -1 .. 5;
+
    function Wind_Force (Time : Milli_Time) return Thousandth;
 
    function Wander_X (Tick : Natural) return Thousandth;

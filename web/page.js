@@ -31,6 +31,7 @@ const STEP_CAP = 4000;
 const DIARY_KEY = "bardo-auto-diary";
 let lineKey = "";
 let detailKey = "";
+let forcedArrival = "";
 let arrivalKey = "";
 let selectedKey = "";
 let lives = [];
@@ -240,8 +241,9 @@ function sceneCopy(code) {
 }
 
 function currentInfo(scene) {
-  if (lineKey) return t(lineKey);
-  if (arrivalKey) return t(arrivalKey);
+  if (lineKey) return lineKey.indexOf(" ") >= 0 ? lineKey : t(lineKey);
+  if (arrivalKey) return arrivalKey.indexOf(" ") >= 0 ? arrivalKey : t(arrivalKey);
+  if (SCREEN[screenId] && SCREEN[screenId].blurb) return t(SCREEN[screenId].blurb);
   return t(infoKey(scene));
 }
 
@@ -391,7 +393,8 @@ function modelNow() {
     x: side[8],
     y: side[9],
     curves: curves,
-    wrath: SCREEN[screenId] && SCREEN[screenId].figures ? SCREEN[screenId] : null
+    wrath: SCREEN[screenId] && SCREEN[screenId].kind ? SCREEN[screenId] : null,
+    peace: SCREEN[screenId] && SCREEN[screenId].peace ? SCREEN[screenId] : null
   };
 }
 
@@ -485,8 +488,9 @@ function showScreen(id, button, extra) {
   detailKey = "";
   arrivalKey = "";
   if (button === "dont") {
-    arrivalKey = REALMS.indexOf(id) >= 0 ? pullKey() : (ARRIVE[id] || "");
+    arrivalKey = forcedArrival || (REALMS.indexOf(id) >= 0 ? pullKey() : (ARRIVE[id] || ""));
   }
+  forcedArrival = "";
   document.getElementById("more").hidden = true;
   if (id === "opening") {
     viewMode = "opening";
@@ -566,13 +570,22 @@ function choose(follow, via) {
   karma = follow
     ? ada.exports.bardo_karma_lighten(karma)
     : ada.exports.bardo_karma_heavy(karma);
-  if (follow && from === "w08") {
-    lineKey = "infoPeaceOnward";
-    detailKey = "infoPeaceOnward";
+  if (follow && from === "p1") {
+    lineKey = "infoClearOnward";
+    detailKey = "infoClearOnward";
     arrivalKey = "";
-    remember("follow", { onward: "peaceful" });
-    if (via === "auto") noteStep("follow", from, from, { karmaBefore: karmaBefore, onward: "peaceful" });
+    remember("follow", { onward: "clear light" });
+    if (via === "auto") noteStep("follow", from, from, { karmaBefore: karmaBefore, onward: "clear light" });
     render();
+    return;
+  }
+  if (!follow && SCREEN[from] && SCREEN[from].peace) {
+    const code = ada.exports.bardo_dull_realm(SCREEN[from].book);
+    const realmCode = code < 0 ? ada.exports.bardo_karma_realm(karma) : code;
+    destination = realmCode;
+    forcedArrival = code < 0 ? "" : ("arrivePeace" + SCREEN[from].book);
+    showScreen(REALMS[realmCode], "dont");
+    if (via === "auto") noteStep("dont", from, screenId, { karmaBefore: karmaBefore });
     return;
   }
   const next = follow ? CLIMB[at + 1] : (at === 0 ? rebirthId() : CLIMB[at - 1]);
@@ -581,6 +594,11 @@ function choose(follow, via) {
 }
 
 function explainOf(action, arg) {
+  if ((action === 21 || action === 22 || action === 23) && SCREEN[screenId]) {
+    const group = action === 21 ? "figures" : action === 22 ? "lights" : "emblems";
+    const item = (SCREEN[screenId][group] || [])[arg];
+    if (item) return { line: item.line, detail: item.detail };
+  }
   if (action === 20 && SCREEN[screenId] && SCREEN[screenId].figures && SCREEN[screenId].figures[arg]) {
     const fig = SCREEN[screenId].figures[arg];
     return { line: fig.line, detail: fig.detail };
@@ -811,7 +829,9 @@ function clearDiary() {
   publishCoverage();
 }
 
-const LIFE_SCREENS = CLIMB.concat(["good"]).concat(REALMS);
+function lifeScreens() {
+  return CLIMB.concat(["good"]).concat(REALMS);
+}
 
 function actionsFor(screen) {
   if (screen === "wish") {
@@ -852,6 +872,17 @@ function actionsFor(screen) {
   if (screen === "good" || REALMS.indexOf(screen) >= 0) {
     return [{ id: "again", kind: "again" }];
   }
+  if (SCREEN[screen] && SCREEN[screen].peace) {
+    const spec = SCREEN[screen];
+    const list = [
+      { id: "follow", kind: "follow" },
+      { id: "dont", kind: "dont" }
+    ];
+    (spec.figures || []).forEach(function (_, i) { list.push({ id: "fig-" + i, kind: "peace", group: "figures", arg: i }); });
+    (spec.lights || []).forEach(function (_, i) { list.push({ id: "beam-" + i, kind: "peace", group: "lights", arg: i }); });
+    (spec.emblems || []).forEach(function (_, i) { list.push({ id: "emblem-" + i, kind: "peace", group: "emblems", arg: i }); });
+    return list;
+  }
   if (SCREEN[screen] && SCREEN[screen].figures) {
     const list = [
       { id: "follow", kind: "follow" },
@@ -867,20 +898,20 @@ function actionsFor(screen) {
 
 function requiredLinks() {
   const links = [];
-  LIFE_SCREENS.forEach(function (screen) {
+  lifeScreens().forEach(function (screen) {
     actionsFor(screen).forEach(function (action) {
       links.push({ from: screen, button: action.id });
     });
   });
   links.push({ from: "womb", button: "petals" });
   return links.filter(function (link) {
-    return !(link.from === "w08" && link.button === "follow");
+    return !(link.from === "p1" && link.button === "follow");
   });
 }
 
 function unreachedNow() {
   return {
-    screens: LIFE_SCREENS.filter(function (id) { return !seenScreens[id]; }),
+    screens: lifeScreens().filter(function (id) { return !seenScreens[id]; }),
     links: requiredLinks().filter(function (link) {
       return !seenLinks[link.from + ">" + link.button];
     })
@@ -889,7 +920,7 @@ function unreachedNow() {
 
 function coverageNow() {
   const gaps = unreachedNow();
-  const screens = (LIFE_SCREENS.length - gaps.screens.length) + "/" + LIFE_SCREENS.length;
+  const screens = (lifeScreens().length - gaps.screens.length) + "/" + lifeScreens().length;
   const linkCount = requiredLinks().length;
   const links = (linkCount - gaps.links.length) + "/" + linkCount;
   return {
@@ -948,10 +979,10 @@ function runFile() {
     totals: totals,
     unreached: unreachedNow(),
     deadEnds: [{
-      from: "J11-B08",
+      from: "J18-B01",
       button: "follow",
-      onward: "peaceful",
-      note: "Following here would open the peaceful days, which are not in this part of the tour. It is not required for coverage."
+      onward: "clear light",
+      note: "Following here would open the Clear Light, which is not in this part of the tour. It is not required for coverage."
     }]
   };
 }
@@ -1099,6 +1130,11 @@ function actionHelps(action) {
   if (action.kind === "dont" && screenId === "wish" && !seenScreens.judge) return true;
   if (action.kind === "dont" && screenId === "judge" && !seenScreens.lights) return true;
   if (action.kind === "dont" && screenId === "lights" && !seenScreens.womb) return true;
+  if (action.kind === "dont" && SCREEN[screenId] && SCREEN[screenId].peace) {
+    const code = ada.exports.bardo_dull_realm(SCREEN[screenId].book);
+    const realm = code < 0 ? REALMS[ada.exports.bardo_karma_realm(karma)] : REALMS[code];
+    if (!seenScreens[realm]) return true;
+  }
   return false;
 }
 
@@ -1138,6 +1174,15 @@ function autoApply(action) {
   }
   if (action.kind === "again") {
     beginAgain("auto");
+    return;
+  }
+  if (action.kind === "peace") {
+    const item = SCREEN[from][action.group][action.arg];
+    lineKey = item.line;
+    detailKey = item.detail;
+    arrivalKey = "";
+    noteStep(action.id, from, from, { karmaBefore: karmaBefore });
+    render();
     return;
   }
   if (action.kind === "figure") {
@@ -1354,6 +1399,7 @@ async function boot() {
       return { speed: out[9], alpha: out[10], stride: out[11] || 1 };
     }
   });
+  await loadIconography();
   loadDiary();
   remember("load");
   render();

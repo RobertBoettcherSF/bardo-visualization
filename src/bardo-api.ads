@@ -93,4 +93,8 @@ package Bardo.API is
      Export, Convention => C, External_Name => "bardo_rebirth",
      Post => Rebirth_Host'Result in 0 .. 5;
 
+   function Dull_Host (Book_Day : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_dull_realm",
+     Post => Dull_Host'Result in -1 .. 5;
+
 end Bardo.API;

@@ -163,4 +163,7 @@ package body Bardo.API is
    function Rebirth_Host (Brightest : Integer; Weight : Integer) return Integer is
      (Bardo.Sidpa.Rebirth_Realm (Brightest, Weight));
 
+   function Dull_Host (Book_Day : Integer) return Integer is
+     (Bardo.Sidpa.Dull_Realm (Book_Day));
+
 end Bardo.API;
