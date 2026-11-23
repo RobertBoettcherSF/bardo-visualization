@@ -116,7 +116,7 @@ package body Bardo.Rain is
    begin
       case P is
          when Chikhai_Primary =>
-            return (Mantra => 3, Speed => 450, Alpha => 350, Stride => 2);
+            return (Mantra => 3, Speed => 220, Alpha => 180, Stride => 4);
          when Chikhai_Secondary =>
             return (Mantra => 3, Speed => 600, Alpha => 500, Stride => 2);
          when Chonyid_Peaceful =>

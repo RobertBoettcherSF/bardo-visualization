@@ -325,18 +325,19 @@ try {
       const run = await readReport("bardo-run.json");
       assert(run.schema === "bardo-run", name + " run schema");
       assert(run.complete === true, name + " run not complete " + JSON.stringify(run.coverage) + " " + JSON.stringify(run.unreached));
-      assert(run.coverage.screens === "25/25", name + " screens " + run.coverage.screens);
+      assert(run.coverage.screens === "28/28", name + " screens " + run.coverage.screens);
       assert(JSON.stringify(run).includes("J05-B14") && JSON.stringify(run).includes("J11-B08"), name + " wrathful ids");
       assert(JSON.stringify(run).includes("J12-B07") && JSON.stringify(run).includes("J18-B01"), name + " peaceful ids");
+      assert(JSON.stringify(run).includes("J19-B00") && JSON.stringify(run).includes("J20-B00/liberation"), name + " clear light ids");
       assert(run.unreached.screens.length === 0, name + " screens left " + run.unreached.screens.join(","));
       assert(run.unreached.links.length === 0, name + " links left " + run.unreached.links.map((l) => l.from + ">" + l.button).join(","));
       ["deva", "asura", "human", "animal", "preta", "hell"].forEach((realm) => {
         assert(run.lives.some((life) => life.ended === realm) || run.totals.rebirths[realm] > 0, name + " missing realm " + realm);
       });
       assert(run.finished === true && typeof run.finishedAt === "string", name + " finished");
-      assert(run.diary && run.diary.screens && run.diary.screens["J01-B49"] && run.diary.screens["J12-B07"] && run.diary.screens["J18-B01"], name + " diary");
+      assert(run.diary && run.diary.screens && run.diary.screens["J01-B49"] && run.diary.screens["J19-B00"] && run.diary.screens["J20-B00"] && run.diary.screens["J20-B00/liberation"], name + " diary");
       assert(run.lives.some((life) => life.steps.some((step) => typeof step.karma === "number")), name + " karma not logged");
-      assert(run.deadEnds && run.deadEnds[0].from === "J18-B01" && run.deadEnds[0].onward === "clear light", name + " dead end");
+      assert(Array.isArray(run.deadEnds) && run.deadEnds.length === 0, name + " dead end");
       await copyFile(join(outDir, "bardo-run.json"), join("/opt/cursor/artifacts", "bardo-run.json"));
     }
     assert(logs.length === 0, name + " console " + logs.join(" | "));
@@ -393,7 +394,7 @@ try {
     await page.waitForFunction(() => {
       const ask = document.getElementById("auto-ask");
       const stats = document.getElementById("auto-stats");
-      return ask.hidden && stats && /Screens \d+\//.test(stats.textContent) && !stats.textContent.includes("25/25");
+      return ask.hidden && stats && /Screens \d+\//.test(stats.textContent) && !stats.textContent.includes("28/28");
     });
     await page.screenshot({ path: join(outDir, "auto-running-" + label + ".png") });
     await page.evaluate(() => { window.__autoBatch = 400; });

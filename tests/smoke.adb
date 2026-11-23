@@ -147,8 +147,11 @@ procedure Smoke is
       Wrath   : constant Bardo.Rain.Params := Bardo.Rain.Parameters (17_000);
       Sidpa   : constant Bardo.Rain.Params := Bardo.Rain.Parameters (49_000);
    begin
-      pragma Assert (Primary.Stride = 2);
-      pragma Assert (Primary.Speed = 450);
+      pragma Assert (Primary.Stride = 4);
+      pragma Assert (Primary.Speed = 220);
+      pragma Assert (Primary.Alpha = 180);
+      pragma Assert (Bardo.Rain.Parameters (250).Speed > Primary.Speed);
+      pragma Assert (Bardo.Rain.Parameters (250).Stride < Primary.Stride);
       pragma Assert (Day_4.Mantra = 2);
       pragma Assert (Day_1.Mantra = 3);
       pragma Assert (Day_1.Speed = 1_000);
@@ -302,6 +305,21 @@ procedure Smoke is
       pragma Assert (Bardo.Sidpa.Dull_Realm (6) = -1);
       pragma Assert (Bardo.API.Dull_Host (7) = 3);
       pragma Assert (Bardo.API.Dull_Host (6) = -1);
+      pragma Assert (Bardo.Sidpa.Dissolve_Clamp (-4) = 0);
+      pragma Assert (Bardo.Sidpa.Dissolve_Clamp (1_500) = 1_000);
+      pragma Assert (Bardo.Sidpa.Dissolve_Stage (0) = 0);
+      pragma Assert (Bardo.Sidpa.Dissolve_Stage (1) = 1);
+      pragma Assert (Bardo.Sidpa.Dissolve_Stage (1_000) = 2);
+      pragma Assert (Bardo.Sidpa.Dissolve_Stage (9_000) = 2);
+      pragma Assert (Bardo.Sidpa.Clear_Step (18, 1) = 19);
+      pragma Assert (Bardo.Sidpa.Clear_Step (18, 0) = -1);
+      pragma Assert (Bardo.Sidpa.Clear_Step (19, 1) = 20);
+      pragma Assert (Bardo.Sidpa.Clear_Step (19, 0) = 18);
+      pragma Assert (Bardo.Sidpa.Clear_Step (20, 1) = 21);
+      pragma Assert (Bardo.Sidpa.Clear_Step (20, 0) = 19);
+      pragma Assert (Bardo.Sidpa.Clear_Step (20, 2) = -1);
+      pragma Assert (Bardo.API.Clear_Step_Host (20, 1) = 21);
+      pragma Assert (Bardo.API.Dissolve_Stage_Host (400) = 1);
       pragma Assert (Bardo.Sidpa.Wind_Force (0) = 0);
       pragma Assert (Bardo.Sidpa.Wind_Force (22_000) = 640);
       pragma Assert (Bardo.Sidpa.Wind_Force (49_000) > Bardo.Sidpa.Wind_Force (22_000));

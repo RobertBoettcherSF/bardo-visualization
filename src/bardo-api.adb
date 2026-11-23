@@ -166,4 +166,11 @@ package body Bardo.API is
    function Dull_Host (Book_Day : Integer) return Integer is
      (Bardo.Sidpa.Dull_Realm (Book_Day));
 
+   function Dissolve_Clamp_Host (Level : Integer) return Integer is
+     (Bardo.Sidpa.Dissolve_Clamp (Level));
+   function Dissolve_Stage_Host (Level : Integer) return Integer is
+     (Bardo.Sidpa.Dissolve_Stage (Level));
+   function Clear_Step_Host (Screen : Integer; Follow : Integer) return Integer is
+     (Bardo.Sidpa.Clear_Step (Screen, Follow));
+
 end Bardo.API;

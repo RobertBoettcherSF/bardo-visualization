@@ -608,6 +608,87 @@ function drawPeace(ctx, w, h, spec) {
   });
 }
 
+function fillAwareness(ctx, w, h, time, calm) {
+  const breathe = !calm && time ? Math.sin(time / 1600) * 0.05 : 0;
+  const glow = ctx.createRadialGradient(
+    w / 2, h * 0.4, 8,
+    w / 2, h * 0.4, Math.max(w, h) * (0.58 + breathe)
+  );
+  glow.addColorStop(0, "#fffaf0");
+  glow.addColorStop(0.22, "#f3ecda");
+  glow.addColorStop(0.5, "#d5cbb2");
+  glow.addColorStop(1, "#241f16");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, w, h);
+  if (!calm && time) {
+    const flicker = 0.08 + Math.sin(time / 900) * 0.04;
+    const core = ctx.createRadialGradient(w / 2, h * 0.4, 4, w / 2, h * 0.4, w * 0.22);
+    core.addColorStop(0, "rgba(255, 253, 248, " + flicker + ")");
+    core.addColorStop(1, "rgba(255, 253, 248, 0)");
+    ctx.fillStyle = core;
+    ctx.fillRect(0, 0, w, h);
+  }
+}
+
+function drawDissolution(ctx, w, h, stage) {
+  const top = h * 0.7;
+  const band = Math.max(28, h * 0.1);
+  if (stage < 2) {
+    const earth = stage === 0 ? band : band * 0.32;
+    ctx.fillStyle = "#6b5434";
+    ctx.fillRect(0, top + band - earth, w, earth);
+  }
+  if (stage > 0) {
+    ctx.fillStyle = stage === 2 ? "#3e6270" : "rgba(62, 98, 112, 0.8)";
+    ctx.fillRect(0, top, w, stage === 2 ? band : band * 0.72);
+  }
+  addDisc(24, 3, w / 2, top + band / 2, Math.min(w * 0.36, 90));
+}
+
+function drawClear(ctx, w, h, model, time) {
+  if (model.clearKind === "secondary") {
+    ctx.fillStyle = "#14120f";
+    ctx.fillRect(0, 0, w, h);
+    const glow = ctx.createRadialGradient(w * 0.5, h * 0.3, 8, w * 0.5, h * 0.3, w * 0.42);
+    glow.addColorStop(0, "rgba(247, 244, 234, 0.62)");
+    glow.addColorStop(1, "rgba(247, 244, 234, 0)");
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(w * 0.5, h * 0.3, w * 0.38, 0, Math.PI * 2);
+    ctx.fill();
+    addDisc(24, 0, w * 0.5, h * 0.3, Math.min(w, h) * 0.16);
+    [[0.2, 0.58], [0.3, 0.66], [0.16, 0.68]].forEach(function (spot, i) {
+      ctx.fillStyle = i === 1 ? "#5c5348" : "#3a3630";
+      ctx.beginPath();
+      ctx.ellipse(w * spot[0], h * spot[1], 11, 20, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(w * spot[0], h * spot[1] - 26, 8, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    addDisc(24, 1, w * 0.23, h * 0.62, 52);
+    ctx.save();
+    ctx.globalAlpha = 0.7;
+    ctx.strokeStyle = "#f7f4ea";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([3, 5]);
+    ctx.beginPath();
+    ctx.ellipse(w * 0.66, h * 0.58, 14, 32, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(w * 0.66, h * 0.58 - 44, 11, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+    addDisc(24, 2, w * 0.66, h * 0.55, 42);
+    return;
+  }
+  fillAwareness(ctx, w, h, time, model.clearKind === "liberation");
+  if (model.clearKind === "primary") {
+    addDisc(24, 0, w / 2, h * 0.4, Math.min(w, h) * 0.24);
+    drawDissolution(ctx, w, h, model.dissolve);
+  }
+}
+
 function drawWishBody(ctx, w, h, model) {
   const colours = ["#f4f1e6", "#1c1c1c", "#a33b32"];
   const yA = h * 0.72;
@@ -693,6 +774,8 @@ function paintAll(time, model) {
     drawPetals(ctx, box.w / 2, box.h * 0.42, radius, 5, t);
   } else if (REALM_WASH[model.screen]) {
     drawRealmLight(ctx, box.w, box.h, model.screen);
+  } else if (model.clearKind) {
+    drawClear(ctx, box.w, box.h, model, t);
   } else if (model.wrath) {
     drawWrathful(ctx, box.w, box.h, model.wrath);
   } else if (model.peace) {

@@ -10,7 +10,7 @@ package Bardo.Rain is
       Mantra : Mantra_Id;
       Speed  : Scale;
       Alpha  : Scale;
-      Stride : Positive range 1 .. 2;
+      Stride : Positive range 1 .. 8;
    end record;
 
    function Count (Id : Mantra_Id) return Positive;

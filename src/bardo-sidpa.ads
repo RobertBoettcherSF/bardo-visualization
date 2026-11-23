@@ -94,6 +94,19 @@ package Bardo.Sidpa is
    function Dull_Realm (Book_Day : Integer) return Integer with
      Post => Dull_Realm'Result in -1 .. 5;
 
+   --  Thousandths along the only dissolution the primary Clear Light
+   --  states: earth into water. The value never names a later element.
+   function Dissolve_Clamp (Level : Integer) return Integer with
+     Post => Dissolve_Clamp'Result in 0 .. 1_000;
+   --  0 earth still present, 1 dissolving, 2 earth has dissolved into water.
+   function Dissolve_Stage (Level : Integer) return Integer with
+     Post => Dissolve_Stage'Result in 0 .. 2;
+
+   --  Clear Light steps. 18 is book day 1, 19 the secondary light,
+   --  20 the primary light, 21 liberation. Follow is 1, don't is 0.
+   function Clear_Step (Screen : Integer; Follow : Integer) return Integer with
+     Post => Clear_Step'Result in -1 .. 21;
+
    function Wind_Force (Time : Milli_Time) return Thousandth;
 
    function Wander_X (Tick : Natural) return Thousandth;

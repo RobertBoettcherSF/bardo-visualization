@@ -159,6 +159,24 @@ const SCREEN = {
     { key: "heruka", line: "tapBuddhaH", detail: "detailBuddhaH" },
     { key: "consort", line: "tapBuddhaK", detail: "detailBuddhaK" }
   ]},
+  c19: {
+    code: "J19-B00", milli: 250, clear: 19, clearKind: "secondary", blurb: "blurbC19",
+    hits: [
+      { line: "tapClearSec", detail: "detailClearSec" },
+      { line: "tapRelatives", detail: "detailRelatives" },
+      { line: "tapThought", detail: "detailThought" }
+    ]
+  },
+  c20: {
+    code: "J20-B00", milli: 0, clear: 20, clearKind: "primary", blurb: "blurbC20",
+    hits: [
+      { line: "tapClearPri", detail: "detailClearPri" },
+      null,
+      null,
+      { line: "tapSlider", detail: "detailSlider" }
+    ]
+  },
+  liberation: { code: "J20-B00/liberation", clearKind: "liberation" },
   good: { code: "J01-B49/good" },
   deva: { code: "J01-B49/deva" },
   asura: { code: "J01-B49/asura" },
@@ -172,6 +190,9 @@ function codeOf(id) {
   return (SCREEN[id] && SCREEN[id].code) || id;
 }
 const REALMS = ["deva", "asura", "human", "animal", "preta", "hell"];
+const CLEAR_ID = { 18: "p1", 19: "c19", 20: "c20", 21: "liberation" };
+let dissolve = 0;
+let dissolveStage = 0;
 const REALM_INFO = {
   deva: "infoDeva", asura: "infoAsura", human: "infoHuman",
   animal: "infoAnimal", preta: "infoPreta", hell: "infoHell"
@@ -203,6 +224,7 @@ function tourList() {
   const teach = direction === 0
     ? CLIMB.slice()
     : ["wish", "judge", "lights", "womb"];
+  if (direction === 0) return teach.concat(["liberation", "good"]).concat(REALMS);
   return teach.concat(["good"]).concat(REALMS);
 }
 
@@ -250,6 +272,7 @@ function currentInfo(scene) {
 function infoKey(scene) {
   if (viewMode === "opening" || screenId === "opening") return "title";
   if (screenId === "good") return "infoGood";
+  if (screenId === "liberation") return "infoLiberation";
   if (REALM_INFO[screenId]) return REALM_INFO[screenId];
   if (SCREEN[screenId] && SCREEN[screenId].info) return SCREEN[screenId].info;
   if (screenId === "wish" && turned) return "infoWishTurn";
@@ -271,7 +294,7 @@ function updateChrome(out) {
   state.dataset.intensity = String(out[5]);
   state.dataset.complexity = String(out[6]);
   state.dataset.mantra = String(out[8]);
-  if (viewMode !== "opening" && !endingLocked && !(SCREEN[screenId] && SCREEN[screenId].cal)) {
+  if (viewMode !== "opening" && !endingLocked && !(SCREEN[screenId] && (SCREEN[screenId].cal || Object.prototype.hasOwnProperty.call(SCREEN[screenId], "milli")))) {
     screenId = screenFromScene(side[0]);
   }
   state.dataset.scene = String(side[0]);
@@ -309,10 +332,29 @@ function updateChrome(out) {
   document.body.classList.toggle("is-opening", viewMode === "opening");
   document.body.classList.toggle("is-ending", ending);
   document.body.classList.toggle("has-choice", teaching);
+  const followButton = document.getElementById("follow");
+  const dontButton = document.getElementById("dont");
+  if (screenId === "c20") {
+    followButton.textContent = t("remain");
+    dontButton.textContent = t("moment");
+  } else if (screenId === "c19") {
+    followButton.textContent = t("recognise");
+    dontButton.textContent = t("moment");
+  } else {
+    followButton.textContent = t("follow");
+    dontButton.textContent = t("dont");
+  }
+  const dissolveBox = document.getElementById("dissolve");
+  if (dissolveBox) dissolveBox.hidden = screenId !== "c20";
+  const dissolveLabel = document.getElementById("dissolve-label");
+  if (dissolveLabel && screenId === "c20") {
+    dissolveLabel.textContent = t("dissolveLabel") + ". " + t("dissolve" + dissolveStage);
+  }
   document.getElementById("enter").textContent = currentInfo(side[0]);
   const quote = document.getElementById("quote");
   if (ending) {
-    quote.textContent = t(screenId === "good" ? "quoteGood" : REALM_QUOTE[screenId]);
+    const quoteKey = screenId === "good" ? "quoteGood" : screenId === "liberation" ? "quoteLiberation" : REALM_QUOTE[screenId];
+    quote.textContent = t(quoteKey);
   }
   const names = sceneCopy(viewMode === "opening" ? -1 : side[0]);
   const moreBody = detailKey
@@ -394,7 +436,9 @@ function modelNow() {
     y: side[9],
     curves: curves,
     wrath: SCREEN[screenId] && SCREEN[screenId].kind ? SCREEN[screenId] : null,
-    peace: SCREEN[screenId] && SCREEN[screenId].peace ? SCREEN[screenId] : null
+    peace: SCREEN[screenId] && SCREEN[screenId].peace ? SCREEN[screenId] : null,
+    clearKind: (SCREEN[screenId] && SCREEN[screenId].clearKind) || "",
+    dissolve: dissolveStage
   };
 }
 
@@ -445,6 +489,13 @@ function placePanels() {
   if (choices.style.top !== top) choices.style.top = top;
   if (choices.style.left !== left) choices.style.left = left;
   if (choices.style.width !== width) choices.style.width = width;
+  const dissolveBox = document.getElementById("dissolve");
+  if (dissolveBox) {
+    const sliderTop = (stage.y + stage.h - 118) + "px";
+    dissolveBox.style.top = sliderTop;
+    dissolveBox.style.left = left;
+    dissolveBox.style.width = width;
+  }
   const panelTop = stage.y + 8;
   const choiceTop = stage.y + stage.h - 56;
   more.style.top = panelTop + "px";
@@ -496,12 +547,14 @@ function showScreen(id, button, extra) {
     viewMode = "opening";
     endingLocked = false;
     turned = false;
-  } else if (ANCHOR[id] || (SCREEN[id] && SCREEN[id].cal)) {
+  } else if (ANCHOR[id] || (SCREEN[id] && (SCREEN[id].cal || Object.prototype.hasOwnProperty.call(SCREEN[id], "milli")))) {
     viewMode = "tour";
     endingLocked = false;
     if (id !== "wish") turned = false;
-    const day = ANCHOR[id] || SCREEN[id].cal;
-    milli = ada.exports.bardo_milli_of_day(day);
+    milli = Object.prototype.hasOwnProperty.call(SCREEN[id] || {}, "milli")
+      ? SCREEN[id].milli
+      : ada.exports.bardo_milli_of_day(ANCHOR[id] || SCREEN[id].cal);
+    if (id === "c20") applyDissolve(0);
   } else {
     viewMode = "ending";
     endingLocked = true;
@@ -509,6 +562,17 @@ function showScreen(id, button, extra) {
   }
   cardsKey = "";
   render();
+}
+
+function applyDissolve(level) {
+  if (!ada) return;
+  const clamped = ada.exports.bardo_dissolve_clamp(level);
+  dissolveStage = ada.exports.bardo_dissolve_stage(clamped);
+  dissolve = clamped;
+  const range = document.getElementById("dissolve-range");
+  if (range && Number(range.value) !== clamped) range.value = String(clamped);
+  const read = document.getElementById("dissolve-read");
+  if (read) read.textContent = t("dissolve" + dissolveStage);
 }
 
 function showOpening() {
@@ -570,13 +634,21 @@ function choose(follow, via) {
   karma = follow
     ? ada.exports.bardo_karma_lighten(karma)
     : ada.exports.bardo_karma_heavy(karma);
+  if (SCREEN[from] && SCREEN[from].clear) {
+    const nextCode = ada.exports.bardo_clear_step(SCREEN[from].clear, follow ? 1 : 0);
+    const next = CLEAR_ID[nextCode];
+    if (!next) return;
+    if (!follow && nextCode === 18) forcedArrival = "arrivePass19";
+    if (!follow && nextCode === 19) forcedArrival = "arrivePass20";
+    showScreen(next, follow ? "follow" : "dont");
+    if (via === "auto") noteStep(follow ? "follow" : "dont", from, screenId, { karmaBefore: karmaBefore });
+    return;
+  }
   if (follow && from === "p1") {
-    lineKey = "infoClearOnward";
-    detailKey = "infoClearOnward";
-    arrivalKey = "";
-    remember("follow", { onward: "clear light" });
-    if (via === "auto") noteStep("follow", from, from, { karmaBefore: karmaBefore, onward: "clear light" });
-    render();
+    const nextCode = ada.exports.bardo_clear_step(18, 1);
+    const next = CLEAR_ID[nextCode];
+    showScreen(next, "follow");
+    if (via === "auto") noteStep("follow", from, screenId, { karmaBefore: karmaBefore });
     return;
   }
   if (!follow && SCREEN[from] && SCREEN[from].peace) {
@@ -594,6 +666,10 @@ function choose(follow, via) {
 }
 
 function explainOf(action, arg) {
+  if (action === 24 && SCREEN[screenId] && SCREEN[screenId].hits && SCREEN[screenId].hits[arg]) {
+    const item = SCREEN[screenId].hits[arg];
+    return { line: item.line, detail: item.detail };
+  }
   if ((action === 21 || action === 22 || action === 23) && SCREEN[screenId]) {
     const group = action === 21 ? "figures" : action === 22 ? "lights" : "emblems";
     const item = (SCREEN[screenId][group] || [])[arg];
@@ -713,11 +789,12 @@ function noteStep(action, from, led, extra) {
   life.karma = karma;
   touchDiary(from, action, led);
   trimSteps();
-  if (led === "good" || REALMS.indexOf(led) >= 0) {
+  if (led === "good" || led === "liberation" || REALMS.indexOf(led) >= 0) {
     life.ended = led;
     if (lifeTotals) {
       lifeTotals.lives += 1;
       if (led === "good") lifeTotals.good += 1;
+      else if (led === "liberation") lifeTotals.liberation += 1;
       else if (lifeTotals.rebirths[led] !== undefined) lifeTotals.rebirths[led] += 1;
     }
     lives.push(life);
@@ -728,7 +805,7 @@ function noteStep(action, from, led, extra) {
 }
 
 function freshTotals() {
-  const totals = { lives: 0, good: 0, incomplete: 0, rebirths: {} };
+  const totals = { lives: 0, good: 0, liberation: 0, incomplete: 0, rebirths: {} };
   REALMS.forEach(function (name) { totals.rebirths[name] = 0; });
   return totals;
 }
@@ -830,7 +907,7 @@ function clearDiary() {
 }
 
 function lifeScreens() {
-  return CLIMB.concat(["good"]).concat(REALMS);
+  return CLIMB.concat(["good", "liberation"]).concat(REALMS);
 }
 
 function actionsFor(screen) {
@@ -869,8 +946,19 @@ function actionsFor(screen) {
     for (let i = 1; i <= 5; i++) list.push({ id: "petal-" + i, kind: "petal", arg: i });
     return list;
   }
-  if (screen === "good" || REALMS.indexOf(screen) >= 0) {
+  if (screen === "good" || screen === "liberation" || REALMS.indexOf(screen) >= 0) {
     return [{ id: "again", kind: "again" }];
+  }
+  if (SCREEN[screen] && SCREEN[screen].clear) {
+    const list = [
+      { id: "follow", kind: "follow" },
+      { id: "dont", kind: "dont" }
+    ];
+    (SCREEN[screen].hits || []).forEach(function (hit, i) {
+      if (!hit) return;
+      list.push({ id: "clear-" + i, kind: "clear", arg: i });
+    });
+    return list;
   }
   if (SCREEN[screen] && SCREEN[screen].peace) {
     const spec = SCREEN[screen];
@@ -904,9 +992,7 @@ function requiredLinks() {
     });
   });
   links.push({ from: "womb", button: "petals" });
-  return links.filter(function (link) {
-    return !(link.from === "p1" && link.button === "follow");
-  });
+  return links;
 }
 
 function unreachedNow() {
@@ -978,12 +1064,7 @@ function runFile() {
     }),
     totals: totals,
     unreached: unreachedNow(),
-    deadEnds: [{
-      from: "J18-B01",
-      button: "follow",
-      onward: "clear light",
-      note: "Following here would open the Clear Light, which is not in this part of the tour. It is not required for coverage."
-    }]
+    deadEnds: []
   };
 }
 
@@ -1174,6 +1255,16 @@ function autoApply(action) {
   }
   if (action.kind === "again") {
     beginAgain("auto");
+    return;
+  }
+  if (action.kind === "clear") {
+    const item = SCREEN[from].hits[action.arg];
+    lineKey = item.line;
+    detailKey = item.detail;
+    arrivalKey = "";
+    if (action.arg === 3) applyDissolve(1000);
+    noteStep(action.id, from, from, { karmaBefore: karmaBefore });
+    render();
     return;
   }
   if (action.kind === "peace") {
@@ -1467,6 +1558,22 @@ document.getElementById("day").addEventListener("input", function (event) {
 });
 document.getElementById("go").addEventListener("click", function () {
   if (viewMode === "opening") showScreen(firstId(), "enter");
+});
+document.getElementById("dissolve-range").addEventListener("input", function (event) {
+  applyDissolve(Number(event.target.value));
+  render();
+});
+document.getElementById("dissolve-range").addEventListener("pointerdown", function () {
+  lineKey = "tapSlider";
+  detailKey = "detailSlider";
+  arrivalKey = "";
+  render();
+});
+document.getElementById("dissolve-label").addEventListener("click", function () {
+  lineKey = "tapSlider";
+  detailKey = "detailSlider";
+  arrivalKey = "";
+  render();
 });
 document.getElementById("follow").addEventListener("click", function () { choose(true); });
 document.getElementById("dont").addEventListener("click", function () { choose(false); });

@@ -116,6 +116,22 @@ body.has-choice #choices { display: flex; }
   pointer-events: auto; flex: 1; max-width: 48%;
   font-size: 14px; line-height: 1.2; padding: 4px 8px;
 }
+#dissolve {
+  position: fixed; z-index: 6;
+  display: flex; flex-direction: column; gap: 2px;
+  pointer-events: auto;
+}
+#dissolve[hidden] { display: none; }
+#dissolve-label, #dissolve-read {
+  margin: 0; text-align: center; color: #f7f4ea;
+  font: 0.85rem/1.25 Georgia, "Iowan Old Style", Palatino, serif;
+  text-shadow: 0 1px 4px #000;
+}
+#dissolve-label {
+  background: transparent; border: 0; padding: 0; cursor: pointer;
+}
+#dissolve-range { width: 100%; accent-color: #e0c36a; }
+#dissolve-read { display: none; }
 #more {
   position: fixed; z-index: 5;
   overflow: auto;
@@ -205,6 +221,11 @@ body.has-choice #choices { display: flex; }
   <p id="quote" class="quote"></p>
   <button type="button" id="go" data-k="enter"></button>
   <button type="button" id="again" data-k="again"></button>
+</div>
+<div id="dissolve" hidden>
+  <button type="button" id="dissolve-label" data-k="dissolveLabel"></button>
+  <input id="dissolve-range" type="range" min="0" max="1000" value="0" aria-labelledby="dissolve-label">
+  <p id="dissolve-read"></p>
 </div>
 <div id="choices">
   <button type="button" id="follow" data-k="follow"></button>

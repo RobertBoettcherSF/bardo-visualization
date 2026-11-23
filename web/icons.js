@@ -317,6 +317,9 @@ async function loadIconography() {
   if (SCREEN.p6 && SCREEN.p6.figures.length !== 42) {
     throw new Error("day 6 figures " + SCREEN.p6.figures.length);
   }
+  ["c19", "c20"].forEach(function (id) {
+    if (CLIMB.indexOf(id) < 0) CLIMB.push(id);
+  });
   window.__iconsReady = true;
   window.__screenCodes = CLIMB.map(function (id) { return SCREEN[id].code; });
 }

@@ -97,4 +97,14 @@ package Bardo.API is
      Export, Convention => C, External_Name => "bardo_dull_realm",
      Post => Dull_Host'Result in -1 .. 5;
 
+   function Dissolve_Clamp_Host (Level : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_dissolve_clamp",
+     Post => Dissolve_Clamp_Host'Result in 0 .. 1_000;
+   function Dissolve_Stage_Host (Level : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_dissolve_stage",
+     Post => Dissolve_Stage_Host'Result in 0 .. 2;
+   function Clear_Step_Host (Screen : Integer; Follow : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_clear_step",
+     Post => Clear_Step_Host'Result in -1 .. 21;
+
 end Bardo.API;

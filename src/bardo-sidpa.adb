@@ -170,6 +170,38 @@ package body Bardo.Sidpa is
         when 1 => 0,
         when others => -1);
 
+   function Dissolve_Clamp (Level : Integer) return Integer is
+     (if Level < 0 then 0 elsif Level > 1_000 then 1_000 else Level);
+
+   function Dissolve_Stage (Level : Integer) return Integer is
+      L : constant Integer := Dissolve_Clamp (Level);
+   begin
+      if L = 0 then
+         return 0;
+      elsif L = 1_000 then
+         return 2;
+      else
+         return 1;
+      end if;
+   end Dissolve_Stage;
+
+   function Clear_Step (Screen : Integer; Follow : Integer) return Integer is
+   begin
+      if Follow not in 0 .. 1 then
+         return -1;
+      end if;
+      case Screen is
+         when 18 =>
+            return (if Follow = 1 then 19 else -1);
+         when 19 =>
+            return (if Follow = 1 then 20 else 18);
+         when 20 =>
+            return (if Follow = 1 then 21 else 19);
+         when others =>
+            return -1;
+      end case;
+   end Clear_Step;
+
    function Wind_Force (Time : Milli_Time) return Thousandth is
       Day : constant Day_Number := Bardo.Calendar.Calendar_Day (Time);
    begin
