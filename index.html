@@ -7,7 +7,7 @@
 <style>
 @font-face {
   font-family: "Rain Devanagari";
-  src: url("assets/devanagari-subset.woff2?v=c754d01") format("woff2");
+  src: url("assets/devanagari-subset.woff2?v=5fb7d06") format("woff2");
   font-display: swap;
 }
 * { box-sizing: border-box; }
@@ -210,7 +210,7 @@ body.has-choice #choices { display: flex; }
 <body>
 <canvas id="rain" aria-hidden="true"></canvas>
 <canvas id="viz"></canvas>
-<p id="stamp" class="stamp" data-dbg>v0.12 b20261123-1817 c754d01</p>
+<p id="stamp" class="stamp" data-dbg>v0.12 b20261123-1818 5fb7d06</p>
 <p id="sid" class="sid"></p>
 <button type="button" id="menu" aria-expanded="false" aria-controls="menu-panel"></button>
 <div id="menu-panel" hidden>
@@ -2244,7 +2244,7 @@ function hitContains(region, x, y) {
   return ang >= start && ang <= region.a1;
 }
 
-const STAMP = "v0.12 b20261123-1817 c754d01";
+const STAMP = "v0.12 b20261123-1818 5fb7d06";
 const RAW_VERSION = "https://raw.githubusercontent.com/RobertBoettcherSF/bardo-visualization/main/version.txt";
 const REPO_API = "https://api.github.com/repos/RobertBoettcherSF/bardo-visualization/commits/main";
 const REALM_COLOUR = ["#C9C3B5", "#4A5E48", "#A89A55", "#3A4A62", "#7A4548", "#5C5550"];
@@ -2567,7 +2567,7 @@ function tourList() {
 }
 
 function firstId() {
-  return direction === 0 ? "womb" : "wish";
+  return direction === 0 ? "womb" : "c20";
 }
 
 function screenFromScene(scene) {
@@ -3651,8 +3651,9 @@ function beginAgain(via) {
   poisonSeen = -1;
   wanderTick = 0;
   pendingAction = 0;
-  showScreen(direction === 0 ? "womb" : "c20", "again");
-  if (via === "auto") noteStep("again", from, "womb", { karmaBefore: karmaBefore });
+  const start = firstId();
+  showScreen(start, "again");
+  if (via === "auto") noteStep("again", from, start, { karmaBefore: karmaBefore });
 }
 
 function takePath(pick, via, actionId) {
