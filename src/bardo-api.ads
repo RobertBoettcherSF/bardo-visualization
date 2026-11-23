@@ -68,4 +68,29 @@ package Bardo.API is
      Export, Convention => C, External_Name => "bardo_realm",
      Post => Realm_Host'Result in 0 .. 5;
 
+   function Karma_Start_Host return Integer with
+     Export, Convention => C, External_Name => "bardo_karma_start",
+     Post => Karma_Start_Host'Result in 0 .. 1_000;
+   function Karma_Lighten_Host (Weight : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_karma_lighten",
+     Post => Karma_Lighten_Host'Result in 0 .. 1_000;
+   function Karma_Heavy_Host (Weight : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_karma_heavy",
+     Post => Karma_Heavy_Host'Result in 0 .. 1_000;
+   function Karma_Carry_Host (Weight : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_karma_carry",
+     Post => Karma_Carry_Host'Result in 0 .. 1_000;
+   function Karma_Band_Host (Weight : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_karma_band",
+     Post => Karma_Band_Host'Result in 0 .. 2;
+   function Karma_Chance_Host (Weight : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_karma_chance",
+     Post => Karma_Chance_Host'Result in 0 .. 1_000;
+   function Karma_Realm_Host (Weight : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_karma_realm",
+     Post => Karma_Realm_Host'Result in 0 .. 5;
+   function Rebirth_Host (Brightest : Integer; Weight : Integer) return Integer with
+     Export, Convention => C, External_Name => "bardo_rebirth",
+     Post => Rebirth_Host'Result in 0 .. 5;
+
 end Bardo.API;

@@ -147,4 +147,20 @@ package body Bardo.API is
    function Realm_Host (Brightest : Integer; Poison : Integer) return Integer is
      (Bardo.Sidpa.Karmic_Realm (Brightest, Poison));
 
+   function Karma_Start_Host return Integer is (Bardo.Sidpa.Karma_Start);
+   function Karma_Lighten_Host (Weight : Integer) return Integer is
+     (Bardo.Sidpa.Karma_Lighten (Weight));
+   function Karma_Heavy_Host (Weight : Integer) return Integer is
+     (Bardo.Sidpa.Karma_Heavy (Weight));
+   function Karma_Carry_Host (Weight : Integer) return Integer is
+     (Bardo.Sidpa.Karma_Carry (Weight));
+   function Karma_Band_Host (Weight : Integer) return Integer is
+     (Bardo.Sidpa.Karma_Band (Weight));
+   function Karma_Chance_Host (Weight : Integer) return Integer is
+     (Bardo.Sidpa.Karma_Chance (Weight));
+   function Karma_Realm_Host (Weight : Integer) return Integer is
+     (Bardo.Sidpa.Fallback_Realm (Weight));
+   function Rebirth_Host (Brightest : Integer; Weight : Integer) return Integer is
+     (Bardo.Sidpa.Rebirth_Realm (Brightest, Weight));
+
 end Bardo.API;

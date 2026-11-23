@@ -96,6 +96,70 @@ package body Bardo.Sidpa is
       elsif Poison = 2 then 3
       else 2);
 
+   function Clamp_Karma (Weight : Integer) return Karma_Weight is
+     (if Weight < 0 then 0 elsif Weight > 1_000 then 1_000 else Weight);
+
+   function Karma_Lighten (Weight : Integer) return Karma_Weight is
+      W : constant Karma_Weight := Clamp_Karma (Weight);
+   begin
+      if W < 160 then
+         return 0;
+      end if;
+      return W - 160;
+   end Karma_Lighten;
+
+   function Karma_Heavy (Weight : Integer) return Karma_Weight is
+      W : constant Karma_Weight := Clamp_Karma (Weight);
+   begin
+      if W > 840 then
+         return 1_000;
+      end if;
+      return W + 160;
+   end Karma_Heavy;
+
+   function Karma_Carry (Weight : Integer) return Karma_Weight is
+     ((Clamp_Karma (Weight) + 500) / 2);
+
+   function Karma_Band (Weight : Integer) return Integer is
+      W : constant Karma_Weight := Clamp_Karma (Weight);
+   begin
+      if W <= 333 then
+         return 0;
+      elsif W >= 667 then
+         return 2;
+      end if;
+      return 1;
+   end Karma_Band;
+
+   function Karma_Chance (Weight : Integer) return Integer is
+      W : constant Karma_Weight := Clamp_Karma (Weight);
+   begin
+      if W <= 500 then
+         return 1_000;
+      end if;
+      return 1_000 - ((W - 500) * 900) / 500;
+   end Karma_Chance;
+
+   function Fallback_Realm (Weight : Integer) return Integer is
+      W : constant Karma_Weight := Clamp_Karma (Weight);
+   begin
+      if W >= 900 then
+         return 5;
+      elsif W >= 800 then
+         return 4;
+      elsif W >= 667 then
+         return 3;
+      elsif W <= 100 then
+         return 0;
+      elsif W <= 220 then
+         return 1;
+      end if;
+      return 2;
+   end Fallback_Realm;
+
+   function Rebirth_Realm (Brightest : Integer; Weight : Integer) return Integer is
+     (if Brightest in 0 .. 5 then Brightest else Fallback_Realm (Weight));
+
    function Wind_Force (Time : Milli_Time) return Thousandth is
       Day : constant Day_Number := Bardo.Calendar.Calendar_Day (Time);
    begin

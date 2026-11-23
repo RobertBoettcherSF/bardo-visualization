@@ -15,6 +15,7 @@ let screenId = "opening";
 let endingLocked = false;
 let turned = false;
 let poisonSeen = -1;
+let karma = 500;
 let autoTimer = 0;
 let autoRunning = false;
 let autoStopRequested = false;
@@ -26,6 +27,8 @@ let lives = [];
 let life = null;
 let seenScreens = {};
 let seenLinks = {};
+let tries = {};
+let runComplete = false;
 const pathLog = [];
 let methodsDone = 0;
 let destination = -1;
@@ -405,7 +408,10 @@ function showScreen(id, button, extra) {
   selectedKey = "";
   lineKey = "";
   detailKey = "";
-  arrivalKey = button === "dont" && ARRIVE[id] ? ARRIVE[id] : "";
+  arrivalKey = "";
+  if (button === "dont") {
+    arrivalKey = REALMS.indexOf(id) >= 0 ? pullKey() : (ARRIVE[id] || "");
+  }
   document.getElementById("more").hidden = true;
   if (id === "opening") {
     viewMode = "opening";
@@ -429,8 +435,16 @@ function showOpening() {
   showScreen("opening", "prev");
 }
 
-function karmicId() {
-  const code = ada.exports.bardo_realm(destination, poisonSeen);
+function pullKey() {
+  const realm = destination >= 0 && destination <= 5
+    ? destination
+    : ada.exports.bardo_karma_realm(karma);
+  const band = ada.exports.bardo_karma_band(karma);
+  return "pull" + band + "_" + realm;
+}
+
+function rebirthId() {
+  const code = ada.exports.bardo_rebirth(destination, karma);
   return REALMS[code] || "human";
 }
 
@@ -471,21 +485,45 @@ function choose(follow, via) {
   if (via !== "auto") playClick();
   if (!SCENE_CODE[screenId]) return;
   const from = screenId;
-  if (follow && screenId === "wish") {
+  const karmaBefore = karma;
+  karma = follow
+    ? ada.exports.bardo_karma_lighten(karma)
+    : ada.exports.bardo_karma_heavy(karma);
+  if (follow && from === "wish") {
     turned = true;
     lineKey = "infoWishTurn";
     detailKey = "bodyWish";
     arrivalKey = "";
     remember("follow", { onward: "chonyid" });
-    if (via === "auto") noteStep("follow", from, "wish");
+    if (via === "auto") noteStep("follow", from, "wish", { karmaBefore: karmaBefore });
     render();
     return;
   }
+  if (follow && from === "womb") {
+    const chance = ada.exports.bardo_karma_chance(karma);
+    const roll = Math.floor(Math.random() * 1000);
+    const natural = roll < chance;
+    const ok = via === "auto" ? true : natural;
+    if (!ok) {
+      lineKey = pullKey();
+      detailKey = "detailFail";
+      arrivalKey = "";
+      render();
+      return;
+    }
+    showScreen("good", "follow");
+    if (via === "auto") {
+      noteStep("follow", from, "good", {
+        karmaBefore: karmaBefore, chance: chance, roll: roll, forced: !natural
+      });
+    }
+    return;
+  }
   const next = follow
-    ? (screenId === "womb" ? "good" : screenId === "lights" ? "judge" : "wish")
-    : (screenId === "wish" ? "judge" : screenId === "judge" ? "lights" : screenId === "lights" ? "womb" : karmicId());
+    ? (from === "lights" ? "judge" : "wish")
+    : (from === "wish" ? "judge" : from === "judge" ? "lights" : from === "lights" ? "womb" : rebirthId());
   showScreen(next, follow ? "follow" : "dont");
-  if (via === "auto") noteStep(follow ? "follow" : "dont", from, screenId);
+  if (via === "auto") noteStep(follow ? "follow" : "dont", from, screenId, { karmaBefore: karmaBefore });
 }
 
 function explainOf(action, arg) {
@@ -561,18 +599,110 @@ function onHit(region, via) {
   render();
 }
 
-function noteStep(action, from, led) {
+function noteStep(action, from, led, extra) {
   seenScreens[from] = true;
   seenScreens[led] = true;
   seenLinks[from + ">" + action] = true;
-  if (!life) life = { steps: [] };
-  life.steps.push({ screen: from, action: action, led: led, t: Date.now() });
+  if (!life) life = { steps: [], karma: karma };
+  const step = { screen: from, action: action, led: led, t: Date.now(), karma: karma };
+  if (extra) {
+    Object.keys(extra).forEach(function (key) { step[key] = extra[key]; });
+  }
+  life.steps.push(step);
+  life.karma = karma;
   if (led === "good" || REALMS.indexOf(led) >= 0) {
     life.ended = led;
     lives.push(life);
-    life = { steps: [] };
+    life = { steps: [], karma: karma };
     window.__autoLives = lives.length;
   }
+  publishCoverage();
+}
+
+const LIFE_SCREENS = ["wish", "judge", "lights", "womb", "good"].concat(REALMS);
+
+function actionsFor(screen) {
+  if (screen === "wish") {
+    return [
+      { id: "follow", kind: "follow" },
+      { id: "dont", kind: "dont" },
+      { id: "abyss-0", kind: "hit", action: 7, arg: 0 },
+      { id: "abyss-1", kind: "hit", action: 7, arg: 1 },
+      { id: "abyss-2", kind: "hit", action: 7, arg: 2 }
+    ];
+  }
+  if (screen === "judge") {
+    return [
+      { id: "follow", kind: "follow" },
+      { id: "dont", kind: "dont" },
+      { id: "mirror", kind: "hit", action: 5, arg: 0 },
+      { id: "pass", kind: "hit", action: 6, arg: 0 },
+      { id: "pebble-w", kind: "hit", action: 8, arg: 0 },
+      { id: "pebble-b", kind: "hit", action: 9, arg: 0 }
+    ];
+  }
+  if (screen === "lights") {
+    const list = [
+      { id: "follow", kind: "follow" },
+      { id: "dont", kind: "dont" }
+    ];
+    for (let i = 0; i < 6; i++) list.push({ id: "light-" + i, kind: "light", arg: i });
+    return list;
+  }
+  if (screen === "womb") {
+    const list = [
+      { id: "follow", kind: "follow" },
+      { id: "dont", kind: "dont" }
+    ];
+    for (let i = 1; i <= 5; i++) list.push({ id: "petal-" + i, kind: "petal", arg: i });
+    return list;
+  }
+  if (screen === "good" || REALMS.indexOf(screen) >= 0) {
+    return [{ id: "again", kind: "again" }];
+  }
+  return [];
+}
+
+function requiredLinks() {
+  const links = [];
+  LIFE_SCREENS.forEach(function (screen) {
+    actionsFor(screen).forEach(function (action) {
+      links.push({ from: screen, button: action.id });
+    });
+  });
+  links.push({ from: "womb", button: "petals" });
+  return links;
+}
+
+function unreachedNow() {
+  return {
+    screens: LIFE_SCREENS.filter(function (id) { return !seenScreens[id]; }),
+    links: requiredLinks().filter(function (link) {
+      return !seenLinks[link.from + ">" + link.button];
+    })
+  };
+}
+
+function coverageNow() {
+  const gaps = unreachedNow();
+  const screens = (LIFE_SCREENS.length - gaps.screens.length) + "/" + LIFE_SCREENS.length;
+  const linkCount = requiredLinks().length;
+  const links = (linkCount - gaps.links.length) + "/" + linkCount;
+  return {
+    screens: screens,
+    links: links,
+    complete: gaps.screens.length === 0 && gaps.links.length === 0
+  };
+}
+
+function publishCoverage() {
+  const now = coverageNow();
+  window.__coverage = now.screens + " " + now.links;
+  window.__coverageComplete = now.complete;
+}
+
+function coverageComplete() {
+  return coverageNow().complete;
 }
 
 function runFile() {
@@ -590,20 +720,18 @@ function runFile() {
   return {
     schema: "bardo-run",
     stamp: STAMP,
+    complete: runComplete,
+    coverage: coverageNow(),
     lives: lives.map(function (item) {
       return {
         steps: item.steps,
         ended: item.ended || "",
+        karma: item.karma,
         incomplete: item.incomplete === true
       };
     }),
     totals: totals,
-    unreached: {
-      screens: ALL_SCREENS.filter(function (id) { return !seenScreens[id]; }),
-      links: CHOICE_LINKS.filter(function (link) {
-        return !seenLinks[link.from + ">" + link.button];
-      })
-    },
+    unreached: unreachedNow(),
     deadEnds: [{
       from: "wish",
       button: "follow",
@@ -635,6 +763,7 @@ function finishAuto() {
   life = null;
   autoRunning = false;
   autoStopRequested = false;
+  runComplete = coverageComplete();
   downloadRun();
   render();
 }
@@ -648,49 +777,146 @@ function autoStep() {
   autoTimer = 0;
   if (!autoRunning) return;
   performAutoAction();
-  if (autoStopRequested || !autoRunning) {
+  if (autoStopRequested || coverageComplete()) {
     finishAuto();
     return;
   }
   scheduleAuto();
 }
 
+function beginAgain(via) {
+  if (via !== "auto") playClick();
+  const from = screenId;
+  const karmaBefore = karma;
+  karma = ada.exports.bardo_karma_carry(karma);
+  methodsDone = 0;
+  destination = -1;
+  poisonSeen = -1;
+  wanderTick = 0;
+  pendingAction = 0;
+  showScreen("wish", "again");
+  if (via === "auto") noteStep("again", from, "wish", { karmaBefore: karmaBefore });
+}
+
+function actionHelps(action) {
+  const link = screenId + ">" + action.id;
+  if (!seenLinks[link]) return true;
+  if (action.kind === "light" && !seenScreens[REALMS[action.arg]]) return true;
+  if (action.kind === "petal" && action.arg === methodsDone + 1 && !seenLinks["womb>petals"]) return true;
+  if (action.kind === "follow" && screenId === "womb" && !seenScreens.good) return true;
+  if (action.kind === "dont" && screenId === "womb") {
+    const realm = destination >= 0 && destination <= 5
+      ? REALMS[destination]
+      : REALMS[ada.exports.bardo_karma_realm(karma)];
+    if (!seenScreens[realm]) return true;
+  }
+  if (action.kind === "dont" && screenId === "wish" && !seenScreens.judge) return true;
+  if (action.kind === "dont" && screenId === "judge" && !seenScreens.lights) return true;
+  if (action.kind === "dont" && screenId === "lights" && !seenScreens.womb) return true;
+  return false;
+}
+
+function pickAction() {
+  const actions = actionsFor(screenId);
+  if (!actions.length) return null;
+  let least = actions[0];
+  let min = tries[screenId + ">" + least.id] || 0;
+  const pool = [];
+  actions.forEach(function (action) {
+    const count = tries[screenId + ">" + action.id] || 0;
+    if (count < min) {
+      min = count;
+      pool.length = 0;
+      pool.push(action);
+    } else if (count === min) {
+      pool.push(action);
+    }
+  });
+  const helpful = pool.filter(actionHelps);
+  const choice = (helpful.length ? helpful : pool);
+  return choice[Math.floor(Math.random() * choice.length)];
+}
+
+function autoApply(action) {
+  const key = screenId + ">" + action.id;
+  tries[key] = (tries[key] || 0) + 1;
+  if (action.kind === "follow") {
+    choose(true, "auto");
+    return;
+  }
+  if (action.kind === "dont") {
+    choose(false, "auto");
+    return;
+  }
+  if (action.kind === "again") {
+    beginAgain("auto");
+    return;
+  }
+  const from = screenId;
+  const karmaBefore = karma;
+  if (action.kind === "light") {
+    destination = action.arg;
+    applyAction(4, action.arg);
+    lineKey = "tapLight" + action.arg;
+    detailKey = "detailLight" + action.arg;
+    arrivalKey = "";
+    noteStep(action.id, from, screenId, { karmaBefore: karmaBefore });
+    render();
+    return;
+  }
+  if (action.kind === "petal") {
+    const before = methodsDone;
+    applyAction(1, action.arg);
+    if (from === "womb" && methodsDone >= 5) {
+      showScreen("good", "petals");
+      noteStep(action.id, from, "womb", { karmaBefore: karmaBefore });
+      noteStep("petals", from, "good", { karmaBefore: karmaBefore });
+      return;
+    }
+    lineKey = methodsDone > before ? "tapClosed" : (sidpa()[1] === 8 ? "outOrder" : "tapPetal" + action.arg);
+    detailKey = "detailPetal" + action.arg;
+    arrivalKey = "";
+    noteStep(action.id, from, screenId, { karmaBefore: karmaBefore });
+    render();
+    return;
+  }
+  if (action.action >= 1 && action.action <= 7) applyAction(action.action, action.arg);
+  const spec = explainOf(action.action, action.arg);
+  if (spec) {
+    lineKey = spec.line;
+    detailKey = spec.detail;
+    arrivalKey = "";
+  }
+  noteStep(action.id, from, screenId, { karmaBefore: karmaBefore });
+  render();
+}
+
 function performAutoAction() {
-  const ended = screenId === "good" || REALMS.indexOf(screenId) >= 0;
-  if (ended || viewMode === "ending") {
+  if (!actionsFor(screenId).length) {
     const from = screenId;
-    goStart();
-    noteStep("again", from, screenId);
+    showScreen("wish", "auto");
+    noteStep("start", from, screenId, { karmaBefore: karma });
     return;
   }
-  if (!SCENE_CODE[screenId]) {
-    const from = screenId;
-    showScreen(firstId(), "auto");
-    noteStep("start", from, screenId);
-    return;
-  }
-  const roll = Math.random();
-  if (roll < 0.5) choose(false, "auto");
-  else if (roll < 0.75) choose(true, "auto");
-  else {
-    const list = window.__regions || [];
-    if (!list.length) choose(false, "auto");
-    else onHit(list[Math.floor(Math.random() * list.length)], "auto");
-  }
+  const action = pickAction();
+  if (!action) return;
+  autoApply(action);
 }
 
 function startAuto() {
   if (autoRunning) return;
   autoRunning = true;
   autoStopRequested = false;
+  runComplete = false;
   lives = [];
-  life = { steps: [] };
+  life = { steps: [], karma: karma };
   seenScreens = {};
   seenLinks = {};
+  tries = {};
   window.__autoLives = 0;
+  if (screenId === "opening" || screenId === "clock") showScreen("wish", "auto");
   seenScreens[screenId] = true;
-  if (screenId === "opening" || tourList().indexOf(screenId) < 0) showScreen(firstId(), "auto");
-  seenScreens[screenId] = true;
+  publishCoverage();
   scheduleAuto();
   render();
 }
@@ -806,6 +1032,7 @@ async function boot() {
   const sequences = loadGlyphs();
   direction = 0;
   destination = -1;
+  karma = exports.bardo_karma_start();
   milli = exports.bardo_start(direction);
   sampleCurves();
   applyStaticText();
@@ -886,7 +1113,7 @@ document.getElementById("go").addEventListener("click", function () {
 });
 document.getElementById("follow").addEventListener("click", function () { choose(true); });
 document.getElementById("dont").addEventListener("click", function () { choose(false); });
-document.getElementById("again").addEventListener("click", goStart);
+document.getElementById("again").addEventListener("click", function () { beginAgain(); });
 document.getElementById("auto").addEventListener("click", function () {
   if (autoRunning) requestStop();
   else startAuto();

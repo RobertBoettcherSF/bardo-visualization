@@ -266,9 +266,26 @@ try {
       await page.click("#start");
       await page.click("#dont");
       now = await page.$eval("#state", (el) => el.dataset.screen);
-      assert(now === "human", name + " rebirth " + now);
+      assert(now === "human", name + " fallback rebirth " + now);
       const line = await page.$eval("#quote", (el) => el.textContent);
       assert(line.toLowerCase().includes("yellow"), name + " realm line " + line);
+      await page.click("#again");
+      now = await page.$eval("#state", (el) => ({ screen: el.dataset.screen, day: el.dataset.day }));
+      assert(now.screen === "wish" && now.day === "22", name + " new life " + now.screen + " " + now.day);
+      await page.click("#dont");
+      await page.click("#dont");
+      const hell = await page.evaluate(() => window.__regions.find((r) => r.action === 4 && r.arg === 5));
+      await page.mouse.click(hell.clientX, hell.clientY);
+      await page.mouse.click(hell.clientX, hell.clientY);
+      const chosen = await page.$eval("#state", (el) => el.dataset.brightest);
+      assert(chosen === "5", name + " hell light " + chosen);
+      await page.click("#dont");
+      await page.click("#dont");
+      now = await page.$eval("#state", (el) => el.dataset.screen);
+      assert(now === "hell", name + " smoky rebirth " + now);
+      const pull = await page.$eval("#enter", (el) => el.textContent);
+      assert(/Heavy karma/i.test(pull) && /smoky/i.test(pull), name + " pull " + pull);
+      await shot("karma");
       await shot("rebirth");
       await page.click("#menu");
       if (await page.$eval("#sound", (el) => el.getAttribute("aria-pressed")) === "true") await page.click("#sound");
@@ -281,24 +298,26 @@ try {
       await mkdir("/opt/cursor/artifacts", { recursive: true });
       await rm(join(outDir, "bardo-report.json"), { force: true });
       await rm(join(outDir, "bardo-run.json"), { force: true });
-      await page.evaluate(() => { window.__autoPace = 40; });
+      await page.evaluate(() => { window.__autoPace = 12; });
       await page.click("#start");
       await page.click("#auto");
-      const stopLabel = await page.$eval("#auto", (el) => el.textContent.trim());
-      assert(stopLabel === "Stop", name + " auto label " + stopLabel);
-      await shot("auto");
+      await page.waitForFunction(() => document.getElementById("auto").textContent.trim() === "Stop");
       await page.click("#viz");
       await page.keyboard.press("F9");
-      await page.waitForFunction(() => window.__autoLives >= 3, { timeout: 20000 });
-      const still = await page.$eval("#auto", (el) => el.textContent.trim());
-      assert(still === "Stop", name + " F9 stopped auto");
-      await page.click("#auto");
+      const during = await page.$eval("#auto", (el) => el.textContent.trim());
+      assert(during === "Stop", name + " F9 stopped auto");
+      await page.waitForFunction(() => document.getElementById("auto").textContent.trim() === "Auto", { timeout: 45000 });
+      await shot("complete");
       const run = await readReport("bardo-run.json");
       assert(run.schema === "bardo-run", name + " run schema");
-      assert(run.totals.lives >= 3, name + " lives " + run.totals.lives);
-      assert(Array.isArray(run.lives) && run.lives.length >= 3, name + " life list");
-      assert(run.totals.good + Object.values(run.totals.rebirths).reduce((a, b) => a + b, 0) >= 3, name + " endings");
-      assert(Array.isArray(run.unreached.screens) && Array.isArray(run.unreached.links), name + " unreached");
+      assert(run.complete === true, name + " run not complete " + JSON.stringify(run.coverage) + " " + JSON.stringify(run.unreached));
+      assert(run.coverage.screens === "11/11", name + " screens " + run.coverage.screens);
+      assert(run.unreached.screens.length === 0, name + " screens left " + run.unreached.screens.join(","));
+      assert(run.unreached.links.length === 0, name + " links left " + run.unreached.links.map((l) => l.from + ">" + l.button).join(","));
+      ["deva", "asura", "human", "animal", "preta", "hell"].forEach((realm) => {
+        assert(run.lives.some((life) => life.ended === realm) || run.totals.rebirths[realm] > 0, name + " missing realm " + realm);
+      });
+      assert(run.lives.some((life) => life.steps.some((step) => typeof step.karma === "number")), name + " karma not logged");
       assert(run.deadEnds && run.deadEnds[0].onward === "chonyid", name + " dead end");
       await copyFile(join(outDir, "bardo-run.json"), join("/opt/cursor/artifacts", "bardo-run.json"));
     }
@@ -339,7 +358,7 @@ try {
   assert(reportPage.logs.length === 0, "report console");
   await reportPage.page.close();
   await mkdir("/opt/cursor/artifacts", { recursive: true });
-  for (const name of ["explain-390.png", "explain-1366.png", "detail-390.png", "detail-1366.png", "auto-390.png", "auto-1366.png", "arrive-390.png", "arrive-1366.png"]) {
+  for (const name of ["karma-390.png", "karma-1366.png", "rebirth-390.png", "rebirth-1366.png", "complete-390.png", "complete-1366.png"]) {
     await copyFile(join(outDir, name), join("/opt/cursor/artifacts", name));
   }
   console.log("browser smoke ok", stamp);

@@ -67,6 +67,28 @@ package Bardo.Sidpa is
    function Karmic_Realm (Brightest : Integer; Poison : Integer) return Integer with
      Post => Karmic_Realm'Result in 0 .. 5;
 
+   --  Hidden karma weight. 0 is light, 1000 is heavy. Not a score.
+   subtype Karma_Weight is Integer range 0 .. 1_000;
+
+   function Karma_Start return Karma_Weight is (500);
+
+   function Karma_Lighten (Weight : Integer) return Karma_Weight;
+   function Karma_Heavy (Weight : Integer) return Karma_Weight;
+   --  Halfway back towards the middle, so a portion of this life remains.
+   function Karma_Carry (Weight : Integer) return Karma_Weight;
+   --  0 light, 1 even, 2 heavy.
+   function Karma_Band (Weight : Integer) return Integer with
+     Post => Karma_Band'Result in 0 .. 2;
+   --  Thousandths. Certain while the weight is even or light, then falls.
+   function Karma_Chance (Weight : Integer) return Integer with
+     Post => Karma_Chance'Result in 0 .. 1_000;
+   --  Fallback when no light was chosen. Light leans to the gods,
+   --  heavy leans to animal, hungry ghost, and hell.
+   function Fallback_Realm (Weight : Integer) return Integer with
+     Post => Fallback_Realm'Result in 0 .. 5;
+   function Rebirth_Realm (Brightest : Integer; Weight : Integer) return Integer with
+     Post => Rebirth_Realm'Result in 0 .. 5;
+
    function Wind_Force (Time : Milli_Time) return Thousandth;
 
    function Wander_X (Tick : Natural) return Thousandth;
