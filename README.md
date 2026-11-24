@@ -2,7 +2,7 @@
 
 An interactive tour of the Bardo states. The clock, the curves and the mantra syllables are Plain Ada, compiled to WebAssembly. The page draws, and nothing else.
 
-The tour is in UK English. Other languages can be overlaid later. Jung’s reverse order is the default. The book-order toggle runs the same screens from the Clear Light toward the womb. Follow moves toward liberation and Don’t follow moves toward rebirth, in either order. The day scrubber jumps to the screen for that day. A life starts at the womb in Jung’s order and at the primary Clear Light in book order. A coda follows every ending and returns to the opening.
+The tour is in UK English. Other languages can be overlaid later. The book’s own order is the default: it starts at the primary Clear Light, the moment of death, and runs forward to rebirth. Jung’s reverse order is the other choice on the order toggle, and the page remembers that choice. His three commentary screens stay in the code. In book order they are left off Next and Previous and open from Menu, under “Jung’s commentary”. In Jung’s order they still come first. The interval curves are hidden until Menu switches them on. Follow moves toward liberation and Don’t follow moves toward rebirth, in either order. The day scrubber jumps to the screen for that day. A life starts at the primary Clear Light in book order and at the womb in Jung’s order. A coda follows every ending and returns to the opening.
 
 ## Screen IDs
 
@@ -56,4 +56,4 @@ node tests/browser/smoke.mjs
 
 Open `index.html`. The font is the sibling file `assets/devanagari-subset.woff2`. Wasm is instantiated from the bytes embedded in the page.
 
-The MIT licence covers this code. The page itself carries no copyright note. The words on the page are ours, checked against the Evans-Wentz book (public domain) and a private German working text that is not in this repository.
+The MIT licence covers this code. The words on the page are ours, checked against the Evans-Wentz book (public domain) and a private German working text that is not in this repository.

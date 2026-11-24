@@ -224,9 +224,10 @@ package body Bardo.Sidpa is
       31, 32, 33, 34, 35, 36, 37,
       41, 42,
       55];
-   Book_Line : constant array (0 .. 27) of Integer :=
-     [1, 2, 3,
-      42, 41,
+   --  The book line leaves out Jung's three frame screens. Those are a
+   --  side path: next from the last frame returns to the primary light.
+   Book_Line : constant array (0 .. 24) of Integer :=
+     [42, 41,
       37, 36, 35, 34, 33, 32, 31,
       27, 26, 25, 24, 23, 22, 21,
       14, 13, 12, 11, 10,
@@ -239,7 +240,7 @@ package body Bardo.Sidpa is
       41, 42];
 
    function Tour_Length (Direction : Direction_Kind) return Natural is
-     (if Direction = Jung_Reverse then 25 else 28);
+     (if Direction = Jung_Reverse then 25 else 25);
 
    function Tour_Screen (Direction : Direction_Kind; Index : Integer) return Integer is
    begin
@@ -271,7 +272,7 @@ package body Bardo.Sidpa is
          return -1;
       end if;
       if Code = 0 and then Step = 1 then
-         return 1;
+         return (if Direction = Jung_Reverse then 1 else 42);
       end if;
       if Code = 55 and then Step = 1 then
          return 0;
@@ -283,6 +284,16 @@ package body Bardo.Sidpa is
             return (if Step = 1 then 62 else 60);
          elsif Code = 62 then
             return (if Step = 1 then 55 else 61);
+         end if;
+      else
+         --  Commentary is off the book line. Previous on the first frame
+         --  returns to the opening. Next on the last frame enters the tour.
+         if Code = 1 then
+            return (if Step = 1 then 2 else 0);
+         elsif Code = 2 then
+            return (if Step = 1 then 3 else 1);
+         elsif Code = 3 then
+            return (if Step = 1 then 42 else 2);
          end if;
       end if;
       if Code = 50 then

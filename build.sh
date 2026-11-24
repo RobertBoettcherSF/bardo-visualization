@@ -21,7 +21,7 @@ if [ -n "$(git status --porcelain)" ]; then
   DIRTY="+"
 fi
 WHEN=$(TZ=Europe/Berlin date +%Y%m%d-%H%M)
-STAMP="v0.12 b${WHEN} ${SHA}${DIRTY}"
+STAMP="v0.13 b${WHEN} ${SHA}${DIRTY}"
 python3 - "$STAMP" << 'PY'
 import pathlib, sys
 stamp = sys.argv[1]

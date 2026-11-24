@@ -19,9 +19,8 @@ const REALM_WASH = {
 function stageBox(width, height, opening, ending) {
   const bar = opening ? 72 : 128;
   const caption = opening ? 108 : ending ? 168 : 56;
-  const wide = window.innerWidth > 700;
-  const folded = document.body.classList.contains("curves-folded");
-  const top = opening ? 40 : wide ? 176 : folded ? 120 : 188;
+  const curvesOn = document.body.classList.contains("show-curves");
+  const top = opening ? 40 : curvesOn ? 248 : 156;
   const availW = Math.max(40, width - 16);
   const availH = Math.max(40, height - bar - caption - top);
   const aspect = 3 / 4;

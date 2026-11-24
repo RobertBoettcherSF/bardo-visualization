@@ -117,11 +117,13 @@ package Bardo.Sidpa is
      return Integer with
      Post => Womb_Path'Result in -1 .. 25;
 
-   --  Reading order. 0 is Jung (toward the Clear Light as the index grows
-   --  after the preface). 1 is the book (Clear Light first, womb last).
-   --  Screen codes are stable integers. Move returns the neighbour, or -1
-   --  when the step would leave the line. Follow_Move is the teaching
-   --  step: follow goes toward liberation, don't follow toward rebirth.
+   --  Reading order. 0 is Jung (frames first, then toward the Clear Light).
+   --  1 is the book (Clear Light first, womb last). The book line omits
+   --  the three commentary frames; those step among themselves and can
+   --  return to the opening or to the primary light. Screen codes are
+   --  stable integers. Move returns the neighbour, or -1 when the step
+   --  would leave the line. Follow_Move is the teaching step: follow goes
+   --  toward liberation, don't follow toward rebirth.
    function Tour_Length (Direction : Direction_Kind) return Natural with
      Post => Tour_Length'Result in 1 .. 32;
    function Tour_Screen (Direction : Direction_Kind; Index : Integer) return Integer with

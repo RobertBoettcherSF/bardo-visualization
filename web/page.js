@@ -270,7 +270,10 @@ const ID_OF = {
 };
 const NUM_OF = {};
 Object.keys(ID_OF).forEach(function (code) { NUM_OF[ID_OF[code]] = Number(code); });
-let scrubDay = 49;
+let scrubDay = 0;
+let tourReturn = "c20";
+let showCurves = false;
+const SETTINGS_KEY = "bardo-settings";
 let orderSnap = { 0: null, 1: null };
 let loopLog = [];
 let repeatKey = "";
@@ -362,7 +365,9 @@ function currentInfo(scene) {
 }
 
 function infoKey(scene) {
-  if (viewMode === "opening" || screenId === "opening") return "title";
+  if (viewMode === "opening" || screenId === "opening") {
+    return direction === 0 ? "orientJung" : "lead";
+  }
   if (screenId === "good") return "infoGood";
   if (screenId === "liberation") return "infoLiberation";
   if (screenId === "amitabha") return "infoAmitabha";
@@ -396,7 +401,14 @@ function updateChrome(out) {
   state.dataset.screen = screenId;
   state.dataset.id = codeOf(screenId);
   const sid = document.getElementById("sid");
-  if (sid) sid.textContent = codeOf(screenId);
+  if (sid) {
+    const source = (screenId === "f1" || screenId === "f2" || screenId === "f3")
+      ? t("sourceJung")
+      : t("sourceBook");
+    sid.textContent = screenId === "f2"
+      ? source + " · " + codeOf(screenId) + " · " + t("modelNotBook")
+      : source + " · " + codeOf(screenId);
+  }
   state.dataset.brightest = String(side[3]);
   state.dataset.outcome = String(side[1]);
   state.dataset.methods = String(side[2]);
@@ -428,6 +440,8 @@ function updateChrome(out) {
   document.body.classList.toggle("has-again", ending || screenId === "coda");
   document.body.classList.toggle("has-scrub", viewMode !== "opening");
   document.body.classList.toggle("has-choice", teaching);
+  document.body.classList.toggle("show-curves", showCurves);
+  document.body.classList.toggle("in-commentary", direction === 1 && (screenId === "f1" || screenId === "f2" || screenId === "f3"));
   const againButton = document.getElementById("again");
   if (againButton) againButton.textContent = screenId === "coda" ? t("toOpening") : t("again");
   const followButton = document.getElementById("follow");
@@ -462,7 +476,7 @@ function updateChrome(out) {
     ? t(detailKey)
     : (viewMode === "opening" ? t("lead") + " " + t("moreEnter") : t(names[1]));
   document.getElementById("more-body").textContent = moreBody;
-  document.getElementById("curves").style.display = detailKey ? "none" : "block";
+  document.getElementById("curves").style.display = detailKey || !showCurves ? "none" : "block";
   document.getElementById("outcome").textContent = viewMode === "opening" || ending ? "" : outcomeText(side[1]);
   const here = NUM_OF[screenId];
   document.getElementById("prev").disabled = viewMode === "opening";
@@ -475,11 +489,13 @@ function updateChrome(out) {
       ? t("scrubGap").replace("{day}", String(scrubDay))
       : t("dayLabel") + " " + scrubDay + " " + t("of") + " 49";
   }
-  const curveButton = document.getElementById("curve-toggle");
+  const curveButton = document.getElementById("curves-menu");
   if (curveButton) {
-    const folded = document.body.classList.contains("curves-folded");
-    curveButton.textContent = folded ? t("curveShow") : t("curveHide");
+    curveButton.textContent = showCurves ? t("curvesMenuHide") : t("curvesMenu");
+    curveButton.setAttribute("aria-pressed", String(showCurves));
   }
+  const commentaryButton = document.getElementById("commentary");
+  if (commentaryButton) commentaryButton.disabled = screenId === "f1";
   const wantWind = viewMode !== "opening";
   if (wantWind !== windWanted) {
     windWanted = wantWind;
@@ -629,6 +645,7 @@ function render() {
   ensureLoop();
   drawGraph(out[2]);
   drawLiveCurves();
+  drawDayMark();
 }
 
 function drawLiveCurves() {
@@ -666,6 +683,32 @@ function drawLiveCurves() {
   ctx.beginPath();
   ctx.moveTo(mark, 2);
   ctx.lineTo(mark, height - 2);
+  ctx.stroke();
+}
+
+function drawDayMark() {
+  const canvas = document.getElementById("day-mark");
+  if (!canvas || canvas.offsetParent === null) return;
+  const ctx = canvas.getContext("2d");
+  const dpr = Math.min(devicePixelRatio || 1, 1.5);
+  const width = canvas.clientWidth || 320;
+  const height = canvas.clientHeight || 14;
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+  ctx.strokeStyle = "#3c4038";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(8, height / 2);
+  ctx.lineTo(width - 8, height / 2);
+  ctx.stroke();
+  const mark = 8 + (scrubDay / 49) * (width - 16);
+  ctx.strokeStyle = "#f5e642";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(mark, 1);
+  ctx.lineTo(mark, height - 1);
   ctx.stroke();
 }
 
@@ -764,7 +807,9 @@ function goStart() {
 function goNext() {
   playClick();
   if (screenId === "opening") {
-    showScreen("f1", "next");
+    const code = ada.exports.bardo_tour_move(direction, 0, 1);
+    if (code < 0 || !ID_OF[code]) return;
+    showScreen(ID_OF[code], "next");
     return;
   }
   const code = ada.exports.bardo_tour_move(direction, NUM_OF[screenId], 1);
@@ -1141,6 +1186,9 @@ function actionsFor(screen) {
       if (!hit) return;
       list.push({ id: "hit-" + i, kind: "clear", arg: i });
     });
+    if (direction === 1 && (screen === "f1" || screen === "f2" || screen === "f3")) {
+      list.push({ id: "return", kind: "return" });
+    }
     return list;
   }
   if (SCREEN[screen] && SCREEN[screen].clear) {
@@ -1152,6 +1200,9 @@ function actionsFor(screen) {
       if (!hit) return;
       list.push({ id: "clear-" + i, kind: "clear", arg: i });
     });
+    if (direction === 1 && screen === "c20") {
+      list.push({ id: "commentary", kind: "commentary" });
+    }
     return list;
   }
   if (SCREEN[screen] && SCREEN[screen].peace) {
@@ -1232,7 +1283,7 @@ function advanceOrder() {
     seenLinks = {};
     methodsDone = 0;
     destination = -1;
-    showScreen("f1", "order");
+    showScreen(other === 0 ? "f1" : "c20", "order");
     return false;
   }
   return true;
@@ -1423,7 +1474,7 @@ function takePath(pick, via, actionId) {
 }
 
 function actionHelps(action) {
-  if (action.kind === "follow" || action.kind === "dont" || action.kind === "again" || action.kind === "path" || action.kind === "coda") {
+  if (action.kind === "follow" || action.kind === "dont" || action.kind === "again" || action.kind === "path" || action.kind === "coda" || action.kind === "commentary" || action.kind === "return") {
     const pending = actionsFor(screenId).some(function (other) {
       return other.kind !== "follow" && other.kind !== "dont" && other.kind !== "again"
         && other.kind !== "path" && other.kind !== "coda"
@@ -1515,6 +1566,18 @@ function autoApply(action) {
     takePath(action.choice, "auto", action.id);
     return;
   }
+  if (action.kind === "commentary") {
+    if (from !== "f1" && from !== "f2" && from !== "f3") tourReturn = from;
+    showScreen("f1", "commentary");
+    noteStep("commentary", from, "f1", { karmaBefore: karmaBefore });
+    return;
+  }
+  if (action.kind === "return") {
+    const back = tourReturn && tourReturn !== from ? tourReturn : "c20";
+    showScreen(back, "return");
+    noteStep("return", from, back, { karmaBefore: karmaBefore });
+    return;
+  }
   if (action.kind === "clear") {
     const item = SCREEN[from].hits[action.arg];
     lineKey = item.line;
@@ -1602,7 +1665,9 @@ function edgesFrom(id) {
   }
   actions.forEach(function (action) {
     if (action.kind === "coda") out.push("coda");
-    if (action.kind === "again") out.push(direction === 0 ? "womb" : "c20");
+    if (action.kind === "again") out.push(firstId());
+    if (action.kind === "commentary") out.push("f1");
+    if (action.kind === "return") out.push(tourReturn && tourReturn !== id ? tourReturn : "c20");
     if (action.kind === "path" && action.choice === 1) out.push("amitabha");
     if (action.kind === "path" && action.choice === 2) out.push("tushita");
   });
@@ -1648,7 +1713,7 @@ function performAutoAction() {
     || (screenId === "womb" && !seenLinks["womb>petals"]);
   if (!here.length) {
     const from = screenId;
-    showScreen("f1", "auto");
+    showScreen(direction === 0 ? "f1" : "c20", "auto");
     noteStep("start", from, screenId, { karmaBefore: karma });
     return;
   }
@@ -1682,7 +1747,7 @@ function startAuto() {
   lifeTotals = freshTotals();
   window.__autoLives = 0;
   applyDiary();
-  if (screenId === "opening" || screenId === "clock") showScreen("f1", "auto");
+  if (screenId === "opening" || screenId === "clock") showScreen(direction === 0 ? "f1" : "c20", "auto");
   seenScreens[screenId] = true;
   publishCoverage();
   if (!autoKeepGoing && coverageComplete()) {
@@ -1808,10 +1873,11 @@ async function boot() {
     glyphPtr: exports.bardo_glyph() >>> 0
   };
   const sequences = loadGlyphs();
-  direction = 0;
   destination = -1;
   karma = exports.bardo_karma_start();
+  loadSettings();
   milli = exports.bardo_start(direction);
+  scrubDay = direction === 0 ? 49 : 0;
   sampleCurves();
   applyStaticText();
   rain = startRain({
@@ -1825,7 +1891,7 @@ async function boot() {
     }
   });
   await loadIconography();
-  if (window.innerWidth <= 700) document.body.classList.add("curves-folded");
+  document.body.classList.toggle("show-curves", showCurves);
   auditMoves();
   loadDiary();
   remember("load");
@@ -1833,9 +1899,48 @@ async function boot() {
   window.__bardoReady = true;
 }
 
-function setDirection(next) {
+function loadSettings() {
+  direction = 1;
+  showCurves = false;
+  try {
+    const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "");
+    if (raw && (raw.direction === 0 || raw.direction === 1)) direction = raw.direction;
+    if (raw && raw.curves === true) showCurves = true;
+  } catch (err) { /* keep the book default */ }
+}
+
+function saveSettings() {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ direction: direction, curves: showCurves }));
+  } catch (err) { /* private mode */ }
+}
+
+function setDirection(next, viaUser) {
+  if (next !== 0 && next !== 1) return;
+  const changed = next !== direction;
   direction = next;
+  saveSettings();
+  if (viaUser && changed && next === 0) {
+    document.getElementById("jung-note").hidden = false;
+  }
+  if (next !== 0) document.getElementById("jung-note").hidden = true;
   render();
+}
+
+function openCommentary() {
+  if (screenId === "f1") return;
+  if (screenId !== "f2" && screenId !== "f3") {
+    tourReturn = screenId === "opening" ? "c20" : screenId;
+  }
+  const panel = document.getElementById("menu-panel");
+  panel.hidden = true;
+  document.getElementById("menu").setAttribute("aria-expanded", "false");
+  showScreen("f1", "commentary");
+}
+
+function returnToTour() {
+  const back = tourReturn && tourReturn !== screenId ? tourReturn : "c20";
+  showScreen(back, "return");
 }
 
 function pollVersion() {
@@ -1864,8 +1969,20 @@ function pollVersion() {
     .catch(function () { /* a failed poll is not a new build */ });
 }
 
-document.getElementById("dir-jung").addEventListener("click", function () { setDirection(0); playClick(); });
-document.getElementById("dir-book").addEventListener("click", function () { setDirection(1); playClick(); });
+document.getElementById("dir-jung").addEventListener("click", function () { setDirection(0, true); playClick(); });
+document.getElementById("dir-book").addEventListener("click", function () { setDirection(1, true); playClick(); });
+document.getElementById("commentary").addEventListener("click", function () { openCommentary(); playClick(); });
+document.getElementById("curves-menu").addEventListener("click", function () {
+  showCurves = !showCurves;
+  saveSettings();
+  playClick();
+  render();
+});
+document.getElementById("jung-dismiss").addEventListener("click", function () {
+  document.getElementById("jung-note").hidden = true;
+  playClick();
+});
+document.getElementById("tour-return").addEventListener("click", function () { returnToTour(); });
 document.getElementById("day").addEventListener("input", function (event) {
   const day = Number(event.target.value);
   const code = ada.exports.bardo_day_screen(day);
@@ -1873,7 +1990,7 @@ document.getElementById("day").addEventListener("input", function (event) {
   showScreen(ID_OF[code], "scrub", { day: day });
 });
 document.getElementById("go").addEventListener("click", function () {
-  if (viewMode === "opening") showScreen(direction === 0 ? "f1" : firstId(), "enter");
+  if (viewMode === "opening") goNext();
 });
 document.getElementById("dissolve-range").addEventListener("input", function (event) {
   applyDissolve(Number(event.target.value));
@@ -1898,10 +2015,6 @@ document.getElementById("again").addEventListener("click", function () {
   else beginAgain();
 });
 document.getElementById("coda").addEventListener("click", function () { showScreen("coda", "coda"); });
-document.getElementById("curve-toggle").addEventListener("click", function () {
-  document.body.classList.toggle("curves-folded");
-  render();
-});
 document.getElementById("auto").addEventListener("click", function () {
   if (autoRunning || autoPrompt) requestStop();
   else startAuto();
