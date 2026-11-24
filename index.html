@@ -7,7 +7,7 @@
 <style>
 @font-face {
   font-family: "Rain Devanagari";
-  src: url("assets/devanagari-subset.woff2?v=5fb7d06") format("woff2");
+  src: url("assets/devanagari-subset.woff2?v=7e37477") format("woff2");
   font-display: swap;
 }
 * { box-sizing: border-box; }
@@ -35,9 +35,11 @@ button { min-height: 44px; min-width: 44px; }
   top: calc(env(safe-area-inset-top) + 54px);
   left: max(8px, env(safe-area-inset-left));
   margin: 0;
+  max-width: calc(100vw - 16px);
   color: #c8c2b4;
   font: 600 11px/1.2 ui-sans-serif, system-ui, sans-serif;
   pointer-events: none;
+  white-space: nowrap;
 }
 #menu {
   position: fixed; z-index: 8;
@@ -66,33 +68,47 @@ button[aria-pressed="true"] { background: #e7e2d4; color: #111; }
 #note { width: 100%; min-height: 44px; }
 #curvebar {
   position: fixed; z-index: 4;
-  top: calc(env(safe-area-inset-top) + 28px);
+  top: calc(env(safe-area-inset-top) + 78px);
   left: 50%; transform: translateX(-50%);
   width: min(36rem, calc(100vw - 1.5rem));
   text-align: center;
 }
 body:not(.has-scrub) #curvebar, body:not(.has-scrub) #scrub { display: none; }
-#curve-live { width: 100%; height: 64px; display: block; background: rgba(7, 8, 7, 0.78); }
-#curve-toggle { display: none; }
+#curve-live { width: 100%; height: 64px; display: none; background: rgba(7, 8, 7, 0.78); }
+#curve-model {
+  display: none; margin: 0;
+  color: #c8c2b4; font: 11px/1.3 ui-sans-serif, system-ui, sans-serif;
+}
+#day-mark { width: 100%; height: 14px; display: block; background: rgba(7, 8, 7, 0.78); }
+body.show-curves #curve-live, body.show-curves #curve-model { display: block; }
 #scrub {
   position: fixed; z-index: 5;
   left: 50%; transform: translateX(-50%);
   width: min(36rem, calc(100vw - 1.5rem));
-  top: calc(env(safe-area-inset-top) + 108px);
+  top: calc(env(safe-area-inset-top) + 112px);
   text-align: center;
 }
+body.show-curves #scrub { top: calc(env(safe-area-inset-top) + 196px); }
 #scrub-read {
   display: block; margin: 0;
   color: #f7f4ea; font: 12px/1.3 ui-sans-serif, system-ui, sans-serif;
   text-shadow: 0 1px 4px #000;
 }
 #day { width: 100%; accent-color: #e0c36a; }
-@media (max-width: 700px) {
-  #curve-toggle { display: inline-block; width: auto; min-height: 36px; margin-bottom: 4px; }
-  body.curves-folded #curve-live { display: none; }
-  body.curves-folded #scrub { top: calc(env(safe-area-inset-top) + 70px); }
-  body:not(.curves-folded) #scrub { top: calc(env(safe-area-inset-top) + 128px); }
+#jung-note {
+  position: fixed; z-index: 9;
+  left: 50%; top: 18%;
+  transform: translateX(-50%);
+  width: min(28rem, calc(100vw - 1.5rem));
+  background: #141614; color: #f7f4ea;
+  border: 1px solid #e0c36a;
+  padding: 1rem 1.1rem;
+  text-align: center;
 }
+#jung-note[hidden] { display: none; }
+#jung-note p { margin: 0 0 0.8rem; font: 1rem/1.4 Georgia, "Iowan Old Style", Palatino, serif; }
+#tour-return { display: none; margin-top: 6px; }
+body.in-commentary #tour-return { display: inline-block; }
 #reload {
   position: fixed; z-index: 7;
   top: calc(env(safe-area-inset-top) + 52px);
@@ -210,14 +226,16 @@ body.has-choice #choices { display: flex; }
 <body>
 <canvas id="rain" aria-hidden="true"></canvas>
 <canvas id="viz"></canvas>
-<p id="stamp" class="stamp" data-dbg>v0.12 b20261123-1818 5fb7d06</p>
+<p id="stamp" class="stamp" data-dbg>v0.13 b20261124-0943 7e37477</p>
 <p id="sid" class="sid"></p>
 <button type="button" id="menu" aria-expanded="false" aria-controls="menu-panel"></button>
 <div id="menu-panel" hidden>
   <div class="row">
-    <button type="button" id="dir-jung" aria-pressed="true"></button>
-    <button type="button" id="dir-book" aria-pressed="false"></button>
+    <button type="button" id="dir-jung" aria-pressed="false"></button>
+    <button type="button" id="dir-book" aria-pressed="true"></button>
   </div>
+  <p><button type="button" id="commentary" data-k="commentary"></button></p>
+  <p><button type="button" id="curves-menu" aria-pressed="false"></button></p>
   <div class="row">
     <button type="button" id="sound" aria-pressed="false"></button>
     <button type="button" id="rain-toggle" aria-pressed="false"></button>
@@ -246,12 +264,17 @@ body.has-choice #choices { display: flex; }
 <p id="crash" hidden></p>
 <p id="errors" hidden></p>
 <div id="curvebar">
-  <button type="button" id="curve-toggle" data-k="curveShow"></button>
+  <p id="curve-model" data-k="modelNotBook"></p>
   <canvas id="curve-live" width="640" height="64" aria-hidden="true"></canvas>
+  <canvas id="day-mark" width="640" height="14" aria-hidden="true"></canvas>
+</div>
+<div id="jung-note" hidden>
+  <p id="jung-note-body" data-k="jungNote"></p>
+  <button type="button" id="jung-dismiss" data-k="jungDismiss"></button>
 </div>
 <div id="scrub">
   <label for="day" id="scrub-read"></label>
-  <input id="day" type="range" min="0" max="49" value="49">
+  <input id="day" type="range" min="0" max="49" value="0">
 </div>
 <div id="caption">
   <h1 id="enter" class="info"></h1>
@@ -259,6 +282,7 @@ body.has-choice #choices { display: flex; }
   <button type="button" id="go" data-k="enter"></button>
   <button type="button" id="again" data-k="again"></button>
   <button type="button" id="coda" data-k="coda"></button>
+  <button type="button" id="tour-return" data-k="returnTour"></button>
 </div>
 <div id="dissolve" hidden>
   <button type="button" id="dissolve-label" data-k="dissolveLabel"></button>
@@ -274,7 +298,7 @@ body.has-choice #choices { display: flex; }
   <p id="outcome"></p>
   <canvas id="curves" width="640" height="120"></canvas>
 </div>
-<div id="state" data-day="49" data-phase="" data-clarity="" data-intensity="" data-complexity="" data-mantra="" data-scene="" data-screen="opening" data-brightest="-1" data-outcome="0" data-methods="0"></div>
+<div id="state" data-day="0" data-phase="" data-clarity="" data-intensity="" data-complexity="" data-mantra="" data-scene="" data-screen="opening" data-brightest="-1" data-outcome="0" data-methods="0"></div>
 <div id="bar" class="bar">
   <button type="button" id="prev"></button>
   <button type="button" id="start"></button>
@@ -283,12 +307,13 @@ body.has-choice #choices { display: flex; }
 </div>
 <noscript><p>This page needs JavaScript.</p></noscript>
 <script>
-const WASM_BASE64 = "AGFzbQEAAAABTAtgAAF/YAAAYAJ/fwBgAX8Bf2ACf38Bf2AEf39/fwF/YAN/f38Bf2AFf39/f38Bf2ADf39/AGAGf39/f39/AX9gCX9/f39/f39/fwADREMAAAAAAQECAwMEAwMEAAMDAwMDAwQDAwMEBQMEBgcDAwQEBAQGBAQEBAQHCAQGBAQEBAQEBgQEBAcEBgUJBAQGCgQGBQQBAIACBgkBfwFB0JLAAAsHyAQhBm1lbW9yeQIAC2JhcmRvX2lucHV0AAAMYmFyZG9fb3V0cHV0AAELYmFyZG9fZ2x5cGgAAgtiYXJkb19zaWRwYQADDWJhcmRvX2NvbXB1dGUABApiYXJkb190aWNrAAUSYmFyZG9fbWFudHJhX2dseXBoAAYLYmFyZG9fc3RhcnQABxJiYXJkb19taWxsaV9vZl9kYXkACApiYXJkb193YWxrAAkMYmFyZG9fYW5jaG9yAAoLYmFyZG9fZmlyc3QACwtiYXJkb19yZWFsbQAMEWJhcmRvX2thcm1hX3N0YXJ0AA0TYmFyZG9fa2FybWFfbGlnaHRlbgAOEWJhcmRvX2thcm1hX2hlYXZ5AA8RYmFyZG9fa2FybWFfY2FycnkAEBBiYXJkb19rYXJtYV9iYW5kABESYmFyZG9fa2FybWFfY2hhbmNlABIRYmFyZG9fa2FybWFfcmVhbG0AEw1iYXJkb19yZWJpcnRoABQQYmFyZG9fZHVsbF9yZWFsbQAVFGJhcmRvX2Rpc3NvbHZlX2NsYW1wABYUYmFyZG9fZGlzc29sdmVfc3RhZ2UAFxBiYXJkb19jbGVhcl9zdGVwABgPYmFyZG9fd29tYl9wYXRoABkRYmFyZG9fdG91cl9sZW5ndGgAGhFiYXJkb190b3VyX3NjcmVlbgAbD2JhcmRvX3RvdXJfbW92ZQAcEWJhcmRvX2ZvbGxvd19tb3ZlAB0QYmFyZG9fZGF5X3NjcmVlbgAeEGJhcmRvX3NjcmVlbl9kYXkAHwq9L0MIAEGAkYCAAAsIAEGgkYCAAAsIAEHgkYCAAAsIAEGAkoCAAAu7BQEHfyOAgICAAEHQAGsiACSAgICAAEEAKAKAkYCAACEBQQAoAoSRgIAAIQICQAJAIAFB6P4CTQ0AQQBBATYCoJGAgAAMAQsCQCACQQJJDQBBAEECNgKgkYCAAAwBCwJAQQAo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AAAAhAAAAAwAAACQAAAACQAAAAEAAAACAAAAAwAAAAoAAAALAAAADAAAAA0AAAAOAAAAFQAAABYAAAAXAAAAGAAAABkAAAAaAAAAGwAAAB8AAAAgAAAAIQAAACIAAAAjAAAAJAAAACUAAAApAAAAKgAAADcAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAMAAAAqAAAAKQAAACUAAAAkAAAAIwAAACIAAAAhAAAAIAAAAB8AAAAbAAAAGgAAABkAAAAYAAAAFwAAABYAAAAVAAAADgAAAA0AAAAMAAAACwAAAAoAAAA8AAAAPQAAAD4AAAA3AAAACgAAAAsAAAAMAAAADQAAAA4AAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACkAAAAqAAAAMQAAACcAAAAgAAAAFgAAAAAAAAAFAAAAAgAAAAQAAAABAAAA/////wMAAAAAAAAAAQAAAAIAAAADAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAAAAAAAAAAAAAAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAAAAAAAAAAAAAAAAAEwAAABQAAAAAAAAAAAAAAAAAAAD///////////////////////////////8xAAAAKgAAACMAAAAcAAAAEgAAAP///////////////////////////////xEAAAAQAAAADwAAAA4AAAANAAAADAAAAAsAAAD///////////////8KAAAACQAAAAgAAAAHAAAABgAAAAUAAAAEAAAA////////////////AQAAAAAAAAD/////////////////////////////////////AAAAADEAAAAxAAAAMQAAADEAAAAAAAAA/////////////////////zEAAAAxAAAAMQAAAP////////////////////////////////////8xAAAAMQAAADEAAAAxAAAAMQAAADEAAAA=";
+const WASM_BASE64 = "AGFzbQEAAAABTAtgAAF/YAAAYAJ/fwBgAX8Bf2ACf38Bf2AEf39/fwF/YAN/f38Bf2AFf39/f38Bf2ADf39/AGAGf39/f39/AX9gCX9/f39/f39/fwADREMAAAAAAQECAwMEAwMEAAMDAwMDAwQDAwMEBQMEBgcDAwQEBAQGBAQEBAQHCAQGBAQEBAQEBgQEBAcEBgUJBAQGCgQGBQQBAIACBgkBfwFB0JLAAAsHyAQhBm1lbW9yeQIAC2JhcmRvX2lucHV0AAAMYmFyZG9fb3V0cHV0AAELYmFyZG9fZ2x5cGgAAgtiYXJkb19zaWRwYQADDWJhcmRvX2NvbXB1dGUABApiYXJkb190aWNrAAUSYmFyZG9fbWFudHJhX2dseXBoAAYLYmFyZG9fc3RhcnQABxJiYXJkb19taWxsaV9vZl9kYXkACApiYXJkb193YWxrAAkMYmFyZG9fYW5jaG9yAAoLYmFyZG9fZmlyc3QACwtiYXJkb19yZWFsbQAMEWJhcmRvX2thcm1hX3N0YXJ0AA0TYmFyZG9fa2FybWFfbGlnaHRlbgAOEWJhcmRvX2thcm1hX2hlYXZ5AA8RYmFyZG9fa2FybWFfY2FycnkAEBBiYXJkb19rYXJtYV9iYW5kABESYmFyZG9fa2FybWFfY2hhbmNlABIRYmFyZG9fa2FybWFfcmVhbG0AEw1iYXJkb19yZWJpcnRoABQQYmFyZG9fZHVsbF9yZWFsbQAVFGJhcmRvX2Rpc3NvbHZlX2NsYW1wABYUYmFyZG9fZGlzc29sdmVfc3RhZ2UAFxBiYXJkb19jbGVhcl9zdGVwABgPYmFyZG9fd29tYl9wYXRoABkRYmFyZG9fdG91cl9sZW5ndGgAGhFiYXJkb190b3VyX3NjcmVlbgAbD2JhcmRvX3RvdXJfbW92ZQAcEWJhcmRvX2ZvbGxvd19tb3ZlAB0QYmFyZG9fZGF5X3NjcmVlbgAeEGJhcmRvX3NjcmVlbl9kYXkAHwr9MUMIAEGAkYCAAAsIAEGgkYCAAAsIAEHgkYCAAAsIAEGAkoCAAAu7BQEHfyOAgICAAEHQAGsiACSAgICAAEEAKAKAkYCAACEBQQAoAoSRgIAAIQICQAJAIAFB6P4CTQ0AQQBBATYCoJGAgAAMAQsCQCACQQJJDQBBAEECNgKgkYCAAAwBCwJAQQAo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////EQAAABAAAAAPAAAADgAAAA0AAAAMAAAACwAAAP///////////////woAAAAJAAAACAAAAAcAAAAGAAAABQAAAAQAAAD///////////////8BAAAAAAAAAP////////////////////////////////////8AAAAAMQAAADEAAAAxAAAAMQAAAAAAAAD/////////////////////MQAAADEAAAAxAAAA/////////////////////////////////////zEAAAAxAAAAMQAAADEAAAAxAAAAMQAAAA==";
 const STRINGS = {
   en: {
     title: "The Bardo states",
-    standfirst: "A guide through the intermediate state, read in Jung’s reverse order.",
-    lead: "A guide for the newly dead, across a symbolic forty-nine days. Jung reads it backwards: Sidpa first, towards the Clear Light.",
+    standfirst: "The Tibetan Book of the Dead, in the order the book itself uses.",
+    lead: "The Tibetan Book of the Dead, read to the dying over 49 days. Next follows the book from the moment of death.",
+    orientJung: "Jung reads this backwards, from rebirth on day 49 toward the Clear Light. Next begins with his commentary.",
     menu: "Menu",
     infoWomb: "A lotus door. Each petal is one method, in order.",
     infoLights: "Six dull lights. The bright sector is the destination.",
@@ -316,7 +341,7 @@ const STRINGS = {
     beingPreta: "A hungry ghost, never filled.",
     beingHell: "A being of the hells, in heat or in cold.",
     infoClock: "The 49-day clock. Clarity falls as the days pass.",
-    moreEnter: "Next begins the tour at the Sidpa end.",
+    moreEnter: "Next follows the book from the primary Clear Light, the moment of death.",
     readMore: "Read more",
     about: "About this scene",
     prev: "Previous",
@@ -330,6 +355,15 @@ const STRINGS = {
     soundOn: "Sound on",
     jungShort: "Jung",
     bookShort: "Book",
+    sourceBook: "Bardo Thodol",
+    sourceJung: "Jung's commentary",
+    modelNotBook: "model, not in the book",
+    commentary: "Jung's commentary",
+    curvesMenu: "Show interval curves (model)",
+    curvesMenuHide: "Hide interval curves (model)",
+    jungNote: "Jung reads the text backwards, from rebirth on day 49 up to the Clear Light at death. He thought Western readers approach it from the Sidpa end, the psychology of the unconscious.",
+    jungDismiss: "Continue",
+    returnTour: "Return to the tour",
     durationNote: "The source says Sidpa suffering usually lasts 22 days, and that karma can make the length uncertain, up to the rest of the 49. These four scenes share days 22–49 of the model clock.",
     colourNote: "The hex colours are our own choice. The book names the lights only in words.",
     sceneWomb: "Closing and choosing the womb",
@@ -549,8 +583,8 @@ const STRINGS = {
     arriveSkipJung: "The frame is set aside. Jung’s order enters at the womb.",
     arriveSkipBook: "The frame is set aside. Book order enters at the primary Clear Light.",
     toOpening: "The opening",
-    curveShow: "Show curves",
-    curveHide: "Hide curves",
+    curveShow: "Show interval curves (model)",
+    curveHide: "Hide interval curves (model)",
     scrubGap: "Day {day} · Chonyid entrance. Days 18–21 are the gap before Sidpa.",
     blurbCoda: "Why the book is read aloud, and how this page computes.",
     infoAmitabha: "A transfer to Amitābha’s western realm. This birth is not taken.",
@@ -637,8 +671,8 @@ const STRINGS = {
     detailPurpose: "The root text is read beside the dying, and to the dead, so that hearing it steadies attention at each vision. This page keeps that use and does not add a rite.",
     tapCaveat2: "Jung’s caveat, stated again on its own.",
     detailCaveat2: "Jung, lines 127 and 214–222, separately from the root text. Reverse order is his help for Western readers. It is not what the Bardo Thodol itself intends.",
-    tapSources: "Sources, without a copyright note.",
-    detailSources: "The root text followed here is Evans-Wentz, cited by line. Jung is quoted only as commentary and always named. Colours come from the checked iconography table. No copyright line is shown.",
+    tapSources: "Where these words come from.",
+    detailSources: "The root text followed here is Evans-Wentz, cited by line. Jung is quoted only as commentary and always named. Colours come from the checked iconography table.",
     tapComputed: "How this page computes.",
     detailComputed: "The clock, the curves, the karma weight, the rebirth, the Clear Light step, and the womb path are Plain Ada integers. A thousandth is the unit. Follow lightens the weight by 160. Don’t follow makes it heavier by 160. The next life carries half the distance back toward the middle.",
     tapVerses: "The appendix verses are pointed to, not printed.",
@@ -1262,9 +1296,8 @@ const REALM_WASH = {
 function stageBox(width, height, opening, ending) {
   const bar = opening ? 72 : 128;
   const caption = opening ? 108 : ending ? 168 : 56;
-  const wide = window.innerWidth > 700;
-  const folded = document.body.classList.contains("curves-folded");
-  const top = opening ? 40 : wide ? 176 : folded ? 120 : 188;
+  const curvesOn = document.body.classList.contains("show-curves");
+  const top = opening ? 40 : curvesOn ? 248 : 156;
   const availW = Math.max(40, width - 16);
   const availH = Math.max(40, height - bar - caption - top);
   const aspect = 3 / 4;
@@ -2244,7 +2277,7 @@ function hitContains(region, x, y) {
   return ang >= start && ang <= region.a1;
 }
 
-const STAMP = "v0.12 b20261123-1818 5fb7d06";
+const STAMP = "v0.13 b20261124-0943 7e37477";
 const RAW_VERSION = "https://raw.githubusercontent.com/RobertBoettcherSF/bardo-visualization/main/version.txt";
 const REPO_API = "https://api.github.com/repos/RobertBoettcherSF/bardo-visualization/commits/main";
 const REALM_COLOUR = ["#C9C3B5", "#4A5E48", "#A89A55", "#3A4A62", "#7A4548", "#5C5550"];
@@ -2516,7 +2549,10 @@ const ID_OF = {
 };
 const NUM_OF = {};
 Object.keys(ID_OF).forEach(function (code) { NUM_OF[ID_OF[code]] = Number(code); });
-let scrubDay = 49;
+let scrubDay = 0;
+let tourReturn = "c20";
+let showCurves = false;
+const SETTINGS_KEY = "bardo-settings";
 let orderSnap = { 0: null, 1: null };
 let loopLog = [];
 let repeatKey = "";
@@ -2608,7 +2644,9 @@ function currentInfo(scene) {
 }
 
 function infoKey(scene) {
-  if (viewMode === "opening" || screenId === "opening") return "title";
+  if (viewMode === "opening" || screenId === "opening") {
+    return direction === 0 ? "orientJung" : "lead";
+  }
   if (screenId === "good") return "infoGood";
   if (screenId === "liberation") return "infoLiberation";
   if (screenId === "amitabha") return "infoAmitabha";
@@ -2642,7 +2680,14 @@ function updateChrome(out) {
   state.dataset.screen = screenId;
   state.dataset.id = codeOf(screenId);
   const sid = document.getElementById("sid");
-  if (sid) sid.textContent = codeOf(screenId);
+  if (sid) {
+    const source = (screenId === "f1" || screenId === "f2" || screenId === "f3")
+      ? t("sourceJung")
+      : t("sourceBook");
+    sid.textContent = screenId === "f2"
+      ? source + " · " + codeOf(screenId) + " · " + t("modelNotBook")
+      : source + " · " + codeOf(screenId);
+  }
   state.dataset.brightest = String(side[3]);
   state.dataset.outcome = String(side[1]);
   state.dataset.methods = String(side[2]);
@@ -2674,6 +2719,8 @@ function updateChrome(out) {
   document.body.classList.toggle("has-again", ending || screenId === "coda");
   document.body.classList.toggle("has-scrub", viewMode !== "opening");
   document.body.classList.toggle("has-choice", teaching);
+  document.body.classList.toggle("show-curves", showCurves);
+  document.body.classList.toggle("in-commentary", direction === 1 && (screenId === "f1" || screenId === "f2" || screenId === "f3"));
   const againButton = document.getElementById("again");
   if (againButton) againButton.textContent = screenId === "coda" ? t("toOpening") : t("again");
   const followButton = document.getElementById("follow");
@@ -2708,7 +2755,7 @@ function updateChrome(out) {
     ? t(detailKey)
     : (viewMode === "opening" ? t("lead") + " " + t("moreEnter") : t(names[1]));
   document.getElementById("more-body").textContent = moreBody;
-  document.getElementById("curves").style.display = detailKey ? "none" : "block";
+  document.getElementById("curves").style.display = detailKey || !showCurves ? "none" : "block";
   document.getElementById("outcome").textContent = viewMode === "opening" || ending ? "" : outcomeText(side[1]);
   const here = NUM_OF[screenId];
   document.getElementById("prev").disabled = viewMode === "opening";
@@ -2721,11 +2768,13 @@ function updateChrome(out) {
       ? t("scrubGap").replace("{day}", String(scrubDay))
       : t("dayLabel") + " " + scrubDay + " " + t("of") + " 49";
   }
-  const curveButton = document.getElementById("curve-toggle");
+  const curveButton = document.getElementById("curves-menu");
   if (curveButton) {
-    const folded = document.body.classList.contains("curves-folded");
-    curveButton.textContent = folded ? t("curveShow") : t("curveHide");
+    curveButton.textContent = showCurves ? t("curvesMenuHide") : t("curvesMenu");
+    curveButton.setAttribute("aria-pressed", String(showCurves));
   }
+  const commentaryButton = document.getElementById("commentary");
+  if (commentaryButton) commentaryButton.disabled = screenId === "f1";
   const wantWind = viewMode !== "opening";
   if (wantWind !== windWanted) {
     windWanted = wantWind;
@@ -2875,6 +2924,7 @@ function render() {
   ensureLoop();
   drawGraph(out[2]);
   drawLiveCurves();
+  drawDayMark();
 }
 
 function drawLiveCurves() {
@@ -2912,6 +2962,32 @@ function drawLiveCurves() {
   ctx.beginPath();
   ctx.moveTo(mark, 2);
   ctx.lineTo(mark, height - 2);
+  ctx.stroke();
+}
+
+function drawDayMark() {
+  const canvas = document.getElementById("day-mark");
+  if (!canvas || canvas.offsetParent === null) return;
+  const ctx = canvas.getContext("2d");
+  const dpr = Math.min(devicePixelRatio || 1, 1.5);
+  const width = canvas.clientWidth || 320;
+  const height = canvas.clientHeight || 14;
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+  ctx.strokeStyle = "#3c4038";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(8, height / 2);
+  ctx.lineTo(width - 8, height / 2);
+  ctx.stroke();
+  const mark = 8 + (scrubDay / 49) * (width - 16);
+  ctx.strokeStyle = "#f5e642";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(mark, 1);
+  ctx.lineTo(mark, height - 1);
   ctx.stroke();
 }
 
@@ -3010,7 +3086,9 @@ function goStart() {
 function goNext() {
   playClick();
   if (screenId === "opening") {
-    showScreen("f1", "next");
+    const code = ada.exports.bardo_tour_move(direction, 0, 1);
+    if (code < 0 || !ID_OF[code]) return;
+    showScreen(ID_OF[code], "next");
     return;
   }
   const code = ada.exports.bardo_tour_move(direction, NUM_OF[screenId], 1);
@@ -3387,6 +3465,9 @@ function actionsFor(screen) {
       if (!hit) return;
       list.push({ id: "hit-" + i, kind: "clear", arg: i });
     });
+    if (direction === 1 && (screen === "f1" || screen === "f2" || screen === "f3")) {
+      list.push({ id: "return", kind: "return" });
+    }
     return list;
   }
   if (SCREEN[screen] && SCREEN[screen].clear) {
@@ -3398,6 +3479,9 @@ function actionsFor(screen) {
       if (!hit) return;
       list.push({ id: "clear-" + i, kind: "clear", arg: i });
     });
+    if (direction === 1 && screen === "c20") {
+      list.push({ id: "commentary", kind: "commentary" });
+    }
     return list;
   }
   if (SCREEN[screen] && SCREEN[screen].peace) {
@@ -3478,7 +3562,7 @@ function advanceOrder() {
     seenLinks = {};
     methodsDone = 0;
     destination = -1;
-    showScreen("f1", "order");
+    showScreen(other === 0 ? "f1" : "c20", "order");
     return false;
   }
   return true;
@@ -3669,7 +3753,7 @@ function takePath(pick, via, actionId) {
 }
 
 function actionHelps(action) {
-  if (action.kind === "follow" || action.kind === "dont" || action.kind === "again" || action.kind === "path" || action.kind === "coda") {
+  if (action.kind === "follow" || action.kind === "dont" || action.kind === "again" || action.kind === "path" || action.kind === "coda" || action.kind === "commentary" || action.kind === "return") {
     const pending = actionsFor(screenId).some(function (other) {
       return other.kind !== "follow" && other.kind !== "dont" && other.kind !== "again"
         && other.kind !== "path" && other.kind !== "coda"
@@ -3761,6 +3845,18 @@ function autoApply(action) {
     takePath(action.choice, "auto", action.id);
     return;
   }
+  if (action.kind === "commentary") {
+    if (from !== "f1" && from !== "f2" && from !== "f3") tourReturn = from;
+    showScreen("f1", "commentary");
+    noteStep("commentary", from, "f1", { karmaBefore: karmaBefore });
+    return;
+  }
+  if (action.kind === "return") {
+    const back = tourReturn && tourReturn !== from ? tourReturn : "c20";
+    showScreen(back, "return");
+    noteStep("return", from, back, { karmaBefore: karmaBefore });
+    return;
+  }
   if (action.kind === "clear") {
     const item = SCREEN[from].hits[action.arg];
     lineKey = item.line;
@@ -3848,7 +3944,9 @@ function edgesFrom(id) {
   }
   actions.forEach(function (action) {
     if (action.kind === "coda") out.push("coda");
-    if (action.kind === "again") out.push(direction === 0 ? "womb" : "c20");
+    if (action.kind === "again") out.push(firstId());
+    if (action.kind === "commentary") out.push("f1");
+    if (action.kind === "return") out.push(tourReturn && tourReturn !== id ? tourReturn : "c20");
     if (action.kind === "path" && action.choice === 1) out.push("amitabha");
     if (action.kind === "path" && action.choice === 2) out.push("tushita");
   });
@@ -3894,7 +3992,7 @@ function performAutoAction() {
     || (screenId === "womb" && !seenLinks["womb>petals"]);
   if (!here.length) {
     const from = screenId;
-    showScreen("f1", "auto");
+    showScreen(direction === 0 ? "f1" : "c20", "auto");
     noteStep("start", from, screenId, { karmaBefore: karma });
     return;
   }
@@ -3928,7 +4026,7 @@ function startAuto() {
   lifeTotals = freshTotals();
   window.__autoLives = 0;
   applyDiary();
-  if (screenId === "opening" || screenId === "clock") showScreen("f1", "auto");
+  if (screenId === "opening" || screenId === "clock") showScreen(direction === 0 ? "f1" : "c20", "auto");
   seenScreens[screenId] = true;
   publishCoverage();
   if (!autoKeepGoing && coverageComplete()) {
@@ -4054,10 +4152,11 @@ async function boot() {
     glyphPtr: exports.bardo_glyph() >>> 0
   };
   const sequences = loadGlyphs();
-  direction = 0;
   destination = -1;
   karma = exports.bardo_karma_start();
+  loadSettings();
   milli = exports.bardo_start(direction);
+  scrubDay = direction === 0 ? 49 : 0;
   sampleCurves();
   applyStaticText();
   rain = startRain({
@@ -4071,7 +4170,7 @@ async function boot() {
     }
   });
   await loadIconography();
-  if (window.innerWidth <= 700) document.body.classList.add("curves-folded");
+  document.body.classList.toggle("show-curves", showCurves);
   auditMoves();
   loadDiary();
   remember("load");
@@ -4079,9 +4178,48 @@ async function boot() {
   window.__bardoReady = true;
 }
 
-function setDirection(next) {
+function loadSettings() {
+  direction = 1;
+  showCurves = false;
+  try {
+    const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "");
+    if (raw && (raw.direction === 0 || raw.direction === 1)) direction = raw.direction;
+    if (raw && raw.curves === true) showCurves = true;
+  } catch (err) { /* keep the book default */ }
+}
+
+function saveSettings() {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ direction: direction, curves: showCurves }));
+  } catch (err) { /* private mode */ }
+}
+
+function setDirection(next, viaUser) {
+  if (next !== 0 && next !== 1) return;
+  const changed = next !== direction;
   direction = next;
+  saveSettings();
+  if (viaUser && changed && next === 0) {
+    document.getElementById("jung-note").hidden = false;
+  }
+  if (next !== 0) document.getElementById("jung-note").hidden = true;
   render();
+}
+
+function openCommentary() {
+  if (screenId === "f1") return;
+  if (screenId !== "f2" && screenId !== "f3") {
+    tourReturn = screenId === "opening" ? "c20" : screenId;
+  }
+  const panel = document.getElementById("menu-panel");
+  panel.hidden = true;
+  document.getElementById("menu").setAttribute("aria-expanded", "false");
+  showScreen("f1", "commentary");
+}
+
+function returnToTour() {
+  const back = tourReturn && tourReturn !== screenId ? tourReturn : "c20";
+  showScreen(back, "return");
 }
 
 function pollVersion() {
@@ -4110,8 +4248,20 @@ function pollVersion() {
     .catch(function () { /* a failed poll is not a new build */ });
 }
 
-document.getElementById("dir-jung").addEventListener("click", function () { setDirection(0); playClick(); });
-document.getElementById("dir-book").addEventListener("click", function () { setDirection(1); playClick(); });
+document.getElementById("dir-jung").addEventListener("click", function () { setDirection(0, true); playClick(); });
+document.getElementById("dir-book").addEventListener("click", function () { setDirection(1, true); playClick(); });
+document.getElementById("commentary").addEventListener("click", function () { openCommentary(); playClick(); });
+document.getElementById("curves-menu").addEventListener("click", function () {
+  showCurves = !showCurves;
+  saveSettings();
+  playClick();
+  render();
+});
+document.getElementById("jung-dismiss").addEventListener("click", function () {
+  document.getElementById("jung-note").hidden = true;
+  playClick();
+});
+document.getElementById("tour-return").addEventListener("click", function () { returnToTour(); });
 document.getElementById("day").addEventListener("input", function (event) {
   const day = Number(event.target.value);
   const code = ada.exports.bardo_day_screen(day);
@@ -4119,7 +4269,7 @@ document.getElementById("day").addEventListener("input", function (event) {
   showScreen(ID_OF[code], "scrub", { day: day });
 });
 document.getElementById("go").addEventListener("click", function () {
-  if (viewMode === "opening") showScreen(direction === 0 ? "f1" : firstId(), "enter");
+  if (viewMode === "opening") goNext();
 });
 document.getElementById("dissolve-range").addEventListener("input", function (event) {
   applyDissolve(Number(event.target.value));
@@ -4144,10 +4294,6 @@ document.getElementById("again").addEventListener("click", function () {
   else beginAgain();
 });
 document.getElementById("coda").addEventListener("click", function () { showScreen("coda", "coda"); });
-document.getElementById("curve-toggle").addEventListener("click", function () {
-  document.body.classList.toggle("curves-folded");
-  render();
-});
 document.getElementById("auto").addEventListener("click", function () {
   if (autoRunning || autoPrompt) requestStop();
   else startAuto();

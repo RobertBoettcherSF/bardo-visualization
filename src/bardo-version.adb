@@ -1,6 +1,6 @@
 package body Bardo.Version is
 
-   Stamp : constant String := "v0.12 b20261123-1818 5fb7d06";
+   Stamp : constant String := "v0.13 b20261124-0943 7e37477";
 
    procedure Copy (Buffer : out String; Length : out Natural) is
    begin
